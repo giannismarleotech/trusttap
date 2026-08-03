@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustTap — NFC Google Review Kaarten, Plaquettes & Standaards</title>
+<meta name="description" content="TrustTap helpt bedrijven meer Google reviews te verzamelen met NFC tap-kaarten, plaquettes en standaards. Tap. Review. Grow.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#C9992F;
+  --gold-light:#E3BC5A;
+  --gold-deep:#A87E22;
+  --ink:#17150F;
+  --ink-soft:#3B3728;
+  --body:#5C5744;
+  --ivory:#FBF8F1;
+  --paper:#FFFFFF;
+  --line:#EAE3D2;
+  --shadow:0 20px 60px -20px rgba(23,21,15,.18);
+  --radius:18px;
+  --font-display:'Montserrat',sans-serif;
+  --font-body:'Public Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+[id]{scroll-margin-top:100px}
+body{font-family:var(--font-body);color:var(--body);background:var(--paper);line-height:1.65;font-size:16.5px;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--ink);line-height:1.15}
+.container{width:min(1160px,92%);margin:0 auto}
+.eyebrow{font-family:var(--font-display);font-size:.78rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);display:inline-flex;align-items:center;gap:.6rem}
+.eyebrow::before{content:"";width:26px;height:2px;background:var(--gold)}
+section{padding:96px 0}
+@media(max-width:720px){section{padding:64px 0}}
+
+/* ---------- ticker ---------- */
+.ticker{background:var(--ink);color:#E8DFC8;overflow:hidden;white-space:nowrap;font-family:var(--font-display);font-size:.74rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;padding:.55rem 0}
+.ticker-track{display:inline-flex;gap:3.5rem;animation:ticker 28s linear infinite;padding-left:100%}
+.ticker span{display:inline-flex;align-items:center;gap:.8rem}
+.ticker .dia{color:var(--gold);font-size:.9em}
+@keyframes ticker{to{transform:translateX(-100%)}}
+@media(prefers-reduced-motion:reduce){.ticker-track{animation:none;padding-left:1rem}}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:78px}
+.brand{display:flex;align-items:center;gap:.75rem}
+.brand svg{height:52px;width:auto}
+.brand-word{font-family:var(--font-display);font-weight:800;font-size:1.35rem;letter-spacing:-.01em;background:linear-gradient(180deg,#A9A9A9,#6F6F6F);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand-word-light{background:linear-gradient(180deg,#F2EEE2,#BDB5A0);-webkit-background-clip:text;background-clip:text}
+.brand-tag{display:block;font-size:.58rem;font-weight:700;letter-spacing:.24em;color:var(--gold);text-transform:uppercase;margin-top:-2px}
+.nav-links{display:flex;gap:2.1rem;font-family:var(--font-display);font-size:.86rem;font-weight:600;color:var(--ink-soft)}
+.nav-links a{position:relative;padding:.3rem 0}
+.nav-links a::after{content:"";position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--gold);transition:width .25s}
+.nav-links a:hover::after{width:100%}
+.btn{font-family:var(--font-display);font-weight:700;font-size:.88rem;letter-spacing:.04em;display:inline-flex;align-items:center;gap:.6rem;padding:.95rem 1.7rem;border-radius:999px;transition:transform .2s,box-shadow .2s,background .2s;cursor:pointer;border:none}
+.btn-gold{background:linear-gradient(135deg,var(--gold-light),var(--gold) 55%,var(--gold-deep));color:#fff;box-shadow:0 10px 26px -10px rgba(201,153,47,.65)}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 16px 32px -10px rgba(201,153,47,.7)}
+.btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-deep)}
+.nav .btn{padding:.7rem 1.4rem}
+.burger{display:none;background:none;border:none;cursor:pointer;padding:.4rem}
+.burger span{display:block;width:24px;height:2px;background:var(--ink);margin:5px 0;transition:.3s}
+.mobile-cta{display:none}
+@media(max-width:900px){
+  .nav-links,.nav>.btn-gold{display:none}
+  .burger{display:block}
+  .nav-links.open{display:flex;flex-direction:column;position:absolute;top:78px;left:0;right:0;background:#fff;padding:1.5rem 5%;gap:1.2rem;border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .nav-links.open .mobile-cta{display:inline-flex;justify-content:center;margin-top:.4rem}
+}
+
+/* ---------- hero ---------- */
+.hero{background:
+  radial-gradient(60% 80% at 85% 10%,rgba(201,153,47,.10),transparent 60%),
+  linear-gradient(180deg,var(--ivory),#fff 75%);
+  padding:88px 0 100px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:4rem;align-items:center}
+.hero h1{font-size:clamp(2.3rem,4.6vw,3.6rem);font-weight:800;letter-spacing:-.02em;margin:1.2rem 0 1.4rem}
+.hero h1 em{font-style:normal;color:var(--gold-deep);position:relative;white-space:nowrap}
+.hero h1 em::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.28em;background:linear-gradient(90deg,rgba(201,153,47,.28),rgba(201,153,47,.1));z-index:-1;border-radius:3px}
+.hero p.lead{font-size:1.13rem;max-width:33rem;margin-bottom:2.2rem}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2.4rem}
+.hero-proof{display:flex;align-items:center;gap:1rem;font-size:.92rem;color:var(--ink-soft)}
+.stars{color:var(--gold);letter-spacing:2px;font-size:1rem}
+.avatars{display:flex}
+.avatars i{width:34px;height:34px;border-radius:50%;border:2px solid #fff;background:linear-gradient(135deg,#D9C089,#A87E22);font-style:normal;color:#fff;font-family:var(--font-display);font-weight:700;font-size:.7rem;display:grid;place-items:center;margin-left:-9px}
+.avatars i:first-child{margin-left:0}
+
+/* hero card visual */
+.hero-visual{position:relative;display:grid;place-items:center;min-height:460px}
+.tap-card{position:relative;width:min(340px,80vw);aspect-ratio:1/1.45;background:linear-gradient(160deg,#201D14,#12100A 60%);border-radius:26px;box-shadow:0 40px 80px -30px rgba(23,21,15,.5),inset 0 1px 0 rgba(255,255,255,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;cursor:pointer;transition:transform .3s}
+.tap-card:hover{transform:translateY(-6px) rotate(-1deg)}
+.tap-card::before{content:"";position:absolute;inset:12px;border:1px solid rgba(201,153,47,.35);border-radius:18px;pointer-events:none}
+.tap-card .cta-line{font-family:var(--font-display);color:#EFE7D2;font-weight:600;font-size:.95rem;text-align:center;line-height:1.5;padding:0 2rem}
+.tap-card .cta-line b{color:var(--gold-light)}
+.tap-card .hint{font-size:.68rem;letter-spacing:.26em;text-transform:uppercase;color:rgba(232,223,200,.55);font-family:var(--font-display);font-weight:600}
+.diamond-wrap{position:relative;width:150px;height:150px;display:grid;place-items:center}
+.ripple{position:absolute;inset:0;border-radius:50%;border:2px solid var(--gold);opacity:0;animation:ripple 2.8s ease-out infinite}
+.ripple:nth-child(2){animation-delay:.9s}
+.ripple:nth-child(3){animation-delay:1.8s}
+@keyframes ripple{0%{transform:scale(.55);opacity:.7}100%{transform:scale(1.5);opacity:0}}
+@media(prefers-reduced-motion:reduce){.ripple{animation:none;display:none}}
+.review-pop{position:absolute;background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:.85rem 1.1rem;font-size:.8rem;color:var(--ink-soft);display:flex;gap:.7rem;align-items:center;border:1px solid var(--line);animation:float 5s ease-in-out infinite}
+.review-pop .g{width:30px;height:30px;border-radius:50%;background:conic-gradient(#4285F4 0 25%,#34A853 0 50%,#FBBC05 0 75%,#EA4335 0);display:grid;place-items:center;color:#fff;font-family:var(--font-display);font-weight:800;font-size:.85rem;flex:none}
+.review-pop .g span{background:#fff;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#4285F4}
+.review-pop b{display:block;color:var(--ink);font-family:var(--font-display);font-size:.78rem}
+.pop-1{top:6%;right:-4%;animation-delay:.5s}
+.pop-2{bottom:10%;left:-8%;animation-delay:1.6s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@media(prefers-reduced-motion:reduce){.review-pop{animation:none}}
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:3rem}
+  .hero-visual{min-height:420px}
+  .pop-2{left:0}.pop-1{right:0}
+}
+
+/* ---------- stats strip ---------- */
+.strip{background:var(--ink);color:#CBC2A8;padding:54px 0}
+.strip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;text-align:center}
+.strip b{display:block;font-family:var(--font-display);font-size:clamp(1.7rem,3vw,2.4rem);font-weight:800;color:#fff}
+.strip b i{font-style:normal;color:var(--gold-light)}
+.strip small{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;font-family:var(--font-display);font-weight:600}
+@media(max-width:760px){.strip-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- steps ---------- */
+.steps-head{max-width:44rem;margin-bottom:3.5rem}
+.steps-head h2,.sec-h2{font-size:clamp(1.9rem,3.4vw,2.7rem);font-weight:800;letter-spacing:-.02em;margin:1rem 0 1.1rem}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem}
+.step{background:var(--ivory);border:1px solid var(--line);border-radius:var(--radius);padding:2.2rem 1.9rem;position:relative;transition:transform .25s,box-shadow .25s}
+.step:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.step .word{font-family:var(--font-display);font-weight:800;font-size:1.35rem;color:var(--gold-deep);letter-spacing:.02em}
+.step h3{font-size:1.12rem;margin:.9rem 0 .6rem}
+.step p{font-size:.95rem}
+.step .glyph{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--gold-light),var(--gold-deep));display:grid;place-items:center;margin-bottom:1.3rem}
+.step .glyph svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:860px){.steps{grid-template-columns:1fr}}
+
+/* ---------- products ---------- */
+.products{background:linear-gradient(180deg,#fff,var(--ivory))}
+.prod-head{text-align:center;max-width:46rem;margin:0 auto 3.5rem}
+.prod-head .eyebrow{justify-content:center}
+.prod-head .eyebrow::before{display:none}
+.prod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.7rem;align-items:stretch}
+.prod{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:2rem 1.8rem 2.2rem;display:flex;flex-direction:column;position:relative;transition:transform .25s,box-shadow .25s}
+.prod:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+.prod.featured{border:2px solid var(--gold);box-shadow:0 24px 60px -24px rgba(201,153,47,.45)}
+.badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold-light),var(--gold-deep));color:#fff;font-family:var(--font-display);font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:.42rem 1.1rem;border-radius:999px;white-space:nowrap}
+.prod-visual{height:170px;border-radius:14px;background:linear-gradient(150deg,#221F15,#131109);display:grid;place-items:center;margin-bottom:1.6rem;position:relative;overflow:hidden}
+.prod-visual::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 60% at 50% 20%,rgba(201,153,47,.22),transparent 70%)}
+.prod-visual svg{height:88px;width:auto;z-index:1}
+.prod h3{font-size:1.25rem;margin-bottom:.4rem}
+.prod .sub{font-size:.9rem;margin-bottom:1.2rem}
+.price{font-family:var(--font-display);margin-bottom:1.3rem}
+.price .now{font-size:1.9rem;font-weight:800;color:var(--ink)}
+.price .was{font-size:1rem;color:#B4AC96;text-decoration:line-through;margin-left:.5rem}
+.price .per{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-deep);font-weight:700;margin-top:.2rem}
+.prod ul{list-style:none;margin-bottom:1.8rem;flex:1}
+.prod li{font-size:.92rem;padding:.42rem 0 .42rem 1.7rem;position:relative}
+.prod li::before{content:"✓";position:absolute;left:0;color:var(--gold-deep);font-weight:700}
+.prod .btn{justify-content:center}
+@media(max-width:900px){.prod-grid{grid-template-columns:1fr;max-width:440px;margin:0 auto}}
+
+/* ---------- why ---------- */
+.why-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:4.5rem;align-items:center}
+.why-figure{background:var(--ink);border-radius:24px;padding:3rem 2.5rem;color:#D8CFB6;position:relative;overflow:hidden}
+.why-figure::before{content:"";position:absolute;width:340px;height:340px;border:1px solid rgba(201,153,47,.25);transform:rotate(45deg);right:-140px;top:-140px;border-radius:36px}
+.why-figure::after{content:"";position:absolute;width:340px;height:340px;border:1px solid rgba(201,153,47,.14);transform:rotate(45deg);right:-110px;top:-110px;border-radius:36px}
+.rank{display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1rem 1.2rem;margin-bottom:.9rem;position:relative;z-index:1}
+.rank:last-child{margin-bottom:0}
+.rank .pos{font-family:var(--font-display);font-weight:800;font-size:1.1rem;width:2.2rem;color:#8F8A78}
+.rank.you{background:rgba(201,153,47,.14);border-color:rgba(201,153,47,.5)}
+.rank.you .pos{color:var(--gold-light)}
+.rank b{color:#fff;font-family:var(--font-display);font-size:.95rem;display:block}
+.rank small{font-size:.78rem}
+.rank .st{margin-left:auto;color:var(--gold-light);font-size:.85rem;white-space:nowrap}
+.why-copy h2{margin-bottom:1.2rem}
+.why-copy p{margin-bottom:1.1rem}
+.check-list{list-style:none;margin-top:1.6rem}
+.check-list li{padding:.5rem 0 .5rem 2.2rem;position:relative;color:var(--ink-soft);font-weight:500}
+.check-list li::before{content:"";position:absolute;left:0;top:.72rem;width:18px;height:18px;background:linear-gradient(135deg,var(--gold-light),var(--gold-deep));border-radius:50%}
+.check-list li::after{content:"✓";position:absolute;left:4.5px;top:.5rem;color:#fff;font-size:.72rem;font-weight:700}
+@media(max-width:900px){.why-grid{grid-template-columns:1fr;gap:3rem}}
+
+/* ---------- testimonials ---------- */
+.testis{background:var(--ivory)}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.7rem;margin-top:3rem}
+.testi{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:2.1rem 1.9rem;display:flex;flex-direction:column;gap:1.1rem}
+.testi p{font-size:.97rem;flex:1}
+.testi .who{display:flex;align-items:center;gap:.9rem}
+.testi .who i{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#D9C089,#A87E22);color:#fff;font-style:normal;display:grid;place-items:center;font-family:var(--font-display);font-weight:700}
+.testi .who b{display:block;color:var(--ink);font-family:var(--font-display);font-size:.92rem}
+.testi .who small{font-size:.8rem}
+@media(max-width:900px){.testi-grid{grid-template-columns:1fr}}
+
+/* ---------- faq ---------- */
+.faq-wrap{max-width:760px;margin:3rem auto 0}
+.faq{border-bottom:1px solid var(--line)}
+.faq button{width:100%;background:none;border:none;text-align:left;font-family:var(--font-display);font-weight:700;font-size:1.05rem;color:var(--ink);padding:1.4rem .2rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.faq button::after{content:"+";font-size:1.5rem;color:var(--gold);font-weight:400;transition:transform .25s;flex:none}
+.faq.open button::after{transform:rotate(45deg)}
+.faq .a{max-height:0;overflow:hidden;transition:max-height .35s ease;font-size:.96rem}
+.faq .a p{padding:0 .2rem 1.4rem}
+
+/* ---------- guarantee / cta ---------- */
+.guarantee{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6rem;margin-top:0}
+.g-item{text-align:center;padding:2.4rem 1.6rem;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
+.g-item .glyph{width:56px;height:56px;margin:0 auto 1.2rem;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center}
+.g-item .glyph svg{width:26px;height:26px;stroke:var(--gold-deep);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.g-item h3{font-size:1.05rem;margin-bottom:.5rem}
+.g-item p{font-size:.9rem}
+@media(max-width:860px){.guarantee{grid-template-columns:1fr}}
+
+.cta-band{background:
+  radial-gradient(50% 90% at 50% 0%,rgba(201,153,47,.18),transparent 65%),var(--ink);
+  color:#D8CFB6;text-align:center;padding:110px 0}
+.cta-band h2{color:#fff;font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.02em;margin:1.4rem auto 1.2rem;max-width:38rem}
+.cta-band p{max-width:34rem;margin:0 auto 2.4rem}
+.cta-band .eyebrow{justify-content:center}
+.cta-band .eyebrow::before,.cta-band .eyebrow::after{content:"";width:26px;height:2px;background:var(--gold)}
+
+/* ---------- footer ---------- */
+footer{background:#0F0D08;color:#9B937D;padding:70px 0 40px;font-size:.92rem}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:3rem;margin-bottom:3.5rem}
+.foot-grid h4{color:#fff;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:1.2rem}
+.foot-grid a{display:block;padding:.28rem 0;transition:color .2s}
+.foot-grid a:hover{color:var(--gold-light)}
+.brand-footer{margin-bottom:1.2rem}
+.brand-footer svg{height:58px;width:auto}
+.foot-brand p{font-size:.88rem;max-width:17rem}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:1.6rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.8rem}
+@media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.foot-grid{grid-template-columns:1fr}}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px;border-radius:6px}
+</style>
+</head>
+<body>
+
+<!-- ticker -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span><i class="dia">◆</i> Eénmalige betaling — onbeperkt gebruik</span>
+    <span><i class="dia">◆</i> Gratis verzending in de Benelux</span>
+    <span><i class="dia">◆</i> Werkt met álle smartphones (NFC + QR)</span>
+    <span><i class="dia">◆</i> Setup in minder dan 2 minuten</span>
+    <span><i class="dia">◆</i> Eénmalige betaling — onbeperkt gebruik</span>
+    <span><i class="dia">◆</i> Gratis verzending in de Benelux</span>
+    <span><i class="dia">◆</i> Werkt met álle smartphones (NFC + QR)</span>
+    <span><i class="dia">◆</i> Setup in minder dan 2 minuten</span>
+  </div>
+</div>
+
+<!-- header -->
+<header>
+  <div class="container nav">
+    <a class="brand" href="#top" aria-label="TrustTap home">
+      <!-- logo mark -->
+      <svg viewBox="0 0 120 130" role="img" aria-label="TrustTap logo">
+        <g fill="none" stroke="#C9992F" stroke-width="3" stroke-linecap="round">
+          <path d="M28 30 A46 46 0 0 1 92 30"/>
+          <path d="M38 20 A60 60 0 0 1 82 20" opacity=".75"/>
+          <path d="M48 40 A28 28 0 0 1 72 40" opacity=".9"/>
+          <rect x="24" y="46" width="72" height="72" transform="rotate(45 60 82)"/>
+          <rect x="31" y="53" width="58" height="58" transform="rotate(45 60 82)"/>
+          <rect x="38" y="60" width="44" height="44" transform="rotate(45 60 82)"/>
+        </g>
+        <text x="60" y="90" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="800" font-size="22" fill="#9B9B9B">TT</text>
+      </svg>
+      <span>
+        <span class="brand-word">TrustTap</span>
+        <span class="brand-tag">Tap. Review. Grow.</span>
+      </span>
+    </a>
+    <nav class="nav-links" id="navLinks" aria-label="Hoofdnavigatie">
+      <a href="#hoe">Hoe het werkt</a>
+      <a href="#producten">Producten</a>
+      <a href="#reviews">Klanten</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+      <a href="#producten" class="btn btn-gold mobile-cta">Bestel nu</a>
+    </nav>
+    <a href="#producten" class="btn btn-gold">Bestel nu</a>
+    <button class="burger" id="burger" aria-label="Menu openen" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- hero -->
+<section class="hero" id="top">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">NFC Review-kaarten &amp; plaquettes</span>
+      <h1>Verzamel tot <em>10× meer</em> Google reviews. Met één tap.</h1>
+      <p class="lead">Uw klanten tikken hun telefoon tegen uw TrustTap-kaart en staan direct op uw Google-reviewpagina. Geen zoeken, geen gedoe — méér reviews, hogere ranking, meer klanten.</p>
+      <div class="hero-ctas">
+        <a href="#producten" class="btn btn-gold">Bekijk producten →</a>
+        <a href="#hoe" class="btn btn-ghost">Hoe werkt het?</a>
+      </div>
+      <div class="hero-proof">
+        <div class="avatars"><i>SB</i><i>MK</i><i>LV</i><i>+</i></div>
+        <div>
+          <span class="stars">★★★★★</span><br>
+          <strong style="color:var(--ink)">4,9/5</strong> — vertrouwd door 2.300+ ondernemers
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="tap-card" id="tapCard" role="img" aria-label="TrustTap NFC-kaart met tik-animatie">
+        <div class="diamond-wrap">
+          <span class="ripple"></span><span class="ripple"></span><span class="ripple"></span>
+          <svg viewBox="0 0 120 130" width="120" aria-hidden="true">
+            <g fill="none" stroke="#C9992F" stroke-width="3" stroke-linecap="round">
+              <path d="M28 30 A46 46 0 0 1 92 30"/>
+              <path d="M38 20 A60 60 0 0 1 82 20" opacity=".75"/>
+              <path d="M48 40 A28 28 0 0 1 72 40" opacity=".9"/>
+              <rect x="24" y="46" width="72" height="72" transform="rotate(45 60 82)"/>
+              <rect x="31" y="53" width="58" height="58" transform="rotate(45 60 82)"/>
+              <rect x="38" y="60" width="44" height="44" transform="rotate(45 60 82)"/>
+            </g>
+            <text x="60" y="90" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="800" font-size="22" fill="#EFE7D2">TT</text>
+          </svg>
+        </div>
+        <div class="cta-line">Waardeert u ons?<br><b>Laat een Google review achter</b></div>
+        <div class="hint">Tap of scan</div>
+      </div>
+      <div class="review-pop pop-1">
+        <div class="g"><span>G</span></div>
+        <div><b>Nieuwe review ★★★★★</b>"Topservice, zeker een aanrader!"</div>
+      </div>
+      <div class="review-pop pop-2">
+        <div class="g"><span>G</span></div>
+        <div><b>Nieuwe review ★★★★★</b>"Snel, vriendelijk en professioneel."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- stats strip -->
+<div class="strip">
+  <div class="container strip-grid">
+    <div class="reveal"><b>2.300<i>+</i></b><small>Tevreden bedrijven</small></div>
+    <div class="reveal"><b>85.000<i>+</i></b><small>Reviews verzameld</small></div>
+    <div class="reveal"><b>10<i>×</i></b><small>Meer reviews gemiddeld</small></div>
+    <div class="reveal"><b>2 <i>min</i></b><small>Installatietijd</small></div>
+  </div>
+</div>
+
+<!-- how it works -->
+<section id="hoe">
+  <div class="container">
+    <div class="steps-head reveal">
+      <span class="eyebrow">Zo simpel is het</span>
+      <h2>Tap. Review. Grow.</h2>
+      <p>Drie woorden, drie stappen. TrustTap maakt van elk klantcontact een kans op een nieuwe vijfsterrenreview.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="glyph"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/><path d="M15 6c1.5 1.5 1.5 4.5 0 6M18 4c2.5 2.5 2.5 7.5 0 10"/></svg></div>
+        <div class="word">01 — Tap</div>
+        <h3>Klant tikt of scant</h3>
+        <p>Uw klant houdt zijn smartphone tegen de kaart (NFC) of scant de QR-code. Werkt op 100% van alle telefoons — geen app nodig.</p>
+      </div>
+      <div class="step reveal">
+        <div class="glyph"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 16.9 6.2 19.9l1.1-6.5L2.6 8.8l6.5-.9z"/></svg></div>
+        <div class="word">02 — Review</div>
+        <h3>Direct op uw reviewpagina</h3>
+        <p>De klant landt meteen op uw Google-reviewformulier. Geen zoeken, geen afhaken — een review schrijven duurt nog geen 30 seconden.</p>
+      </div>
+      <div class="step reveal">
+        <div class="glyph"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div>
+        <div class="word">03 — Grow</div>
+        <h3>Stijg in Google &amp; groei</h3>
+        <p>Meer recente reviews = hogere lokale ranking. U wordt vaker gevonden, vaker gekozen en verwelkomt meer nieuwe klanten.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- products -->
+<section class="products" id="producten">
+  <div class="container">
+    <div class="prod-head reveal">
+      <span class="eyebrow">◆ Onze producten ◆</span>
+      <h2 class="sec-h2">Kies uw TrustTap</h2>
+      <p>Eénmalige aankoop, levenslang gebruik. Geen abonnement, geen verborgen kosten. Elke TrustTap wordt geleverd met NFC-chip én QR-code.</p>
+    </div>
+    <div class="prod-grid">
+      <div class="prod reveal">
+        <div class="prod-visual">
+          <svg viewBox="0 0 120 130" aria-hidden="true"><g fill="none" stroke="#C9992F" stroke-width="3"><path d="M28 30 A46 46 0 0 1 92 30"/><path d="M48 40 A28 28 0 0 1 72 40"/><rect x="24" y="46" width="72" height="72" transform="rotate(45 60 82)"/><rect x="34" y="56" width="52" height="52" transform="rotate(45 60 82)"/></g><text x="60" y="90" text-anchor="middle" font-family="Montserrat" font-weight="800" font-size="22" fill="#EFE7D2">TT</text></svg>
+        </div>
+        <h3>Review Kaart</h3>
+        <p class="sub">Op zak bij elke medewerker of naast de kassa. Formaat bankkaart.</p>
+        <div class="price"><span class="now">€ 34</span><span class="was">€ 49</span><span class="per">Eénmalig — onbeperkt gebruik</span></div>
+        <ul>
+          <li>NFC-chip + QR-code</li>
+          <li>Slijtvast premium PVC</li>
+          <li>Onbeperkt aantal reviews</li>
+          <li>Gratis verzending</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost">In winkelmand</a>
+      </div>
+      <div class="prod featured reveal">
+        <span class="badge">Meest gekozen</span>
+        <div class="prod-visual">
+          <svg viewBox="0 0 120 130" aria-hidden="true"><g fill="none" stroke="#E3BC5A" stroke-width="3"><path d="M28 30 A46 46 0 0 1 92 30"/><path d="M38 20 A60 60 0 0 1 82 20" opacity=".7"/><path d="M48 40 A28 28 0 0 1 72 40"/><rect x="24" y="46" width="72" height="72" transform="rotate(45 60 82)"/><rect x="31" y="53" width="58" height="58" transform="rotate(45 60 82)"/><rect x="38" y="60" width="44" height="44" transform="rotate(45 60 82)"/></g><text x="60" y="90" text-anchor="middle" font-family="Montserrat" font-weight="800" font-size="22" fill="#fff">TT</text></svg>
+        </div>
+        <h3>Review Plaquette</h3>
+        <p class="sub">Elegant aan de muur, op de toonbank of bij de ingang. Zelfklevend met 3M-tape.</p>
+        <div class="price"><span class="now">€ 59</span><span class="was">€ 99</span><span class="per">Eénmalig — onbeperkt gebruik</span></div>
+        <ul>
+          <li>NFC-chip + QR-code</li>
+          <li>Luxe matte afwerking met goudaccent</li>
+          <li>Weerbestendig, binnen &amp; buiten</li>
+          <li>Levenslange garantie</li>
+        </ul>
+        <a href="#contact" class="btn btn-gold">In winkelmand</a>
+      </div>
+      <div class="prod reveal">
+        <div class="prod-visual">
+          <svg viewBox="0 0 120 130" aria-hidden="true"><g fill="none" stroke="#C9992F" stroke-width="3"><path d="M28 30 A46 46 0 0 1 92 30"/><path d="M48 40 A28 28 0 0 1 72 40"/><rect x="24" y="46" width="72" height="72" transform="rotate(45 60 82)"/><rect x="34" y="56" width="52" height="52" transform="rotate(45 60 82)"/></g><text x="60" y="90" text-anchor="middle" font-family="Montserrat" font-weight="800" font-size="22" fill="#EFE7D2">TT</text></svg>
+        </div>
+        <h3>Review Standaard</h3>
+        <p class="sub">Vrijstaande display voor op tafel, balie of receptie. Valt meteen op.</p>
+        <div class="price"><span class="now">€ 79</span><span class="was">€ 129</span><span class="per">Eénmalig — onbeperkt gebruik</span></div>
+        <ul>
+          <li>NFC-chip + QR-code</li>
+          <li>Stevige acryl standaard</li>
+          <li>Dubbelzijdig ontwerp</li>
+          <li>Levenslange garantie</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost">In winkelmand</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- why -->
+<section>
+  <div class="container why-grid">
+    <div class="why-figure reveal" aria-label="Voorbeeld van lokale Google-ranking">
+      <div class="rank"><span class="pos">2</span><div><b>Concurrent B</b><small>68 reviews</small></div><span class="st">★ 4,4</span></div>
+      <div class="rank you"><span class="pos">1</span><div><b>Uw zaak, met TrustTap</b><small>312 reviews · stijgt elke week</small></div><span class="st">★ 4,9</span></div>
+      <div class="rank"><span class="pos">3</span><div><b>Concurrent C</b><small>41 reviews</small></div><span class="st">★ 4,2</span></div>
+      <div class="rank"><span class="pos">4</span><div><b>Concurrent D</b><small>23 reviews</small></div><span class="st">★ 4,0</span></div>
+    </div>
+    <div class="why-copy reveal">
+      <span class="eyebrow">Waarom reviews?</span>
+      <h2 class="sec-h2">Reviews zijn de snelste weg naar plek #1 op Google</h2>
+      <p>Het aantal, de score en de regelmaat van uw Google reviews behoren tot de belangrijkste factoren voor uw lokale vindbaarheid. En 8 op de 10 mensen bekijken reviews vóór ze een zaak bezoeken.</p>
+      <p>U spreekt uw klanten élke dag — TrustTap zorgt dat u dat moment nooit meer onbenut laat.</p>
+      <ul class="check-list">
+        <li>Hogere positie in Google Maps &amp; lokale zoekresultaten</li>
+        <li>Meer vertrouwen bij nieuwe klanten</li>
+        <li>Verse reviews, week na week — volledig automatisch</li>
+        <li>Werkt ook voor TripAdvisor, Facebook &amp; Instagram</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- testimonials -->
+<section class="testis" id="reviews">
+  <div class="container">
+    <div class="reveal" style="text-align:center;max-width:44rem;margin:0 auto">
+      <span class="eyebrow" style="justify-content:center">Klantverhalen</span>
+      <h2 class="sec-h2">Ondernemers over TrustTap</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi reveal">
+        <span class="stars">★★★★★</span>
+        <p>"Van 28 naar 240 reviews in drie maanden. Klanten vinden het tikken zelfs leuk. Onze zaterdagen zitten nu standaard vol — beste investering in jaren."</p>
+        <div class="who"><i>SB</i><div><b>Sofie B.</b><small>Brasserie De Linde, Gent</small></div></div>
+      </div>
+      <div class="testi reveal">
+        <span class="stars">★★★★★</span>
+        <p>"De plaquette hangt naast onze kassa. Setup duurde letterlijk twee minuten. We krijgen nu 10 à 15 nieuwe reviews per week en staan bovenaan in Google Maps."</p>
+        <div class="who"><i>MK</i><div><b>Mehdi K.</b><small>Barbershop Royal, Brussel</small></div></div>
+      </div>
+      <div class="testi reveal">
+        <span class="stars">★★★★★</span>
+        <p>"Als loodgieter geef ik na elke klus de kaart even aan de klant. Mijn agenda zit zes weken vooruit vol en nieuwe klanten zeggen allemaal: 'gevonden via Google'."</p>
+        <div class="who"><i>LV</i><div><b>Lars V.</b><small>Sanitair Vermeulen, Antwerpen</small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- guarantees -->
+<section>
+  <div class="container">
+    <div class="guarantee">
+      <div class="g-item reveal">
+        <div class="glyph"><svg viewBox="0 0 24 24"><path d="M12 2l7 4v6c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3>30 dagen geld terug</h3>
+        <p>Niet tevreden? Stuur uw TrustTap terug en u krijgt het volledige bedrag terugbetaald.</p>
+      </div>
+      <div class="g-item reveal">
+        <div class="glyph"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>Levenslange garantie</h3>
+        <p>NFC-chip defect? U ontvangt kosteloos een nieuw exemplaar. Zonder discussie.</p>
+      </div>
+      <div class="g-item reveal">
+        <div class="glyph"><svg viewBox="0 0 24 24"><path d="M3 7h13v10H3zM16 10h4l1 3v4h-5z"/><circle cx="7" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg></div>
+        <h3>Gratis &amp; snelle levering</h3>
+        <p>Vandaag besteld, binnen 2 à 3 werkdagen geleverd in heel de Benelux.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- faq -->
+<section id="faq" style="padding-top:0">
+  <div class="container">
+    <div class="reveal" style="text-align:center;max-width:44rem;margin:0 auto">
+      <span class="eyebrow" style="justify-content:center">Veelgestelde vragen</span>
+      <h2 class="sec-h2">Alles wat u wilt weten</h2>
+    </div>
+    <div class="faq-wrap">
+      <div class="faq">
+        <button aria-expanded="false">Hoe koppel ik TrustTap aan mijn bedrijf?</button>
+        <div class="a"><p>Scan na levering de QR-code op uw product. U kiest uw bedrijfsprofiel en de koppeling met uw Google-reviewpagina staat meteen live. De hele setup duurt minder dan twee minuten — geen technische kennis nodig.</p></div>
+      </div>
+      <div class="faq">
+        <button aria-expanded="false">Heb ik een abonnement nodig?</button>
+        <div class="a"><p>Nee. TrustTap is een éénmalige aankoop met onbeperkt gebruik. Geen maandkosten, geen verborgen kosten, geen limiet op het aantal reviews.</p></div>
+      </div>
+      <div class="faq">
+        <button aria-expanded="false">Werkt het op alle smartphones?</button>
+        <div class="a"><p>Ja. Zo'n 90% van de smartphones ondersteunt NFC (gewoon tikken), en elke smartphone kan de QR-code scannen. Uw klanten hebben géén app nodig.</p></div>
+      </div>
+      <div class="faq">
+        <button aria-expanded="false">Moeten mijn klanten een Google-account hebben?</button>
+        <div class="a"><p>Om een Google review te schrijven is een Google-account nodig — maar de overgrote meerderheid van smartphonegebruikers heeft er al één via Gmail, YouTube of Google Maps.</p></div>
+      </div>
+      <div class="faq">
+        <button aria-expanded="false">Kan ik ook reviews verzamelen voor andere platformen?</button>
+        <div class="a"><p>Zeker. U kunt uw TrustTap op elk moment koppelen aan TripAdvisor, Facebook, Instagram of een eigen link — en later gratis wijzigen.</p></div>
+      </div>
+      <div class="faq">
+        <button aria-expanded="false">Hoe snel wordt mijn bestelling geleverd?</button>
+        <div class="a"><p>Wij verzenden elke werkdag. In België en Nederland ontvangt u uw bestelling doorgaans binnen 2 à 3 werkdagen, gratis verzonden.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- final CTA -->
+<section class="cta-band">
+  <div class="container reveal">
+    <span class="eyebrow">Klaar om te groeien?</span>
+    <h2>Elke klant die vertrekt zonder review, is een gemiste kans.</h2>
+    <p>Sluit u aan bij 2.300+ ondernemers die hun reputatie lieten groeien met TrustTap. Vandaag besteld, deze week al nieuwe reviews.</p>
+    <a href="#producten" class="btn btn-gold">Bestel uw TrustTap →</a>
+  </div>
+</section>
+
+<!-- footer -->
+<footer id="contact">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand brand-footer" href="#top" aria-label="TrustTap — terug naar boven">
+          <svg viewBox="0 0 120 130" role="img" aria-label="TrustTap logo">
+            <g fill="none" stroke="#C9992F" stroke-width="3" stroke-linecap="round">
+              <path d="M28 30 A46 46 0 0 1 92 30"/>
+              <path d="M38 20 A60 60 0 0 1 82 20" opacity=".75"/>
+              <path d="M48 40 A28 28 0 0 1 72 40" opacity=".9"/>
+              <rect x="24" y="46" width="72" height="72" transform="rotate(45 60 82)"/>
+              <rect x="31" y="53" width="58" height="58" transform="rotate(45 60 82)"/>
+              <rect x="38" y="60" width="44" height="44" transform="rotate(45 60 82)"/>
+            </g>
+            <text x="60" y="90" text-anchor="middle" font-family="Montserrat,sans-serif" font-weight="800" font-size="22" fill="#EFE7D2">TT</text>
+          </svg>
+          <span>
+            <span class="brand-word brand-word-light">TrustTap</span>
+            <span class="brand-tag">Tap. Review. Grow.</span>
+          </span>
+        </a>
+        <p>TrustTap helpt lokale ondernemers meer Google reviews te verzamelen met slimme NFC-kaarten, plaquettes en standaards.</p>
+      </div>
+      <div>
+        <h4>Menu</h4>
+        <a href="#hoe">Hoe het werkt</a>
+        <a href="#producten">Producten</a>
+        <a href="#reviews">Klantverhalen</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div>
+        <h4>Service</h4>
+        <a href="#">Bestelling volgen</a>
+        <a href="#">Bulkbestellingen</a>
+        <a href="#">Retourbeleid</a>
+        <a href="#">Privacybeleid</a>
+        <a href="#">Algemene voorwaarden</a>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <a href="mailto:info@trusttap.be">info@trusttap.be</a>
+        <a href="tel:+3200000000">+32 (0)0 000 00 00</a>
+        <p style="margin-top:.6rem;font-size:.85rem">Ma–vr: 9:00 – 17:00<br>Brussel, België</p>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 TrustTap. Alle rechten voorbehouden.</span>
+      <span style="color:var(--gold-light);font-family:var(--font-display);letter-spacing:.18em;text-transform:uppercase;font-size:.72rem">Tap. Review. Grow.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// mobile menu
+const burger=document.getElementById('burger'),links=document.getElementById('navLinks');
+burger.addEventListener('click',()=>{
+  const open=links.classList.toggle('open');
+  burger.setAttribute('aria-expanded',open);
+});
+links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>links.classList.remove('open')));
+
+// FAQ accordion (dynamic height, no clipping)
+document.querySelectorAll('.faq button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const item=btn.parentElement,answer=item.querySelector('.a'),wasOpen=item.classList.contains('open');
+    document.querySelectorAll('.faq.open').forEach(f=>{
+      f.classList.remove('open');
+      f.querySelector('button').setAttribute('aria-expanded','false');
+      f.querySelector('.a').style.maxHeight=null;
+    });
+    if(!wasOpen){
+      item.classList.add('open');
+      btn.setAttribute('aria-expanded','true');
+      answer.style.maxHeight=answer.scrollHeight+'px';
+    }
+  });
+});
+
+// scroll reveal
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}});
+},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// tap card interaction
+document.getElementById('tapCard').addEventListener('click',function(){
+  this.style.transform='scale(.97)';
+  setTimeout(()=>this.style.transform='',180);
+});
+</script>
+</body>
+</html>
