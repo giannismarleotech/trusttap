@@ -84,7 +84,7 @@ header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdro
 .hero-proof{display:flex;align-items:center;gap:1rem;font-size:.9rem;color:var(--ink)}
 .sterren{color:var(--goud-diep);letter-spacing:2px}
 /* 3D-plaquette (opgebouwd model) */
-.plaq3d-scene{perspective:1200px;display:grid;place-items:center}
+
 .plaq3d{--pw:min(370px,80vw);position:relative;width:var(--pw);aspect-ratio:1/1;transform-style:preserve-3d;transform:rotateX(10deg) rotateY(-16deg);transition:transform .18s ease-out;animation:plaqzweef 6s ease-in-out infinite;will-change:transform}
 .pl-dikte{position:absolute;inset:0;border-radius:9%;background:#C9C9C9}
 .pl-dikte.d1{transform:translateZ(-4px)}
@@ -102,18 +102,77 @@ header{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdro
 .pl-nfc{width:42%;height:auto}
 .pl-tap{color:#4A4A4A;font-weight:600;font-size:.56em;letter-spacing:.01em}
 .pl-logo{width:46%;height:auto;margin-top:.2em}
+
+/* ===== tap-demo animatie ===== */
+.demo-scene{position:relative;perspective:1200px;display:grid;place-items:center;width:100%;max-width:440px;margin:0 auto}
+.demo-caption{text-align:center;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--goud-tekst);margin-top:1.4rem}
+.demo-phone{position:absolute;right:-6%;bottom:-4%;width:32%;z-index:5;pointer-events:none;animation:phBeweeg 9s ease-in-out infinite}
+
+/* hand die de telefoon vasthoudt */
+.hand{position:absolute;background:linear-gradient(160deg,#F2CDB0,#E2B18C);border:1px solid rgba(146,92,54,.28);box-shadow:inset 0 -3px 6px rgba(146,92,54,.15)}
+.pols{right:-30%;bottom:-26%;width:86%;height:52%;border-radius:46% 54% 38% 52%;transform:rotate(-22deg);z-index:1}
+.vinger{border-radius:99px;height:8.5%;z-index:6}
+.v1{left:-17%;top:24%;width:30%;transform:rotate(-4deg)}
+.v2{left:-19%;top:35%;width:33%;transform:rotate(-2deg)}
+.v3{left:-18%;top:46%;width:32%;transform:rotate(1deg)}
+.v4{left:-15%;top:57%;width:28%;transform:rotate(4deg)}
+.duim{right:-12%;bottom:20%;width:46%;height:10%;border-radius:99px;transform:rotate(-55deg);z-index:6}
+.ph-body{position:relative;z-index:2}
+
+.ph-body{position:relative;width:100%;aspect-ratio:9/18.5;background:#101010;border-radius:16% / 8%;box-shadow:0 24px 50px -18px rgba(0,0,0,.55),inset 0 0 0 2px #2c2c2c;overflow:hidden}
+.ph-notch{position:absolute;top:2.5%;left:50%;transform:translateX(-50%);width:34%;height:2.6%;background:#000;border-radius:99px;z-index:3}
+.ph-scr{position:absolute;inset:2.5% 4%;border-radius:12% / 6%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6%;text-align:center}
+.scr-tap{background:#000;color:#D8B266;font-size:.55rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;animation:scrTapWissel 9s ease infinite}
+.scr-tap svg{width:36%;height:auto}
+.scr-google{background:#fff;opacity:0;animation:scrGoogleWissel 9s ease infinite;padding:8% 6%}
+.g-top{display:flex;align-items:center;gap:5%;font-size:.6rem;color:#3B3728}
+.g-bol{width:1.15rem;height:1.15rem;border-radius:50%;background:conic-gradient(#4285F4 0 25%,#34A853 0 50%,#FBBC05 0 75%,#EA4335 0);color:#fff;display:grid;place-items:center;font-weight:800;font-size:.62rem}
+.g-zaak{font-size:.58rem;font-weight:700;color:#141414;margin-top:4%}
+.g-sterren{display:flex;gap:4%;font-size:1.05rem;line-height:1}
+.g-sterren i{font-style:normal;color:#E4E0D4}
+.g-sterren i:nth-child(1){animation:ster1 9s ease infinite}
+.g-sterren i:nth-child(2){animation:ster2 9s ease infinite}
+.g-sterren i:nth-child(3){animation:ster3 9s ease infinite}
+.g-sterren i:nth-child(4){animation:ster4 9s ease infinite}
+.g-sterren i:nth-child(5){animation:ster5 9s ease infinite}
+.g-knop{font-size:.5rem;font-weight:700;letter-spacing:.06em;color:#fff;background:#1a73e8;border-radius:99px;padding:4% 10%;animation:knopPuls 9s ease infinite}
+.tapring{position:absolute;left:-18%;top:38%;width:46%;aspect-ratio:1;border:2px solid #D8B266;border-radius:50%;opacity:0;animation:tapRing 9s ease-out infinite}
+.tapring.r2{animation-delay:.35s}
+@keyframes phBeweeg{
+  0%{transform:translate(120%,55%) rotate(10deg);opacity:0}
+  9%{opacity:1}
+  17%{transform:translate(4%,6%) rotate(4deg)}
+  25%{transform:translate(4%,6%) rotate(4deg)}
+  36%{transform:translate(26%,-16%) rotate(0deg) scale(1.35)}
+  82%{transform:translate(26%,-16%) rotate(0deg) scale(1.35);opacity:1}
+  94%,100%{transform:translate(120%,55%) rotate(10deg);opacity:0}
+}
+@keyframes scrTapWissel{0%,28%{opacity:1}36%,100%{opacity:0}}
+@keyframes scrGoogleWissel{0%,28%{opacity:0}36%,88%{opacity:1}96%,100%{opacity:0}}
+@keyframes tapRing{0%,17%{opacity:0;transform:scale(.35)}21%{opacity:.85}31%{opacity:0;transform:scale(1.5)}100%{opacity:0}}
+@keyframes ster1{0%,42%{color:#E4E0D4}47%,86%{color:#F2B01E}93%,100%{color:#E4E0D4}}
+@keyframes ster2{0%,48%{color:#E4E0D4}53%,86%{color:#F2B01E}93%,100%{color:#E4E0D4}}
+@keyframes ster3{0%,54%{color:#E4E0D4}59%,86%{color:#F2B01E}93%,100%{color:#E4E0D4}}
+@keyframes ster4{0%,60%{color:#E4E0D4}65%,86%{color:#F2B01E}93%,100%{color:#E4E0D4}}
+@keyframes ster5{0%,66%{color:#E4E0D4}71%,86%{color:#F2B01E}93%,100%{color:#E4E0D4}}
+@keyframes knopPuls{0%,72%{transform:scale(1)}76%{transform:scale(.9)}80%,100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){
+  .demo-phone{animation:none;transform:translate(26%,-16%) scale(1.35);opacity:1}
+  .scr-tap{animation:none;opacity:0}
+  .scr-google{animation:none;opacity:1}
+  .g-sterren i{animation:none;color:#F2B01E}
+  .tapring{display:none}
+  .g-knop{animation:none}
+}
+@media(max-width:900px){
+  .demo-scene{max-width:380px}
+  .demo-phone{right:-2%}
+}
+
 .glans{position:absolute;inset:0;border-radius:9%;background:linear-gradient(115deg,rgba(255,255,255,0) 42%,rgba(255,255,255,.30) 50%,rgba(255,255,255,0) 58%);pointer-events:none;mix-blend-mode:screen;transform:translateZ(1px)}
 @keyframes plaqzweef{0%,100%{transform:rotateX(10deg) rotateY(-16deg) translateY(0)}50%{transform:rotateX(10deg) rotateY(-16deg) translateY(-12px)}}
 .plaq3d.actief{animation:none}
 @media(prefers-reduced-motion:reduce){.plaq3d{animation:none}}
-.reviewpop{position:absolute;background:#fff;border-radius:12px;box-shadow:var(--schaduw);padding:.8rem 1rem;font-size:.78rem;color:var(--body);display:flex;gap:.7rem;align-items:center;border:1px solid var(--lijn);animation:zweef 5s ease-in-out infinite}
-.reviewpop b{display:block;color:var(--ink);font-size:.76rem}
-.reviewpop .g{width:28px;height:28px;border-radius:50%;background:conic-gradient(#4285F4 0 25%,#34A853 0 50%,#FBBC05 0 75%,#EA4335 0);display:grid;place-items:center;flex:none}
-.reviewpop .g span{background:#fff;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;color:#4285F4;font-weight:800;font-size:.8rem}
-.pop1{top:4%;right:0;animation-delay:.6s}
-.pop2{bottom:8%;left:-2%;animation-delay:1.8s}
-@keyframes zweef{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@media(prefers-reduced-motion:reduce){.reviewpop{animation:none}}
 @media(max-width:900px){
   .hero-grid{grid-template-columns:1fr;gap:3rem;text-align:center}
   .hero p.lead{margin-left:auto;margin-right:auto}
@@ -234,6 +293,49 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
 .reveal.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
 :focus-visible{outline:3px solid var(--goud);outline-offset:3px}
+
+/* specs */
+.specs-lijst{columns:2;column-gap:3.5rem;max-width:850px;margin:0 auto}
+.specs-lijst li{break-inside:avoid}
+@media(max-width:700px){.specs-lijst{columns:1}}
+/* voor wie */
+.voorwie{background:var(--ivoor)}
+.wie-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem}
+.wie{background:#fff;border:1px solid var(--lijn);padding:1.8rem 1.6rem;position:relative}
+.wie::before{content:"";position:absolute;top:-5px;left:1.6rem;width:10px;height:10px;background:var(--goud);transform:rotate(45deg)}
+.wie h3{font-size:1rem;margin-bottom:.4rem}
+.wie p{font-size:.88rem}
+@media(max-width:900px){.wie-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:580px){.wie-grid{grid-template-columns:1fr}}
+
+/* bulk & custom banner */
+.bulk{margin-top:2.6rem;border:1.5px solid var(--goud);background:#fff;padding:2rem 2.2rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap}
+.bulk h3{font-size:1.15rem;margin-bottom:.4rem}
+.bulk p{font-size:.93rem;max-width:36rem}
+.bulk .btn{flex:none}
+/* algemene voorwaarden modal */
+.av-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100;display:grid;place-items:center;padding:4vh 4vw}
+.av-overlay[hidden]{display:none}
+.av-box{background:#fff;max-width:760px;width:100%;max-height:88vh;overflow-y:auto;padding:2.6rem 2.4rem;position:relative;border-top:4px solid var(--goud)}
+.av-box h2{font-size:1.4rem;margin-bottom:.3rem}
+.av-box .av-sub{font-size:.78rem;color:#9A927C;margin-bottom:1.4rem}
+.av-box h3{font-size:.95rem;margin:1.3rem 0 .4rem}
+.av-box p{font-size:.9rem}
+.av-sluit{position:absolute;top:.8rem;right:1rem;background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--ink);line-height:1}
+/* extra responsiviteit */
+@media(max-width:640px){
+  .bulk{flex-direction:column;align-items:flex-start;padding:1.6rem}
+  .taal button{padding:.4rem .55rem;font-size:.68rem}
+  .nav{height:70px}
+  .nav-links.open{top:70px}
+  [id]{scroll-margin-top:86px}
+  .hero{padding:56px 0 64px}
+  .cta{padding:72px 0}
+  .strip{padding:44px 0}
+  .av-box{padding:1.8rem 1.3rem}
+  .wa-zweef{width:50px;height:50px;right:14px;bottom:14px}
+  .foot-onder{flex-direction:column;align-items:flex-start;gap:.4rem}
+}
 .wa-zweef{position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;background:#25D366;display:grid;place-items:center;box-shadow:0 12px 30px -8px rgba(37,211,102,.6);z-index:80;transition:transform .2s}
 .wa-zweef:hover{transform:scale(1.08)}
 .wa-zweef svg{width:30px;height:30px}
@@ -251,7 +353,6 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
     <nav class="nav-links" id="navLinks">
       <a href="#hoe" data-i18n="nav_hoe"></a>
       <a href="#producten" data-i18n="nav_prod"></a>
-      <a href="#klanten" data-i18n="nav_klant"></a>
       <a href="#faq">FAQ</a>
       <a href="#contact" data-i18n="nav_contact"></a>
       <a href="#producten" class="btn btn-goud mobiel-cta" data-i18n="nav_cta"></a>
@@ -279,12 +380,12 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
         <a href="#hoe" class="btn btn-lijn" data-i18n="hero_cta2"></a>
       </div>
       <div class="hero-proof">
-        <span class="sterren">★★★★★</span>
         <span data-i18n-html="hero_proof"></span>
       </div>
     </div>
     <div class="hero-visual">
-      <div class="plaq3d-scene" id="plaqScene">
+      <div class="demo-scene" id="plaqScene">
+        
         <div class="plaq3d" id="plaq3d">
           <div class="pl-dikte d3"></div><div class="pl-dikte d2"></div><div class="pl-dikte d1"></div>
           <div class="pl-vlak">
@@ -320,17 +421,35 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
           </div>
           <span class="glans"></span>
         </div>
+        <div class="demo-phone" aria-hidden="true">
+          <span class="hand pols"></span>
+          <span class="hand vinger v1"></span><span class="hand vinger v2"></span><span class="hand vinger v3"></span><span class="hand vinger v4"></span>
+          <div class="ph-body">
+            <span class="ph-notch"></span>
+            <div class="ph-scr scr-tap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#D8B266" stroke-width="2" stroke-linecap="round"><path d="M8 9.5 a5 5 0 0 1 0 5"/><path d="M11 7 a9 9 0 0 1 0 10"/><path d="M14 4.5 a13 13 0 0 1 0 15"/></svg>
+              <span data-i18n="demo_tap"></span>
+            </div>
+            <div class="ph-scr scr-google">
+              <div class="g-top"><span class="g-bol">G</span><b data-i18n="demo_kop"></b></div>
+              <div class="g-zaak" data-i18n="demo_zaak"></div>
+              <div class="g-sterren"><i>★</i><i>★</i><i>★</i><i>★</i><i>★</i></div>
+              <div class="g-knop" data-i18n="demo_knop"></div>
+            </div>
+          </div>
+          <span class="hand duim"></span>
+          <span class="tapring r1"></span><span class="tapring r2"></span>
+        </div>
       </div>
-      <div class="reviewpop pop1"><div class="g"><span>G</span></div><div><b data-i18n="pop_titel"></b><span data-i18n="pop1_txt"></span></div></div>
-      <div class="reviewpop pop2"><div class="g"><span>G</span></div><div><b data-i18n="pop_titel"></b><span data-i18n="pop2_txt"></span></div></div>
+      <div class="demo-caption" data-i18n="demo_caption"></div>
     </div>
   </div>
 </section>
 
 <div class="strip">
   <div class="container strip-grid">
-    <div class="reveal"><b>2.300<i>+</i></b><small data-i18n="stat1"></small></div>
-    <div class="reveal"><b>85.000<i>+</i></b><small data-i18n="stat2"></small></div>
+    <div class="reveal"><b>1<i>×</i></b><small data-i18n="stat1"></small></div>
+    <div class="reveal"><b><i>∞</i></b><small data-i18n="stat2"></small></div>
     <div class="reveal"><b>10<i>×</i></b><small data-i18n="stat3"></small></div>
     <div class="reveal"><b>2 <i>min</i></b><small data-i18n="stat4"></small></div>
   </div>
@@ -375,6 +494,27 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
         <a href="https://wa.me/32492175552?text=Hallo%2C%20ik%20wil%20graag%20TrustTap%20bestellen." target="_blank" rel="noopener" class="btn btn-goud" data-i18n="p_btn"></a>
       </div>
     </div>
+    <div class="bulk reveal" id="offerte">
+      <div>
+        <h3 data-i18n="bulk_t"></h3>
+        <p data-i18n="bulk_p"></p>
+      </div>
+      <a class="btn btn-zwart" href="mailto:info@trusttap.be?subject=Offerte%20aanvraag%20TrustTap" data-i18n="bulk_btn"></a>
+    </div>
+  </div>
+</section>
+
+<section id="specs">
+  <div class="container">
+    <div class="stap-kop reveal">
+      <span class="eyebrow" data-i18n="sp_eyebrow"></span>
+      <h2 class="sec-h2" data-i18n="sp_h2"></h2>
+      <p data-i18n="sp_intro"></p>
+    </div>
+    <ul class="check-lijst specs-lijst reveal">
+      <li data-i18n="sp1"></li><li data-i18n="sp2"></li><li data-i18n="sp3"></li>
+      <li data-i18n="sp4"></li><li data-i18n="sp5"></li><li data-i18n="sp6"></li>
+    </ul>
   </div>
 </section>
 
@@ -398,21 +538,25 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
   </div>
 </section>
 
-<section class="klanten" id="klanten">
+<section class="voorwie">
   <div class="container">
     <div class="stap-kop reveal">
-      <span class="eyebrow" data-i18n="testi_eyebrow"></span>
-      <h2 class="sec-h2" data-i18n="testi_h2"></h2>
+      <span class="eyebrow" data-i18n="wie_eyebrow"></span>
+      <h2 class="sec-h2" data-i18n="wie_h2"></h2>
+      <p data-i18n="wie_intro"></p>
     </div>
-    <div class="testi-grid">
-      <div class="testi reveal"><span class="sterren">★★★★★</span><p data-i18n="t1_p"></p><div class="wie"><b>Sofie B.</b><small data-i18n="t1_wie"></small></div></div>
-      <div class="testi reveal"><span class="sterren">★★★★★</span><p data-i18n="t2_p"></p><div class="wie"><b>Mehdi K.</b><small data-i18n="t2_wie"></small></div></div>
-      <div class="testi reveal"><span class="sterren">★★★★★</span><p data-i18n="t3_p"></p><div class="wie"><b>Lars V.</b><small data-i18n="t3_wie"></small></div></div>
+    <div class="wie-grid">
+      <div class="wie reveal"><h3 data-i18n="w1_t"></h3><p data-i18n="w1_p"></p></div>
+      <div class="wie reveal"><h3 data-i18n="w2_t"></h3><p data-i18n="w2_p"></p></div>
+      <div class="wie reveal"><h3 data-i18n="w3_t"></h3><p data-i18n="w3_p"></p></div>
+      <div class="wie reveal"><h3 data-i18n="w4_t"></h3><p data-i18n="w4_p"></p></div>
+      <div class="wie reveal"><h3 data-i18n="w5_t"></h3><p data-i18n="w5_p"></p></div>
+      <div class="wie reveal"><h3 data-i18n="w6_t"></h3><p data-i18n="w6_p"></p></div>
     </div>
   </div>
 </section>
 
-<section>
+<section id="garanties">
   <div class="container garanties">
     <div class="gar reveal"><h3 data-i18n="g1_t"></h3><p data-i18n="g1_p"></p></div>
     <div class="gar reveal"><h3 data-i18n="g2_t"></h3><p data-i18n="g2_p"></p></div>
@@ -433,6 +577,8 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
       <div class="faq"><button aria-expanded="false" data-i18n="f4_v"></button><div class="a"><p data-i18n="f4_a"></p></div></div>
       <div class="faq"><button aria-expanded="false" data-i18n="f5_v"></button><div class="a"><p data-i18n="f5_a"></p></div></div>
       <div class="faq"><button aria-expanded="false" data-i18n="f6_v"></button><div class="a"><p data-i18n="f6_a"></p></div></div>
+      <div class="faq"><button aria-expanded="false" data-i18n="f7_v"></button><div class="a"><p data-i18n="f7_a"></p></div></div>
+      <div class="faq"><button aria-expanded="false" data-i18n="f8_v"></button><div class="a"><p data-i18n="f8_a"></p></div></div>
     </div>
   </div>
 </section>
@@ -457,15 +603,13 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
         <h4>Menu</h4>
         <a href="#hoe" data-i18n="nav_hoe"></a>
         <a href="#producten" data-i18n="nav_prod"></a>
-        <a href="#klanten" data-i18n="nav_klant"></a>
         <a href="#faq">FAQ</a>
       </div>
       <div>
         <h4 data-i18n="foot_service"></h4>
-        <a href="#" data-i18n="foot_s1"></a>
-        <a href="#" data-i18n="foot_s2"></a>
-        <a href="#" data-i18n="foot_s3"></a>
-        <a href="#" data-i18n="foot_s4"></a>
+        <a href="#offerte" data-i18n="foot_s2"></a>
+        <a href="#garanties" data-i18n="foot_s3"></a>
+        <a href="#" class="av-open" data-i18n="foot_s4"></a>
       </div>
       <div>
         <h4>Contact</h4>
@@ -473,6 +617,7 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
         <a href="tel:+32492175552">+32 492 17 55 52</a>
         <a href="https://wa.me/32492175552?text=Hallo%2C%20ik%20wil%20graag%20TrustTap%20bestellen." target="_blank" rel="noopener">WhatsApp</a>
         <a href="https://trusttap.be">trusttap.be</a>
+        <p style="margin-top:.8rem;font-size:.85rem;line-height:1.7">Meirebeekstraat 10b<br>9800 Deinze, België<br>BTW BE 1041.196.713</p>
       </div>
     </div>
     <div class="foot-onder">
@@ -486,6 +631,9 @@ footer{background:var(--zwart);color:#A29A85;padding:70px 0 40px;font-size:.9rem
 /* ---------------- vertalingen ---------------- */
 const T = {
 nl:{
+ sp_eyebrow:"Wat u krijgt", sp_h2:"Alles inbegrepen, direct klaar", sp_intro:"Elke TrustTap wordt volledig geconfigureerd geleverd — uitpakken, neerleggen en reviews verzamelen.", sp1:"Formaat bankkaart (85,6 × 54 mm) — past overal", sp2:"Slijtvast premium PVC met matte afwerking", sp3:"Premium NFC-chip — werkt met iPhone én Android", sp4:"Geen app en geen abonnement nodig", sp5:"Vooraf gekoppeld aan uw Google-reviewpagina", sp6:"Levenslange garantie — defect wordt gratis vervangen", wie_eyebrow:"Voor wie?", wie_h2:"Gemaakt voor elke lokale onderneming", wie_intro:"Overal waar u klanten persoonlijk ontmoet, werkt TrustTap.", w1_t:"Horeca & restaurants", w1_p:"Bij de rekening of aan de kassa — het perfecte moment voor een review.", w2_t:"Kappers & barbershops", w2_p:"Klant tevreden in de stoel? Eén tap bij het afrekenen volstaat.", w3_t:"Winkels & boetieks", w3_p:"Naast de kassa of op de toonbank, altijd binnen handbereik.", w4_t:"Vakmensen aan huis", w4_p:"Loodgieters, elektriciens, schilders: geef de kaart na elke klus.", w5_t:"Garages & carwash", w5_p:"Bij het ophalen van de wagen — tevreden klanten delen het graag.", w6_t:"Praktijken & salons", w6_p:"Van schoonheidssalon tot kinesist: bouw vertrouwen op met verse reviews.", f7_v:"Wat als mijn TrustTap kapot gaat?", f7_a:"Dan ontvangt u gratis een nieuw exemplaar — levenslang. Stuur een mail naar info@trusttap.be met een korte omschrijving en wij regelen de rest.", f8_v:"Kan ik bestellen voor meerdere vestigingen of medewerkers?", f8_a:"Zeker. Grotere aantallen en custom made ontwerpen in uw eigen huisstijl zijn mogelijk op aanvraag. Vraag vrijblijvend een offerte aan via info@trusttap.be of WhatsApp.",
+ demo_tap:"Houd tegen de kaart", demo_kop:"Google Review", demo_zaak:"Uw zaak", demo_knop:"Review plaatsen", demo_caption:"Tap → review geplaatst. Zo simpel is het.",
+ bulk_t:"Grote aantallen of een eigen ontwerp?", bulk_p:"Grotere volumes en custom made ontwerpen in uw eigen huisstijl (logo, kleuren, tekst) zijn mogelijk op aanvraag. Vraag vrijblijvend een offerte aan.", bulk_btn:"Vraag offerte aan",
  pk1_t:"1 TrustTap Kaart", pk1_s:"Eén NFC review-kaart, klaar voor gebruik. Ideaal om te starten.", pk2_t:"2 TrustTap Kaarten", pk2_s:"Voordeelpakket: één naast de kassa, één op zak.", pk2_badge:"Voordeelpakket",
  nav_hoe:"Hoe het werkt", nav_prod:"Producten", nav_klant:"Klanten", nav_contact:"Contact", nav_cta:"Bestel nu",
  tick1:"Eénmalige betaling — onbeperkt gebruik", tick2:"Gratis verzending in de Benelux", tick3:"Werkt met alle moderne smartphones", tick4:"Setup in minder dan 2 minuten",
@@ -493,9 +641,8 @@ nl:{
  hero_h1:"Verzamel tot <em>10× meer</em> Google reviews. Met één tap.",
  hero_lead:"Uw klanten tikken hun telefoon tegen uw TrustTap-kaart en staan direct op uw Google-reviewpagina. Geen zoeken, geen gedoe — méér reviews, hogere ranking, meer klanten.",
  hero_cta1:"Bekijk producten →", hero_cta2:"Hoe werkt het?",
- hero_proof:"<strong>4,9/5</strong> — vertrouwd door 2.300+ ondernemers",
- pop_titel:"Nieuwe review ★★★★★", pop1_txt:"\"Topservice, zeker een aanrader!\"", pop2_txt:"\"Snel, vriendelijk en professioneel.\"",
- stat1:"Tevreden bedrijven", stat2:"Reviews verzameld", stat3:"Meer reviews gemiddeld", stat4:"Installatietijd",
+ hero_proof:"<strong>Levenslange garantie</strong> · Gratis verzending · Geen abonnement",
+ stat1:"Eénmalige betaling", stat2:"Onbeperkte taps", stat3:"Meer reviews gemiddeld", stat4:"Installatietijd",
  stap_eyebrow:"Zo simpel is het", stap_intro:"Drie woorden, drie stappen. TrustTap maakt van elk klantcontact een kans op een nieuwe vijfsterrenreview.",
  stap1_t:"Klant tikt of scant", stap1_p:"Uw klant houdt zijn smartphone even tegen de kaart. Werkt op alle moderne telefoons — geen app nodig.",
  stap2_t:"Direct op uw reviewpagina", stap2_p:"De klant landt meteen op uw Google-reviewformulier. Geen zoeken, geen afhaken — een review duurt nog geen 30 seconden.",
@@ -508,7 +655,7 @@ nl:{
  p_f1:"Premium NFC-chip", p1_f2:"Slijtvast premium PVC", p_f3:"Onbeperkt aantal reviews", p_f4:"Gratis verzending",
  p2_f2:"Luxe matte afwerking met goudaccent", p2_f3:"Weerbestendig, binnen & buiten", p_f5:"Levenslange garantie",
  p3_f2:"Stevige acryl standaard", p3_f3:"Dubbelzijdig ontwerp",
- rank_b:"Concurrent B", rank_b_s:"68 reviews", rank_jij:"Uw zaak, met TrustTap", rank_jij_s:"312 reviews · stijgt elke week", rank_c:"Concurrent C", rank_c_s:"41 reviews", rank_d:"Concurrent D", rank_d_s:"23 reviews",
+ rank_b:"Concurrent B", rank_b_s:"68 reviews", rank_jij:"Uw zaak, met TrustTap", rank_jij_s:"stijgt elke week", rank_c:"Concurrent C", rank_c_s:"41 reviews", rank_d:"Concurrent D", rank_d_s:"23 reviews",
  why_eyebrow:"Waarom reviews?", why_h2:"Reviews zijn de snelste weg naar plek #1 op Google",
  why_p1:"Het aantal, de score en de regelmaat van uw Google reviews behoren tot de belangrijkste factoren voor uw lokale vindbaarheid. En 8 op de 10 mensen bekijken reviews vóór ze een zaak bezoeken.",
  why_p2:"U spreekt uw klanten élke dag — TrustTap zorgt dat u dat moment nooit meer onbenut laat.",
@@ -517,8 +664,8 @@ nl:{
  t1_p:"\"Van 28 naar 240 reviews in drie maanden. Klanten vinden het tikken zelfs leuk. Onze zaterdagen zitten nu standaard vol.\"", t1_wie:"Brasserie De Linde, Gent",
  t2_p:"\"De plaquette hangt naast onze kassa. Setup duurde twee minuten. We krijgen nu 10 à 15 nieuwe reviews per week.\"", t2_wie:"Barbershop Royal, Brussel",
  t3_p:"\"Na elke klus geef ik de kaart even aan de klant. Mijn agenda zit zes weken vooruit vol dankzij Google.\"", t3_wie:"Sanitair Vermeulen, Antwerpen",
- g1_t:"30 dagen geld terug", g1_p:"Niet tevreden? Stuur uw TrustTap terug en u krijgt het volledige bedrag terugbetaald.",
- g2_t:"Levenslange garantie", g2_p:"NFC-chip defect? U ontvangt kosteloos een nieuw exemplaar. Zonder discussie.",
+ g1_t:"Levenslange garantie", g1_p:"Gaat uw TrustTap ooit kapot of werkt de NFC-chip niet meer? U ontvangt kosteloos een nieuw exemplaar. Altijd.",
+ g2_t:"Custom & bulk op aanvraag", g2_p:"Eigen ontwerp in uw huisstijl of grote aantallen voor meerdere vestigingen? Vraag vrijblijvend een offerte aan.",
  g3_t:"Gratis & snelle levering", g3_p:"Vandaag besteld, binnen 2 à 3 werkdagen geleverd in heel de Benelux.",
  faq_eyebrow:"Veelgestelde vragen", faq_h2:"Alles wat u wilt weten",
  f1_v:"Hoe koppel ik TrustTap aan mijn bedrijf?", f1_a:"Tik na levering uw eigen telefoon tegen de kaart en volg de eenvoudige setup. U kiest uw bedrijfsprofiel en de koppeling met uw Google-reviewpagina staat meteen live — in minder dan twee minuten.",
@@ -528,13 +675,16 @@ nl:{
  f5_v:"Kan ik ook reviews verzamelen voor andere platformen?", f5_a:"Zeker. U kunt uw TrustTap op elk moment koppelen aan TripAdvisor, Facebook, Instagram of een eigen link — en later gratis wijzigen.",
  f6_v:"Hoe snel wordt mijn bestelling geleverd?", f6_a:"Wij verzenden elke werkdag. In België en Nederland ontvangt u uw bestelling doorgaans binnen 2 à 3 werkdagen, gratis verzonden.",
  cta_h2:"Elke klant die vertrekt zonder review, is een gemiste kans.",
- cta_p:"Sluit u aan bij 2.300+ ondernemers die hun reputatie lieten groeien met TrustTap. Vandaag besteld, deze week al nieuwe reviews.",
+ cta_p:"Laat uw reputatie groeien met TrustTap. Vandaag besteld, deze week al nieuwe reviews.",
  cta_btn:"Bestel uw TrustTap →",
  foot_over:"TrustTap helpt lokale ondernemers meer Google reviews te verzamelen met slimme NFC-kaarten, plaquettes en standaards.",
- foot_service:"Service", foot_s1:"Bestelling volgen", foot_s2:"Bulkbestellingen", foot_s3:"Retourbeleid", foot_s4:"Algemene voorwaarden",
- foot_copy:"© 2026 TrustTap. Alle rechten voorbehouden."
+ foot_service:"Service", foot_s2:"Bulk & custom", foot_s3:"Garantie", foot_s4:"Algemene voorwaarden",
+ foot_copy:"© 2026 TrustTap — BTW BE 1041.196.713 — Alle rechten voorbehouden."
 },
 en:{
+ sp_eyebrow:"What you get", sp_h2:"Everything included, ready to go", sp_intro:"Every TrustTap ships fully configured — unpack, place it, and start collecting reviews.", sp1:"Credit card size (85.6 × 54 mm) — fits anywhere", sp2:"Durable premium PVC with matte finish", sp3:"Premium NFC chip — works with iPhone and Android", sp4:"No app and no subscription needed", sp5:"Pre-linked to your Google review page", sp6:"Lifetime warranty — defects replaced for free", wie_eyebrow:"Who is it for?", wie_h2:"Built for every local business", wie_intro:"Wherever you meet customers in person, TrustTap works.", w1_t:"Hospitality & restaurants", w1_p:"With the bill or at the register — the perfect review moment.", w2_t:"Hairdressers & barbershops", w2_p:"Happy client in the chair? One tap at checkout is all it takes.", w3_t:"Shops & boutiques", w3_p:"Next to the register or on the counter, always within reach.", w4_t:"Tradespeople on location", w4_p:"Plumbers, electricians, painters: hand over the card after every job.", w5_t:"Garages & car washes", w5_p:"At pickup time — satisfied customers love to share.", w6_t:"Practices & salons", w6_p:"From beauty salons to physiotherapists: build trust with fresh reviews.", f7_v:"What if my TrustTap breaks?", f7_a:"You’ll receive a free replacement — for life. Email info@trusttap.be with a short description and we’ll take care of the rest.", f8_v:"Can I order for multiple locations or employees?", f8_a:"Absolutely. Larger quantities and custom made designs in your own brand style are available on request. Ask for a free quote via info@trusttap.be or WhatsApp.",
+ demo_tap:"Hold against the card", demo_kop:"Google Review", demo_zaak:"Your business", demo_knop:"Post review", demo_caption:"Tap → review posted. It’s that simple.",
+ bulk_t:"Large quantities or a custom design?", bulk_p:"Larger volumes and custom made designs in your own brand style (logo, colours, text) are available on request. Request a free, no-obligation quote.", bulk_btn:"Request a quote",
  pk1_t:"1 TrustTap Card", pk1_s:"One NFC review card, ready to use. Perfect to get started.", pk2_t:"2 TrustTap Cards", pk2_s:"Value pack: one by the register, one in your pocket.", pk2_badge:"Value pack",
  nav_hoe:"How it works", nav_prod:"Products", nav_klant:"Customers", nav_contact:"Contact", nav_cta:"Order now",
  tick1:"One-time payment — unlimited use", tick2:"Free shipping across the Benelux", tick3:"Works with all modern smartphones", tick4:"Set up in under 2 minutes",
@@ -542,9 +692,8 @@ en:{
  hero_h1:"Collect up to <em>10× more</em> Google reviews. With a single tap.",
  hero_lead:"Your customers tap their phone on your TrustTap card and land straight on your Google review page. No searching, no hassle — more reviews, higher ranking, more customers.",
  hero_cta1:"View products →", hero_cta2:"How does it work?",
- hero_proof:"<strong>4.9/5</strong> — trusted by 2,300+ business owners",
- pop_titel:"New review ★★★★★", pop1_txt:"\"Great service, highly recommended!\"", pop2_txt:"\"Fast, friendly and professional.\"",
- stat1:"Happy businesses", stat2:"Reviews collected", stat3:"More reviews on average", stat4:"Setup time",
+ hero_proof:"<strong>Lifetime warranty</strong> · Free shipping · No subscription",
+ stat1:"One-time payment", stat2:"Unlimited taps", stat3:"More reviews on average", stat4:"Setup time",
  stap_eyebrow:"It's that simple", stap_intro:"Three words, three steps. TrustTap turns every customer interaction into a chance for a new five-star review.",
  stap1_t:"Customer taps or scans", stap1_p:"Your customer briefly holds their smartphone against the card. Works on all modern phones — no app needed.",
  stap2_t:"Straight to your review page", stap2_p:"The customer lands directly on your Google review form. No searching, no drop-off — a review takes less than 30 seconds.",
@@ -557,7 +706,7 @@ en:{
  p_f1:"Premium NFC chip", p1_f2:"Durable premium PVC", p_f3:"Unlimited reviews", p_f4:"Free shipping",
  p2_f2:"Luxury matte finish with gold accent", p2_f3:"Weatherproof, indoor & outdoor", p_f5:"Lifetime warranty",
  p3_f2:"Sturdy acrylic stand", p3_f3:"Double-sided design",
- rank_b:"Competitor B", rank_b_s:"68 reviews", rank_jij:"Your business, with TrustTap", rank_jij_s:"312 reviews · growing every week", rank_c:"Competitor C", rank_c_s:"41 reviews", rank_d:"Competitor D", rank_d_s:"23 reviews",
+ rank_b:"Competitor B", rank_b_s:"68 reviews", rank_jij:"Your business, with TrustTap", rank_jij_s:"growing every week", rank_c:"Competitor C", rank_c_s:"41 reviews", rank_d:"Competitor D", rank_d_s:"23 reviews",
  why_eyebrow:"Why reviews?", why_h2:"Reviews are the fastest route to #1 on Google",
  why_p1:"The number, score and frequency of your Google reviews are among the most important factors for your local visibility. And 8 out of 10 people check reviews before visiting a business.",
  why_p2:"You talk to your customers every single day — TrustTap makes sure you never waste that moment again.",
@@ -566,8 +715,8 @@ en:{
  t1_p:"\"From 28 to 240 reviews in three months. Customers actually enjoy tapping. Our Saturdays are now fully booked.\"", t1_wie:"Brasserie De Linde, Ghent",
  t2_p:"\"The plaque hangs next to our register. Setup took two minutes. We now get 10 to 15 new reviews every week.\"", t2_wie:"Barbershop Royal, Brussels",
  t3_p:"\"After every job I hand the card to the customer. My schedule is booked six weeks ahead thanks to Google.\"", t3_wie:"Sanitair Vermeulen, Antwerp",
- g1_t:"30-day money back", g1_p:"Not satisfied? Return your TrustTap and get a full refund.",
- g2_t:"Lifetime warranty", g2_p:"Defective NFC chip? You'll receive a free replacement. No questions asked.",
+ g1_t:"Lifetime warranty", g1_p:"Does your TrustTap ever break or stop working? You'll receive a free replacement. Always.",
+ g2_t:"Custom & bulk on request", g2_p:"Your own design in your brand style, or large volumes for multiple locations? Request a free quote.",
  g3_t:"Free & fast delivery", g3_p:"Order today, delivered within 2–3 working days across the Benelux.",
  faq_eyebrow:"Frequently asked questions", faq_h2:"Everything you want to know",
  f1_v:"How do I link TrustTap to my business?", f1_a:"After delivery, tap your own phone on the card and follow the simple setup. Choose your business profile and the link to your Google review page goes live instantly — in under two minutes.",
@@ -577,13 +726,16 @@ en:{
  f5_v:"Can I collect reviews for other platforms too?", f5_a:"Absolutely. You can link your TrustTap to TripAdvisor, Facebook, Instagram or a custom link at any time — and change it later for free.",
  f6_v:"How fast is delivery?", f6_a:"We ship every working day. In Belgium and the Netherlands you'll typically receive your order within 2–3 working days, shipped free.",
  cta_h2:"Every customer who leaves without a review is a missed opportunity.",
- cta_p:"Join 2,300+ business owners growing their reputation with TrustTap. Order today, see new reviews this week.",
+ cta_p:"Grow your reputation with TrustTap. Order today, see new reviews this week.",
  cta_btn:"Order your TrustTap →",
  foot_over:"TrustTap helps local businesses collect more Google reviews with smart NFC cards, plaques and stands.",
- foot_service:"Service", foot_s1:"Track your order", foot_s2:"Bulk orders", foot_s3:"Return policy", foot_s4:"Terms & conditions",
- foot_copy:"© 2026 TrustTap. All rights reserved."
+ foot_service:"Service", foot_s2:"Bulk & custom", foot_s3:"Warranty", foot_s4:"Terms & conditions",
+ foot_copy:"© 2026 TrustTap — VAT BE 1041.196.713 — All rights reserved."
 },
 fr:{
+ sp_eyebrow:"Ce que vous recevez", sp_h2:"Tout compris, prêt à l’emploi", sp_intro:"Chaque TrustTap est livré entièrement configuré — déballez, posez et récoltez des avis.", sp1:"Format carte bancaire (85,6 × 54 mm) — se place partout", sp2:"PVC premium résistant avec finition mate", sp3:"Puce NFC premium — compatible iPhone et Android", sp4:"Sans application et sans abonnement", sp5:"Pré-lié à votre page d’avis Google", sp6:"Garantie à vie — remplacement gratuit en cas de défaut", wie_eyebrow:"Pour qui ?", wie_h2:"Conçu pour chaque commerce local", wie_intro:"Partout où vous rencontrez vos clients en personne, TrustTap fonctionne.", w1_t:"Horeca & restaurants", w1_p:"Avec l’addition ou à la caisse — le moment idéal pour un avis.", w2_t:"Coiffeurs & barbiers", w2_p:"Client satisfait ? Un seul tap au moment de payer suffit.", w3_t:"Boutiques & commerces", w3_p:"Près de la caisse ou sur le comptoir, toujours à portée de main.", w4_t:"Artisans à domicile", w4_p:"Plombiers, électriciens, peintres : remettez la carte après chaque chantier.", w5_t:"Garages & car-wash", w5_p:"À la remise du véhicule — les clients satisfaits adorent partager.", w6_t:"Cabinets & salons", w6_p:"Du salon de beauté au kiné : gagnez la confiance avec des avis récents.", f7_v:"Que se passe-t-il si mon TrustTap se casse ?", f7_a:"Vous recevez gratuitement un nouvel exemplaire — à vie. Envoyez un e-mail à info@trusttap.be avec une brève description et nous nous occupons du reste.", f8_v:"Puis-je commander pour plusieurs établissements ou employés ?", f8_a:"Bien sûr. De plus grandes quantités et des designs sur mesure dans votre propre style sont possibles sur demande. Demandez un devis gratuit via info@trusttap.be ou WhatsApp.",
+ demo_tap:"Approchez de la carte", demo_kop:"Avis Google", demo_zaak:"Votre commerce", demo_knop:"Publier l’avis", demo_caption:"Tap → avis publié. C’est aussi simple que ça.",
+ bulk_t:"Grandes quantités ou design personnalisé ?", bulk_p:"Des volumes plus importants et des designs sur mesure dans votre propre style (logo, couleurs, texte) sont possibles sur demande. Demandez un devis gratuit et sans engagement.", bulk_btn:"Demander un devis",
  pk1_t:"1 Carte TrustTap", pk1_s:"Une carte d’avis NFC, prête à l’emploi. Idéale pour commencer.", pk2_t:"2 Cartes TrustTap", pk2_s:"Pack avantage : une près de la caisse, une en poche.", pk2_badge:"Pack avantage",
  nav_hoe:"Comment ça marche", nav_prod:"Produits", nav_klant:"Clients", nav_contact:"Contact", nav_cta:"Commander",
  tick1:"Paiement unique — utilisation illimitée", tick2:"Livraison gratuite dans le Benelux", tick3:"Compatible avec tous les smartphones modernes", tick4:"Installation en moins de 2 minutes",
@@ -591,9 +743,8 @@ fr:{
  hero_h1:"Récoltez jusqu'à <em>10× plus</em> d'avis Google. En un seul tap.",
  hero_lead:"Vos clients posent leur téléphone sur votre carte TrustTap et arrivent directement sur votre page d'avis Google. Pas de recherche, pas de tracas — plus d'avis, un meilleur classement, plus de clients.",
  hero_cta1:"Voir les produits →", hero_cta2:"Comment ça marche ?",
- hero_proof:"<strong>4,9/5</strong> — la confiance de plus de 2 300 entrepreneurs",
- pop_titel:"Nouvel avis ★★★★★", pop1_txt:"« Service au top, je recommande ! »", pop2_txt:"« Rapide, aimable et professionnel. »",
- stat1:"Entreprises satisfaites", stat2:"Avis récoltés", stat3:"Plus d'avis en moyenne", stat4:"Temps d'installation",
+ hero_proof:"<strong>Garantie à vie</strong> · Livraison gratuite · Sans abonnement",
+ stat1:"Paiement unique", stat2:"Taps illimités", stat3:"Plus d'avis en moyenne", stat4:"Temps d'installation",
  stap_eyebrow:"C'est aussi simple que ça", stap_intro:"Trois mots, trois étapes. TrustTap transforme chaque contact client en une occasion de recevoir un nouvel avis cinq étoiles.",
  stap1_t:"Le client tape ou scanne", stap1_p:"Votre client approche brièvement son smartphone de la carte. Fonctionne sur tous les téléphones modernes — sans application.",
  stap2_t:"Directement sur votre page d'avis", stap2_p:"Le client arrive immédiatement sur votre formulaire d'avis Google. Pas de recherche, pas d'abandon — un avis prend moins de 30 secondes.",
@@ -606,7 +757,7 @@ fr:{
  p_f1:"Puce NFC premium", p1_f2:"PVC premium résistant", p_f3:"Nombre d'avis illimité", p_f4:"Livraison gratuite",
  p2_f2:"Finition mate de luxe avec accent doré", p2_f3:"Résistant aux intempéries, intérieur & extérieur", p_f5:"Garantie à vie",
  p3_f2:"Support en acrylique robuste", p3_f3:"Design recto-verso",
- rank_b:"Concurrent B", rank_b_s:"68 avis", rank_jij:"Votre commerce, avec TrustTap", rank_jij_s:"312 avis · en hausse chaque semaine", rank_c:"Concurrent C", rank_c_s:"41 avis", rank_d:"Concurrent D", rank_d_s:"23 avis",
+ rank_b:"Concurrent B", rank_b_s:"68 avis", rank_jij:"Votre commerce, avec TrustTap", rank_jij_s:"en hausse chaque semaine", rank_c:"Concurrent C", rank_c_s:"41 avis", rank_d:"Concurrent D", rank_d_s:"23 avis",
  why_eyebrow:"Pourquoi les avis ?", why_h2:"Les avis sont le chemin le plus rapide vers la 1re place sur Google",
  why_p1:"Le nombre, la note et la régularité de vos avis Google comptent parmi les facteurs les plus importants pour votre visibilité locale. Et 8 personnes sur 10 consultent les avis avant de visiter un commerce.",
  why_p2:"Vous parlez à vos clients chaque jour — TrustTap veille à ce que vous ne laissiez plus jamais passer ce moment.",
@@ -615,8 +766,8 @@ fr:{
  t1_p:"« De 28 à 240 avis en trois mois. Les clients adorent taper leur téléphone. Nos samedis affichent complet. »", t1_wie:"Brasserie De Linde, Gand",
  t2_p:"« La plaque est à côté de notre caisse. Installation en deux minutes. Nous recevons 10 à 15 nouveaux avis par semaine. »", t2_wie:"Barbershop Royal, Bruxelles",
  t3_p:"« Après chaque chantier, je tends la carte au client. Mon agenda est rempli six semaines à l'avance grâce à Google. »", t3_wie:"Sanitair Vermeulen, Anvers",
- g1_t:"30 jours satisfait ou remboursé", g1_p:"Pas satisfait ? Renvoyez votre TrustTap et soyez intégralement remboursé.",
- g2_t:"Garantie à vie", g2_p:"Puce NFC défectueuse ? Vous recevez gratuitement un nouvel exemplaire. Sans discussion.",
+ g1_t:"Garantie à vie", g1_p:"Votre TrustTap ne fonctionne plus ? Vous recevez gratuitement un nouvel exemplaire. Toujours.",
+ g2_t:"Sur mesure & gros volumes", g2_p:"Votre propre design ou de grandes quantités pour plusieurs établissements ? Demandez un devis gratuit.",
  g3_t:"Livraison gratuite & rapide", g3_p:"Commandé aujourd'hui, livré en 2 à 3 jours ouvrables dans tout le Benelux.",
  faq_eyebrow:"Questions fréquentes", faq_h2:"Tout ce que vous voulez savoir",
  f1_v:"Comment lier TrustTap à mon entreprise ?", f1_a:"Après la livraison, approchez votre propre téléphone de la carte et suivez la configuration simple. Choisissez votre profil d'entreprise et le lien vers votre page d'avis Google est actif immédiatement — en moins de deux minutes.",
@@ -626,11 +777,11 @@ fr:{
  f5_v:"Puis-je aussi récolter des avis pour d'autres plateformes ?", f5_a:"Bien sûr. Vous pouvez lier votre TrustTap à TripAdvisor, Facebook, Instagram ou un lien personnalisé à tout moment — et le modifier gratuitement plus tard.",
  f6_v:"Quel est le délai de livraison ?", f6_a:"Nous expédions chaque jour ouvrable. En Belgique et aux Pays-Bas, vous recevez généralement votre commande sous 2 à 3 jours ouvrables, livraison gratuite.",
  cta_h2:"Chaque client qui part sans laisser d'avis est une occasion manquée.",
- cta_p:"Rejoignez plus de 2 300 entrepreneurs qui font grandir leur réputation avec TrustTap. Commandez aujourd'hui, recevez de nouveaux avis cette semaine.",
+ cta_p:"Faites grandir votre réputation avec TrustTap. Commandez aujourd’hui, recevez de nouveaux avis cette semaine.",
  cta_btn:"Commandez votre TrustTap →",
  foot_over:"TrustTap aide les commerçants locaux à récolter plus d'avis Google grâce à des cartes, plaques et supports NFC intelligents.",
- foot_service:"Service", foot_s1:"Suivre ma commande", foot_s2:"Commandes en gros", foot_s3:"Politique de retour", foot_s4:"Conditions générales",
- foot_copy:"© 2026 TrustTap. Tous droits réservés."
+ foot_service:"Service", foot_s2:"Gros volumes & sur mesure", foot_s3:"Garantie", foot_s4:"Conditions générales",
+ foot_copy:"© 2026 TrustTap — TVA BE 1041.196.713 — Tous droits réservés."
 }
 };
 
@@ -671,6 +822,12 @@ document.querySelectorAll('.faq button').forEach(btn=>{
   });
 });
 
+/* algemene voorwaarden modal */
+const avOverlay=document.getElementById('avOverlay');
+document.querySelectorAll('.av-open').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();avOverlay.hidden=false;document.body.style.overflow='hidden';}));
+document.getElementById('avSluit').addEventListener('click',()=>{avOverlay.hidden=true;document.body.style.overflow='';});
+avOverlay.addEventListener('click',e=>{if(e.target===avOverlay){avOverlay.hidden=true;document.body.style.overflow='';}});
+
 /* scroll-reveal */
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
@@ -694,5 +851,40 @@ if(scene&&plaq&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
 <a class="wa-zweef" href="https://wa.me/32492175552?text=Hallo%2C%20ik%20wil%20graag%20TrustTap%20bestellen." target="_blank" rel="noopener" aria-label="WhatsApp">
   <svg viewBox="0 0 32 32" fill="#fff" aria-hidden="true"><path d="M16 3C9.4 3 4 8.3 4 14.9c0 2.5.8 4.8 2.1 6.7L4.5 27l5.6-1.6c1.8 1 3.8 1.6 5.9 1.6 6.6 0 12-5.3 12-11.9S22.6 3 16 3zm0 21.6c-1.9 0-3.7-.6-5.2-1.5l-.4-.2-3.3 1 1-3.2-.3-.4c-1.2-1.7-1.9-3.7-1.9-5.7C6 9.4 10.5 5 16 5s10 4.4 10 9.9-4.5 9.7-10 9.7zm5.5-7.3c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.3 3.5 5.6 4.9.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg>
 </a>
+
+<div class="av-overlay" id="avOverlay" hidden>
+  <div class="av-box" role="dialog" aria-modal="true" aria-label="Algemene voorwaarden">
+    <button class="av-sluit" id="avSluit" aria-label="Sluiten">×</button>
+    <h2>Algemene voorwaarden — TrustTap</h2>
+    <p class="av-sub">Laatst bijgewerkt: augustus 2026 · De Nederlandstalige versie is bindend.</p>
+
+    <h3>1. Identiteit van de onderneming</h3>
+    <p>TrustTap · Meirebeekstraat 10b, 9800 Deinze, België · BTW BE 1041.196.713 · info@trusttap.be · +32 492 17 55 52 · trusttap.be</p>
+
+    <h3>2. Toepasselijkheid</h3>
+    <p>Deze voorwaarden zijn van toepassing op alle bestellingen van en overeenkomsten met TrustTap. Door een bestelling te plaatsen aanvaardt de klant deze voorwaarden.</p>
+
+    <h3>3. Producten en activatie</h3>
+    <p>TrustTap levert NFC-producten (kaarten, plaquettes en standaards) die per klant individueel worden geconfigureerd en gekoppeld aan het bedrijfsprofiel of de bestemmingslink van de klant. Elk product wordt dus op maat van de klant gepersonaliseerd vóór of bij levering.</p>
+
+    <h3>4. Prijzen en betaling</h3>
+    <p>Alle vermelde prijzen zijn in euro en inclusief btw, tenzij anders aangegeven. De bestelling wordt verwerkt na ontvangst van de betaling. Voor grote volumes en custom made ontwerpen wordt een offerte op maat opgesteld.</p>
+
+    <h3>5. Levering</h3>
+    <p>TrustTap verzendt naar de Benelux. De opgegeven levertermijnen zijn indicatief. Vertraging in de levering geeft geen recht op schadevergoeding of ontbinding van de overeenkomst.</p>
+
+    <h3>6. Herroepingsrecht en terugbetaling</h3>
+    <p>Omdat elk TrustTap-product volgens de specificaties van de klant wordt geconfigureerd en gepersonaliseerd (koppeling aan het bedrijfsprofiel, en bij custom ontwerpen ook de vormgeving), zijn deze producten uitgesloten van het herroepingsrecht overeenkomstig artikel VI.73, 3° van het Wetboek van Economisch Recht. Aankopen worden bijgevolg niet terugbetaald en niet teruggenomen, behoudens de hierna vermelde garantie en de dwingende wettelijke garantieverplichtingen.</p>
+
+    <h3>7. Levenslange werkingsgarantie</h3>
+    <p>TrustTap garandeert de werking van de NFC-chip voor de volledige levensduur van het product. Werkt de chip niet of niet meer, of vertoont het product een defect dat niet te wijten is aan opzettelijke beschadiging of abnormaal gebruik, dan ontvangt de klant kosteloos een nieuw exemplaar. De klant meldt het defect via info@trusttap.be met een korte omschrijving en, indien mogelijk, een foto. Deze garantie doet geen afbreuk aan de wettelijke garantie van twee jaar voor consumenten.</p>
+
+    <h3>8. Gebruik en aansprakelijkheid</h3>
+    <p>De werking van reviewplatformen (zoals Google) valt buiten de controle van TrustTap. TrustTap garandeert geen minimumaantal reviews, rankings of commerciële resultaten. De klant is zelf verantwoordelijk voor het naleven van de richtlijnen van de gebruikte platformen. De aansprakelijkheid van TrustTap is in elk geval beperkt tot het aankoopbedrag van het betrokken product.</p>
+
+    <h3>9. Klachten, toepasselijk recht en bevoegde rechtbank</h3>
+    <p>Klachten kunnen worden gericht aan info@trusttap.be en worden zo snel mogelijk behandeld. Op alle overeenkomsten is het Belgisch recht van toepassing. Geschillen behoren tot de bevoegdheid van de rechtbanken van het gerechtelijk arrondissement Oost-Vlaanderen, onverminderd dwingende bevoegdheidsregels ten gunste van consumenten.</p>
+  </div>
+</div>
 </body>
 </html>
