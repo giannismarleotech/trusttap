@@ -249,7 +249,7 @@ const VERKOPERS = ["Giannis","Jano"];
 
 /* ---------- opslag ---------- */
 const SLEUTEL = "trusttap_crm_v1";
-function leegeData(){return {klanten:[],verkopen:[],leads:[],bezoeken:[],dagstatus:[],tickets:[],taken:[],stock:{magazijn:0,Giannis:0,Jano:0},stocklog:[],teller:1}}
+function leegeData(){return {klanten:[],verkopen:[],leads:[],bezoeken:[],dagstatus:[],tickets:[],taken:[],webshopWacht:[],stock:{magazijn:0,Giannis:0,Jano:0},stocklog:[],teller:1}}
 
 /* ---------- startgegevens (verkopen & leads Giannis, 13-15/08/2026) ---------- */
 function seedData(){
@@ -605,6 +605,12 @@ function renderVerkopen(){
     <select id="fltFactuur"><option value="">Alles</option><option value="open" ${vkFilter.factuur==="open"?"selected":""}>Factuur nog te maken</option></select>
     <span class="subtxt"><b>${lijst.length}</b> verkopen · <b>${totTags}</b> tags · <b>${eur(totOmzet)}</b></span>
   </div>
+  ${DB.webshopWacht.length?`<div class="kaart" style="margin-bottom:1rem;border-left:4px solid var(--rood)">
+    <h3>🛒 Webshopbestellingen — wachten op SumUp-betaling (${DB.webshopWacht.length})</h3>
+    <p class="subtxt" style="margin:.3rem 0 .6rem">Nog géén verkoop: pas na "Betaald ✓" wordt de verkoop geregistreerd (bij Jano) en de stock afgeboekt.</p>
+    ${DB.webshopWacht.map(w=>`<div class="li-item">${nlDatum(w.datum)} — <b>${esc(w.g.zaak||w.g.naam||"?")}</b> · ${esc(w.g.productnaam||"")} · <b>${eur(w.g.totaal)}</b> · ${esc(w.g.email||"")} ${esc(w.g.tel||"")}
+      <span style="float:right;display:flex;gap:.3rem"><button class="knop klein" data-wsbetaald="${w.id}">Betaald ✓ → verkoop</button><button class="knop klein roodk" data-wsweg="${w.id}">✕</button></span></div>`).join("")}
+  </div>`:""}
   <div class="kaart">${lijst.length?`
     <table><tr><th>Datum</th><th>Klant</th><th>Aantal</th><th>Totaal</th><th>Betaling</th><th>Factuur</th><th>Verkoper</th><th>Commissie</th><th></th></tr>
     ${lijst.map(v=>`<tr>
@@ -619,6 +625,9 @@ function renderVerkopen(){
     </table>`:'<div class="leeg">Nog geen verkopen geregistreerd.</div>'}
   </div>`;
   document.getElementById("nieuweVerkoop").addEventListener("click",()=>verkoopFormulier({}));
+  inhoud.querySelectorAll("[data-wsbetaald]").forEach(b=>b.addEventListener("click",()=>webshopBetaald(Number(b.dataset.wsbetaald))));
+  inhoud.querySelectorAll("[data-wsweg]").forEach(b=>b.addEventListener("click",()=>{
+    if(confirm("Bestelling annuleren (niet betaald)?")){DB.webshopWacht=DB.webshopWacht.filter(x=>x.id!=b.dataset.wsweg);bewaar();renderVerkopen();}}));
   document.getElementById("csvKnop").addEventListener("click",()=>{
     const kop=["datum","klant","aantal","prijs_per_stuk","totaal","betaalwijze","factuur_gemaakt","verkoper","notitie"];
     const rijen=lijst.map(v=>[v.datum,klantNaam(v.klantId),v.aantal,String(v.prijs).replace(".",","),String(v.totaal).replace(".",","),v.betaalwijze,v.factuur?"ja":"nee",v.verkoper,v.notitie||""]);
@@ -873,8 +882,8 @@ function meldingenLijst(){
   DB.tickets.filter(t=>t.status==="open"&&t.prioriteit!=="hoog").length&&m.push({i:"🎫",t:DB.tickets.filter(t=>t.status==="open"&&t.prioriteit!=="hoog").length+" open ticket(s)",view:"tickets"});
   const oj=DB.verkopen.filter(v=>v.verkoper==="Giannis"&&!v.janoBetaald);
   if(oj.length)m.push({i:"💶",t:eur(oj.reduce((s2,v)=>s2+v.totaal/2,0))+" commissie uit "+oj.length+" Giannis-verkopen nog aan Jano over te maken",view:"verkopen"});
-  const wb=DB.verkopen.filter(v=>v.webshop&&!v.betaald).length;
-  if(wb)m.push({i:"\ud83d\uded2",t:wb+" webshopbestelling"+(wb>1?"en":"")+" wachten op SumUp-betaalbevestiging",view:"verkopen"});
+  const wb=DB.webshopWacht.length;
+  if(wb)m.push({i:"\ud83d\uded2",t:wb+" webshopbestelling"+(wb>1?"en":"")+" wachten op SumUp-betaling (nog niet in de cijfers)",view:"verkopen"});
   const opTeVolgen=DB.bezoeken.filter(b=>b.resultaat==="opvolgen"&&!b.opgevolgd).length;
   if(opTeVolgen)m.push({i:"\ud83d\udeb6",t:opTeVolgen+" bezoek"+(opTeVolgen>1?"en":"")+" met interesse nog op te volgen (maak er een lead van)",view:"agenda"});
   DB.taken.filter(t=>!t.klaar&&t.deadline&&t.deadline<vandaag).forEach(t=>m.push({i:"⏰",t:"Taak verlopen: "+t.titel+" ("+nlDatum(t.deadline)+")",view:"taken"}));
@@ -1200,26 +1209,32 @@ function renderInstellingen(){
 }
 
 async function webshopImport(){
-  const {data,error}=await SB.from("webshop_orders").select("id,gegevens").eq("verwerkt",false);
+  const {data,error}=await SB.from("webshop_orders").select("id,gegevens,created_at").eq("verwerkt",false);
   if(error||!data||!data.length)return;
   for(const o of data){
-    const g=o.gegevens||{};
-    let k=DB.klanten.find(x=>g.email&&x.email&&x.email.toLowerCase()===String(g.email).toLowerCase());
-    if(!k){k={id:nieuwId(),naam:g.zaak||g.naam||"Webshopklant",email:g.email||"",tel:g.tel||"",adres:g.adres||"",btw:g.btw||"",
-      notities:"Via webshop. Contact: "+(g.naam||"")+(g.googlelink?" · Google: "+g.googlelink:""),aangemaakt:vandaagStr()};DB.klanten.push(k);}
-    const aantal=Number(g.tags)||1, totaal=Number(g.totaal)||0;
-    DB.verkopen.push({id:nieuwId(),datum:vandaagStr(),klantId:k.id,aantal,prijs:+(totaal/aantal).toFixed(2),totaal,
-      betaalwijze:"kaart",factuur:false,verkoper:"Jano",bron:"magazijn",webshop:true,betaald:false,
-      notitie:"WEBSHOP (SumUp) — "+(g.productnaam||"")+(g.opm?" · "+g.opm:"")});
-    DB.stock.magazijn-=aantal;
-    DB.stocklog.unshift({datum:vandaagStr(),wie:"Webshop",type:"verkoop",aantal,van:"magazijn",naar:"klant: "+k.naam,actie:"Webshopverkoop \u2212"+aantal+" (magazijn) \u2192 "+k.naam});
+    DB.webshopWacht.push({id:nieuwId(),orderId:o.id,datum:vandaagStr(),g:o.gegevens||{}});
     await SB.from("webshop_orders").update({verwerkt:true}).eq("id",o.id);
   }
   bewaar();
   const a=document.querySelector("#hoofdnav a.actief");
   if(!modalOverlay||modalOverlay.hidden)toon(a?a.dataset.view:"dashboard");
   try{if(typeof Notification!=="undefined"&&Notification&&Notification.permission==="granted")
-    new Notification("Nieuwe webshopbestelling!",{body:"Automatisch geregistreerd op naam van Jano \u2014 wacht op betaalbevestiging.",icon:"tt-icon.png"});}catch(e){}
+    new Notification("Nieuwe webshopbestelling!",{body:"Wacht op SumUp-betaling \u2014 telt nog niet mee in de cijfers.",icon:"tt-icon.png"});}catch(e){}
+}
+function webshopBetaald(wid){
+  const w=DB.webshopWacht.find(x=>x.id==wid); if(!w)return;
+  const g=w.g;
+  let k=DB.klanten.find(x=>g.email&&x.email&&x.email.toLowerCase()===String(g.email).toLowerCase());
+  if(!k){k={id:nieuwId(),naam:g.zaak||g.naam||"Webshopklant",email:g.email||"",tel:g.tel||"",adres:g.adres||"",btw:g.btw||"",
+    notities:"Via webshop. Contact: "+(g.naam||"")+(g.googlelink?" \u00b7 Google: "+g.googlelink:""),aangemaakt:vandaagStr()};DB.klanten.push(k);}
+  const aantal=Number(g.tags)||1, totaal=Number(g.totaal)||0;
+  DB.verkopen.push({id:nieuwId(),datum:vandaagStr(),klantId:k.id,aantal,prijs:+(totaal/aantal).toFixed(2),totaal,
+    betaalwijze:"kaart",factuur:false,verkoper:"Jano",bron:"magazijn",webshop:true,betaald:true,
+    notitie:"WEBSHOP (SumUp betaald) \u2014 "+(g.productnaam||"")+(g.opm?" \u00b7 "+g.opm:"")});
+  DB.stock.magazijn-=aantal;
+  DB.stocklog.unshift({datum:vandaagStr(),wie:"Webshop",type:"verkoop",aantal,van:"magazijn",naar:"klant: "+k.naam,actie:"Webshopverkoop \u2212"+aantal+" (magazijn) \u2192 "+k.naam});
+  DB.webshopWacht=DB.webshopWacht.filter(x=>x.id!=wid);
+  bewaar();renderVerkopen();
 }
 function meldCollega(){
   try{
