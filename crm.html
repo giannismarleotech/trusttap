@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrustTap CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--goud:#D8B266;--goud-d:#B08A3E;--zwart:#111;--ink:#1a1a1a;--grijs:#6b6552;--lijn:#e8e0cc;--ivoor:#FBF8F1;--rood:#C0392B;--groen:#1E8E4E;--blauw:#2563EB}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Montserrat',sans-serif;background:var(--ivoor);color:var(--ink);font-size:15px}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:.92rem;padding:.6rem .7rem;border:1px solid var(--lijn);border-radius:8px;background:#fff;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--goud);border-color:var(--goud)}
+label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--grijs);display:block;margin:.7rem 0 .25rem}
+.knop{background:linear-gradient(135deg,#E8C67A,var(--goud) 50%,var(--goud-d));color:#fff;border:none;border-radius:99px;padding:.7rem 1.4rem;font-weight:700;font-size:.85rem}
+.knop:hover{filter:brightness(1.05)}
+.knop.klein{padding:.45rem .95rem;font-size:.78rem}
+.knop.zwartk{background:var(--zwart)}
+.knop.lijnk{background:#fff;color:var(--ink);border:1.5px solid var(--lijn)}
+.knop.roodk{background:var(--rood)}
+h2{font-size:1.3rem;font-weight:800;margin-bottom:1rem}
+h3{font-size:1rem;font-weight:700}
+.kaart{background:#fff;border:1px solid var(--lijn);border-radius:14px;padding:1.3rem}
+table{width:100%;border-collapse:collapse;font-size:.87rem}
+th{text-align:left;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--grijs);padding:.55rem .6rem;border-bottom:2px solid var(--lijn)}
+td{padding:.6rem;border-bottom:1px solid var(--lijn);vertical-align:top}
+tr:hover td{background:#FCF9F0}
+.tag{display:inline-block;font-size:.68rem;font-weight:700;padding:.2rem .6rem;border-radius:99px}
+.t-goud{background:#F6ECD3;color:var(--goud-d)}.t-groen{background:#DFF3E7;color:var(--groen)}
+.t-rood{background:#FAE1DD;color:var(--rood)}.t-blauw{background:#DEE9FF;color:var(--blauw)}.t-grijs{background:#EEE;color:#666}
+.rij{display:grid;gap:.8rem}
+@media(min-width:700px){.rij.c2{grid-template-columns:1fr 1fr}.rij.c3{grid-template-columns:repeat(3,1fr)}.rij.c4{grid-template-columns:repeat(4,1fr)}}
+.leeg{color:var(--grijs);font-size:.85rem;padding:1rem 0;text-align:center}
+/* ---- login ---- */
+#loginScherm{min-height:100vh;display:grid;place-items:center;background:#111}
+.login-box{background:#fff;border-radius:16px;padding:2.6rem 2.4rem;width:min(400px,92vw);border-top:4px solid var(--goud)}
+.login-box h1{font-size:1.4rem;font-weight:800;margin-bottom:.2rem}
+.login-box h1 span{color:var(--goud-d)}
+.login-box p{font-size:.8rem;color:var(--grijs);margin-bottom:1rem}
+#loginFout{color:var(--rood);font-size:.8rem;margin-top:.7rem;display:none}
+/* ---- app layout ---- */
+#app{display:none;min-height:100vh}
+.zijbalk{position:fixed;left:0;top:0;bottom:0;width:230px;background:var(--zwart);color:#cfc7b2;padding:1.4rem 0;display:flex;flex-direction:column;z-index:10}
+.zijbalk .merk{padding:0 1.4rem 1.2rem;border-bottom:1px solid rgba(216,178,102,.25)}
+.zijbalk .merk b{color:#fff;font-size:1.05rem;font-weight:800}
+.zijbalk .merk b span{color:var(--goud)}
+.zijbalk .merk small{display:block;font-size:.62rem;letter-spacing:.3em;color:var(--goud);text-transform:uppercase;margin-top:2px}
+.zijbalk nav{flex:1;padding-top:.8rem}
+.zijbalk nav a{display:block;padding:.75rem 1.4rem;color:#cfc7b2;text-decoration:none;font-size:.88rem;font-weight:600;border-left:3px solid transparent}
+.zijbalk nav a.actief,.zijbalk nav a:hover{background:rgba(216,178,102,.12);color:#fff;border-left-color:var(--goud)}
+#ticketBadge:not(:empty),#meldBadge:not(:empty),#taakBadge:not(:empty){background:var(--rood);color:#fff;border-radius:99px;font-size:.62rem;padding:.1rem .45rem;margin-left:.45rem;font-weight:800}
+.zijbalk .gebruiker{padding:1rem 1.4rem;border-top:1px solid rgba(255,255,255,.08);font-size:.8rem}
+.zijbalk .gebruiker b{color:#fff;display:block}
+.zijbalk .gebruiker button{background:none;border:none;color:var(--goud);font-size:.75rem;font-weight:700;padding:0;margin-top:.3rem}
+.hoofd{margin-left:230px;padding:2rem 2.2rem;max-width:1200px}
+@media(max-width:860px){
+  .zijbalk{position:static;width:100%;flex-direction:row;align-items:center;padding:.6rem .8rem;overflow-x:auto}
+  .zijbalk .merk{padding:0 1rem 0 .4rem;border:none;white-space:nowrap}
+  .zijbalk nav{display:flex;padding:0}
+  .zijbalk nav a{padding:.55rem .8rem;border-left:none;border-bottom:3px solid transparent;white-space:nowrap}
+  .zijbalk nav a.actief{border-bottom-color:var(--goud)}
+  .zijbalk .gebruiker{display:flex;gap:.6rem;align-items:center;border:none;padding:.4rem .8rem;white-space:nowrap}
+  .hoofd{margin-left:0;padding:1.2rem}
+  #app{display:none;flex-direction:column}
+}
+/* ---- dashboard ---- */
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.9rem;margin-bottom:1.2rem}
+.stat{background:#fff;border:1px solid var(--lijn);border-radius:14px;padding:1.1rem 1.2rem}
+.stat b{font-size:1.5rem;font-weight:800;display:block}
+.stat small{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--grijs);font-weight:700}
+.balkje{height:10px;background:#F1EADA;border-radius:99px;overflow:hidden;margin-top:.4rem}
+.balkje i{display:block;height:100%;background:linear-gradient(90deg,#E8C67A,var(--goud-d));border-radius:99px}
+/* ---- modal ---- */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;display:grid;place-items:center;padding:3vh 3vw}
+.overlay[hidden]{display:none}
+.modal{background:#fff;border-radius:14px;padding:1.6rem;width:min(560px,94vw);max-height:90vh;overflow-y:auto;border-top:4px solid var(--goud);position:relative}
+.modal .sluit{position:absolute;top:.6rem;right:.9rem;background:none;border:none;font-size:1.6rem;color:#999}
+/* ---- kalender ---- */
+.kal-kop{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.kal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.kal-dagnaam{font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--grijs);text-align:center;padding:.3rem 0}
+.kal-dag{background:#fff;border:1px solid var(--lijn);border-radius:10px;min-height:72px;padding:.35rem .45rem;font-size:.78rem;cursor:pointer;position:relative}
+.kal-dag:hover{border-color:var(--goud)}
+.kal-dag.buiten{opacity:.35}
+.kal-dag.vandaag{border:2px solid var(--goud)}
+.kal-dag.geselecteerd{background:#FCF4DF}
+.kal-dag.mist::after{content:"!";position:absolute;top:.25rem;right:.4rem;color:#fff;background:var(--rood);width:14px;height:14px;border-radius:50%;font-size:.6rem;font-weight:800;display:grid;place-items:center}
+.stipjes{position:absolute;bottom:.35rem;left:.45rem;display:flex;gap:3px}
+.stip{width:7px;height:7px;border-radius:50%}
+.s-groen{background:var(--groen)}.s-blauw{background:var(--blauw)}
+.filterbalk{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.filterbalk input,.filterbalk select{width:auto;min-width:150px}
+.subtxt{font-size:.78rem;color:var(--grijs)}
+.koppel{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
+.detailblok{margin-top:1rem}
+.li-item{border:1px solid var(--lijn);border-radius:10px;padding:.7rem .9rem;margin-bottom:.5rem;background:#fff;font-size:.85rem}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="loginScherm">
+  <div class="login-box">
+    <h1>Trust<span>Tap</span> CRM</h1>
+    <p>Meld je aan met je beheerdersaccount.</p>
+    <label>E-mailadres</label>
+    <input type="email" id="loginEmail" autocomplete="username" placeholder="naam@voorbeeld.be">
+    <label>Wachtwoord</label>
+    <input type="password" id="loginWw" autocomplete="current-password" placeholder="••••••••">
+    <div id="loginFout">Onjuiste combinatie van e-mail en wachtwoord.</div>
+    <div style="margin-top:1.2rem"><button class="knop" style="width:100%" id="loginKnop">Aanmelden</button></div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app">
+  <aside class="zijbalk">
+    <div class="merk"><b>Trust<span>Tap</span> CRM</b><small>Tap. Review. Grow.</small></div>
+    <nav id="hoofdnav">
+      <a href="#dashboard" data-view="dashboard" class="actief">📊 Dashboard</a>
+      <a href="#meldingen" data-view="meldingen">🔔 Meldingen<span id="meldBadge"></span></a>
+      <a href="#agenda" data-view="agenda">📅 Agenda</a>
+      <a href="#verkopen" data-view="verkopen">💰 Verkopen</a>
+      <a href="#klanten" data-view="klanten">👥 Klanten</a>
+      <a href="#leads" data-view="leads">🎯 Leads</a>
+      <a href="#tickets" data-view="tickets">🎫 Tickets<span id="ticketBadge"></span></a>
+      <a href="#taken" data-view="taken">✅ Taken<span id="taakBadge"></span></a>
+      <a href="#stock" data-view="stock">📦 Stock</a>
+      <a href="#instellingen" data-view="instellingen">⚙️ Instellingen</a>
+    </nav>
+    <div class="gebruiker"><b id="gebruikerNaam"></b><button id="uitloggen">Uitloggen</button></div>
+  </aside>
+  <main class="hoofd" id="inhoud"></main>
+</div>
+
+<div class="overlay" id="modalOverlay" hidden><div class="modal"><button class="sluit" id="modalSluit">×</button><div id="modalInhoud"></div></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   TrustTap CRM — ONLINE (Supabase: gedeelde database + echte logins) — één bestand, gegevens in localStorage
+   ============================================================ */
+"use strict";
+const SB_URL="https://abpnpymfjnzxsscdfvop.supabase.co";
+const SB_KEY="sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh";
+const SB=window.supabase.createClient(SB_URL,SB_KEY);
+const NAAM_VAN={"info@trusttap.be":"Jano","giannis@live.be":"Giannis"};
+let dbVersie=0;
+
+/* ---------- mini SHA-256 (public domain implementatie) ---------- */
+function sha256(ascii){function rightRotate(v,a){return(v>>>a)|(v<<(32-a))}
+var mathPow=Math.pow,maxWord=mathPow(2,32),result='',words=[],asciiBitLength=ascii.length*8;
+var hash=sha256.h=sha256.h||[],k=sha256.k=sha256.k||[],primeCounter=k.length,isComposite={};
+for(var candidate=2;primeCounter<64;candidate++){if(!isComposite[candidate]){for(var i=0;i<313;i+=candidate){isComposite[i]=candidate}
+hash[primeCounter]=(mathPow(candidate,.5)*maxWord)|0;k[primeCounter++]=(mathPow(candidate,1/3)*maxWord)|0}}
+ascii+='\x80';while(ascii.length%64-56)ascii+='\x00';
+for(i=0;i<ascii.length;i++){var j=ascii.charCodeAt(i);if(j>>8)return;words[i>>2]|=j<<((3-i)%4)*8}
+words[words.length]=(asciiBitLength/maxWord)|0;words[words.length]=asciiBitLength;
+for(j=0;j<words.length;){var w=words.slice(j,j+=16),oldHash=hash;hash=hash.slice(0,8);
+for(i=0;i<64;i++){var w15=w[i-15],w2=w[i-2];
+var a=hash[0],e=hash[4];
+var temp1=hash[7]+(rightRotate(e,6)^rightRotate(e,11)^rightRotate(e,25))+((e&hash[5])^((~e)&hash[6]))+k[i]+(w[i]=(i<16)?w[i]:(w[i-16]+(rightRotate(w15,7)^rightRotate(w15,18)^(w15>>>3))+w[i-7]+(rightRotate(w2,17)^rightRotate(w2,19)^(w2>>>10)))|0);
+var temp2=(rightRotate(a,2)^rightRotate(a,13)^rightRotate(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
+hash=[(temp1+temp2)|0].concat(hash);hash[4]=(hash[4]+temp1)|0}
+for(i=0;i<8;i++){hash[i]=(hash[i]+oldHash[i])|0}}
+for(i=0;i<8;i++){for(j=3;j+1;j--){var b=(hash[i]>>(j*8))&255;result+=((b<16)?0:'')+b.toString(16)}}
+return result}
+
+/* ---------- accounts (gehashte wachtwoorden) ---------- */
+const ACCOUNTS = {
+  "info@trusttap.be": {naam:"Jano", hash:"6f4ae80404c65786b5ac8c3aa397e26fc82222773f7196cc8355ccc0be162979"},
+  "giannis@live.be":  {naam:"Giannis", hash:"56d78f1babf473dc4e410445a74cbf092e6b63ba6c6de060c2020fa156d4415b"}
+};
+const VERKOPERS = ["Giannis","Jano"];
+
+/* ---------- opslag ---------- */
+const SLEUTEL = "trusttap_crm_v1";
+function leegeData(){return {klanten:[],verkopen:[],leads:[],bezoeken:[],dagstatus:[],tickets:[],taken:[],stock:{magazijn:0,Giannis:0,Jano:0},stocklog:[],teller:1}}
+
+/* ---------- startgegevens (verkopen & leads Giannis, 13-15/08/2026) ---------- */
+function seedData(){
+  const K=[
+    {id:1,naam:"Bloemenshop Deinze (De Keukeleire)",email:"julievangansbeke@hotmail.com",tel:"",adres:"Deinze",btw:"BE1016354122",notities:"",aangemaakt:"2026-08-13"},
+    {id:2,naam:"Ideal BV (Ideal Fashion)",email:"info@idealfashion.be",tel:"",adres:"Deinze",btw:"BE0424765077",notities:"",aangemaakt:"2026-08-13"},
+    {id:3,naam:"Pralinja",email:"",tel:"",adres:"Deinze",btw:"BE0627963350",notities:"E-mail nog opvragen",aangemaakt:"2026-08-13"},
+    {id:4,naam:"Aankoop Goud Deinze",email:"s096_isabel@hotmail.com",tel:"",adres:"Deinze",btw:"",notities:"BTW-nummer nog opvragen",aangemaakt:"2026-08-13"},
+    {id:5,naam:"Fox",email:"",tel:"",adres:"Deinze",btw:"",notities:"BTW & e-mail: zie website",aangemaakt:"2026-08-13"},
+    {id:6,naam:"Vertriest Deinze Fietsen BV",email:"vertriest@telenet.be",tel:"",adres:"Deinze",btw:"BE0779616219",notities:"",aangemaakt:"2026-08-13"},
+    {id:7,naam:"Slagerij Bart en Noortje",email:"noortjehaemelinck@icloud.com",tel:"",adres:"Deinze",btw:"BE1027173877",notities:"",aangemaakt:"2026-08-13"},
+    {id:8,naam:"Femkes Koffie Magie",email:"info@hokus-pokus-toverbol.be",tel:"",adres:"Deinze",btw:"BE0808417794",notities:"Gelinkt aan Hokus Pokus Toverbol",aangemaakt:"2026-08-13"},
+    {id:9,naam:"Sofie Vanoosthuyse (Biza BV)",email:"sofie.vanoosthuyse@telenet.be",tel:"",adres:"",btw:"BE0823385488",notities:"",aangemaakt:"2026-08-14"},
+    {id:10,naam:"Asian Bowl Leuven",email:"shelly.vo1979@gmail.com",tel:"",adres:"Leuven",btw:"BE0748623135",notities:"",aangemaakt:"2026-08-14"},
+    {id:11,naam:"G&G Banden",email:"ozangulsever@hotmail.com",tel:"",adres:"",btw:"BE1028986391",notities:"",aangemaakt:"2026-08-15"},
+    {id:12,naam:"Queens Hairsaloon",email:"sisa92@hotmail.be",tel:"",adres:"",btw:"BE0748548856",notities:"BTW mogelijk BE0742548856 — verifi\u00ebren",aangemaakt:"2026-08-15"}
+  ];
+  const V=[
+    {id:13,datum:"2026-08-13",klantId:1,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:14,datum:"2026-08-13",klantId:2,aantal:1,prijs:30,totaal:30,betaalwijze:"payconiq",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:15,datum:"2026-08-13",klantId:3,aantal:1,prijs:30,totaal:30,betaalwijze:"kaart",factuur:false,verkoper:"Giannis",notitie:"SumUp"},
+    {id:16,datum:"2026-08-13",klantId:4,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:17,datum:"2026-08-13",klantId:5,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:18,datum:"2026-08-13",klantId:6,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:19,datum:"2026-08-13",klantId:7,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:20,datum:"2026-08-13",klantId:8,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:21,datum:"2026-08-14",klantId:9,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:22,datum:"2026-08-14",klantId:10,aantal:2,prijs:25,totaal:50,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:"2 voor \u20ac50"},
+    {id:23,datum:"2026-08-15",klantId:11,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""},
+    {id:24,datum:"2026-08-15",klantId:12,aantal:1,prijs:30,totaal:30,betaalwijze:"cash",factuur:false,verkoper:"Giannis",notitie:""}
+  ];
+  const L=[
+    {id:25,naam:"BENU Apotheek Deinze",contact:"Markt 16 \u00b7 09 386 13 70 \u00b7 apotheek.deinze@benu.be",status:"interesse",actieDatum:"",eigenaar:"Giannis",notities:"Interesse voor grote opgave/bestelling (bulk!)"},
+    {id:26,naam:"Bar Flo",contact:"Tolpoortstraat 66 \u00b7 hello@flodeinze.be / florianheyerick@outlook.com",status:"interesse",actieDatum:"",eigenaar:"Giannis",notities:"Contact opnemen / teruggaan"},
+    {id:27,naam:"KDkes (Kinderkleding)",contact:"Tolpoortstraat 64 \u00b7 0468 33 30 30",status:"interesse",actieDatum:"",eigenaar:"Giannis",notities:"Wil het wel \u2014 contact opnemen / teruggaan"},
+    {id:28,naam:"Nina's Bloemenhoek",contact:"Markt 111 \u00b7 09 334 85 14 / 0475 63 05 31 \u00b7 ninasbloemenhoek@gmail.com",status:"interesse",actieDatum:"",eigenaar:"Giannis",notities:"Wil het wel \u2014 contact opnemen"},
+    {id:29,naam:"Odiel (Brasserie)",contact:"Markt 71 \u00b7 09 324 40 48 \u00b7 brasserieodiel@gmail.com",status:"langsgaan",actieDatum:"",eigenaar:"Giannis",notities:"Interesse \u2014 fysiek herbezoeken"},
+    {id:30,naam:"Chlo\u00e9's",contact:"Markt 68 \u00b7 09 386 59 01",status:"nieuw",actieDatum:"",eigenaar:"Giannis",notities:"Eventueel interesse \u2014 opvolgen"},
+    {id:31,naam:"D\u00e9lifrance / D\u00e9li@go",contact:"Markt 68 \u00b7 09 386 59 01 \u00b7 delifrance.deinze@skynet.be",status:"nieuw",actieDatum:"",eigenaar:"Giannis",notities:"Eventueel interesse \u2014 opvolgen"},
+    {id:32,naam:"Hokus Pokus Toverbol",contact:"Gentstraat 43 bus 1 \u00b7 09 386 02 04 / 0497 18 30 80 \u00b7 info@hokus-pokus-toverbol.be",status:"interesse",actieDatum:"",eigenaar:"Giannis",notities:"Heeft gekocht voor buren (Femkes Koffie Magie), wil evt. ook voor de snoepwinkel"}
+  ];
+  return Object.assign(leegeData(),{klanten:K,verkopen:V,leads:L,teller:40});
+}
+
+let DB = leegeData();
+let bewaarBezig=false;
+function bewaar(){ticketBadgeUpdate();pushDb()}
+async function pushDb(){
+  if(bewaarBezig){bewaarBezig="opnieuw";return}
+  bewaarBezig=true;
+  const nieuw=dbVersie+1;
+  const {data,error}=await SB.from("crm_state").update({data:DB,versie:nieuw}).eq("id",1).eq("versie",dbVersie).select("versie");
+  if(error){alert("Opslaan mislukt: "+error.message)}
+  else if(!data||!data.length){ await dbLaden(); alert("Iemand anders sloeg net iets op — de nieuwste gegevens zijn herladen. Doe je wijziging opnieuw."); const a=document.querySelector("#hoofdnav a.actief"); toon(a?a.dataset.view:"dashboard"); }
+  else dbVersie=nieuw;
+  const nog=bewaarBezig==="opnieuw"; bewaarBezig=false; if(nog)pushDb();
+}
+function ticketBadgeUpdate(){
+  const tb=document.getElementById("ticketBadge");if(tb)tb.textContent=DB.tickets.filter(t=>t.status!=="opgelost").length||"";
+  const kb=document.getElementById("taakBadge");if(kb)kb.textContent=DB.taken.filter(t=>!t.klaar).length||"";
+  const mb=document.getElementById("meldBadge");if(mb)mb.textContent=meldingenLijst().length||"";
+}
+function nieuwId(){return DB.teller++}
+
+/* ---------- helpers ---------- */
+const eur = n => "€ "+Number(n||0).toFixed(2).replace(".",",");
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function vandaagStr(){const d=new Date();return d.toISOString().slice(0,10)}
+function nlDatum(iso){if(!iso)return"";const[y,m,d]=iso.split("-");return d+"/"+m+"/"+y}
+function prijsPerStuk(aantal){return aantal>=2 ? 25.00 : 30.00}
+function klantNaam(id){const k=DB.klanten.find(k=>k.id==id);return k?k.naam:"(verwijderde klant)"}
+let ingelogd = null;
+
+/* ---------- login ---------- */
+const loginScherm=document.getElementById("loginScherm"), app=document.getElementById("app");
+async function probeerLogin(){
+  const e=document.getElementById("loginEmail").value.trim().toLowerCase();
+  const w=document.getElementById("loginWw").value;
+  const {data,error}=await SB.auth.signInWithPassword({email:e,password:w});
+  if(error||!data.session){document.getElementById("loginFout").style.display="block";return}
+  ingelogd=NAAM_VAN[e]||e; await start();
+}
+document.getElementById("loginKnop").addEventListener("click",probeerLogin);
+document.getElementById("loginWw").addEventListener("keydown",e=>{if(e.key==="Enter")probeerLogin()});
+document.getElementById("uitloggen").addEventListener("click",async()=>{await SB.auth.signOut();location.reload()});
+
+async function dbLaden(){
+  const {data,error}=await SB.from("crm_state").select("data,versie").eq("id",1).maybeSingle();
+  if(error){alert("Kan database niet lezen: "+error.message);return}
+  if(!data){ DB=seedData(); dbVersie=1;
+    const r=await SB.from("crm_state").insert({id:1,data:DB,versie:1});
+    if(r.error)alert("Eerste opslag mislukt: "+r.error.message);
+  } else { DB=Object.assign(leegeData(),data.data); dbVersie=data.versie; }
+}
+async function start(){
+  await dbLaden();
+  loginScherm.style.display="none";
+  app.style.display="flex";
+  document.getElementById("gebruikerNaam").textContent="👤 "+ingelogd;
+  ticketBadgeUpdate();
+  toon("dashboard");
+  SB.channel("crm").on("postgres_changes",{event:"UPDATE",schema:"public",table:"crm_state"},p=>{
+    if(p.new&&p.new.versie>dbVersie){DB=Object.assign(leegeData(),p.new.data);dbVersie=p.new.versie;
+      const a=document.querySelector("#hoofdnav a.actief");
+      if(!modalOverlay||modalOverlay.hidden)toon(a?a.dataset.view:"dashboard");
+      ticketBadgeUpdate();}
+  }).subscribe();
+}
+
+/* ---------- navigatie ---------- */
+document.getElementById("hoofdnav").addEventListener("click",e=>{
+  const a=e.target.closest("a[data-view]"); if(!a)return; e.preventDefault();
+  document.querySelectorAll("#hoofdnav a").forEach(x=>x.classList.remove("actief"));
+  a.classList.add("actief"); toon(a.dataset.view);
+});
+const inhoud=document.getElementById("inhoud");
+function toon(view){
+  if(view==="dashboard")renderDashboard();
+  else if(view==="agenda")renderAgenda();
+  else if(view==="verkopen")renderVerkopen();
+  else if(view==="klanten")renderKlanten();
+  else if(view==="leads")renderLeads();
+  else if(view==="tickets")renderTickets();
+  else if(view==="taken")renderTaken();
+  else if(view==="meldingen")renderMeldingen();
+  else if(view==="stock")renderStock();
+  else if(view==="instellingen")renderInstellingen();
+}
+
+/* ---------- modal ---------- */
+const modalOverlay=document.getElementById("modalOverlay"), modalInhoud=document.getElementById("modalInhoud");
+function openModal(html){modalInhoud.innerHTML=html;modalOverlay.hidden=false}
+function sluitModal(){modalOverlay.hidden=true;modalInhoud.innerHTML=""}
+document.getElementById("modalSluit").addEventListener("click",sluitModal);
+modalOverlay.addEventListener("click",e=>{if(e.target===modalOverlay)sluitModal()});
+
+
+/* ---------- SVG-grafieken (geen externe libraries) ---------- */
+function svgStaaf(data,opties){
+  opties=opties||{};
+  const H=150,padB=26,padT=16,bw=Math.max(8,Math.min(40,Math.floor(560/Math.max(1,data.length))-6));
+  const W=(bw+6)*data.length+10;
+  const max=Math.max(1,...data.map(d=>d.waarde));
+  let s=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-height:${H}px" role="img">`;
+  data.forEach((d,i)=>{
+    const h=Math.round((H-padB-padT)*d.waarde/max), x=5+i*(bw+6), y=H-padB-h;
+    s+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" rx="3" fill="url(#gg)"/>`;
+    if(d.waarde&&opties.toonWaarde!==false)s+=`<text x="${x+bw/2}" y="${y-4}" text-anchor="middle" font-size="9" fill="#6b6552">${opties.euro?Math.round(d.waarde):d.waarde}</text>`;
+    if(d.label)s+=`<text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="8.5" fill="#9a927c">${d.label}</text>`;
+  });
+  s=`<svg viewBox="0 0 0 0" width="0" height="0"><defs><linearGradient id="gg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8C67A"/><stop offset="1" stop-color="#B08A3E"/></linearGradient></defs></svg>`+s;
+  return s+"</svg>";
+}
+function laatsteDagen(n){
+  const uit=[];
+  for(let i=n-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);uit.push(d.toISOString().slice(0,10))}
+  return uit;
+}
+
+/* ============================================================ DASHBOARD */
+function statsBerekenen(){
+  const v=DB.verkopen;
+  const omzet=v.reduce((s,x)=>s+x.totaal,0);
+  const stuks=v.reduce((s,x)=>s+Number(x.aantal),0);
+  const per={}; VERKOPERS.forEach(n=>per[n]={omzet:0,stuks:0,aantal:0});
+  v.forEach(x=>{if(!per[x.verkoper])per[x.verkoper]={omzet:0,stuks:0,aantal:0};per[x.verkoper].omzet+=x.totaal;per[x.verkoper].stuks+=Number(x.aantal);per[x.verkoper].aantal++});
+  const betaal={cash:0,kaart:0,payconiq:0,overschrijving:0};
+  v.forEach(x=>{betaal[x.betaalwijze]=(betaal[x.betaalwijze]||0)+x.totaal});
+  const factuurOpen=v.filter(x=>!x.factuur).length;
+  const vandaag=vandaagStr();
+  const omzetVandaag=v.filter(x=>x.datum===vandaag).reduce((s,x)=>s+x.totaal,0);
+  return {omzet,stuks,per,betaal,factuurOpen,omzetVandaag};
+}
+function renderDashboard(){
+  const s=statsBerekenen();
+  const stockTot=DB.stock.magazijn+DB.stock.Giannis+DB.stock.Jano;
+  const maxOmzet=Math.max(1,...VERKOPERS.map(n=>s.per[n].omzet));
+  const recent=[...DB.verkopen].sort((a,b)=>b.datum.localeCompare(a.datum)).slice(0,6);
+  const openLeads=DB.leads.filter(l=>!["gewonnen","verloren"].includes(l.status));
+  inhoud.innerHTML=`
+  <div class="koppel"><h2 style="margin:0">Dashboard</h2>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+      <button class="knop klein" id="snelVerkoop">+ Verkoop</button>
+      <button class="knop klein lijnk" id="snelKlant">+ Klant</button>
+      <button class="knop klein lijnk" id="snelLead">+ Lead</button>
+    </div></div>
+  <div class="statgrid">
+    <div class="stat"><small>Omzet vandaag</small><b>${eur(s.omzetVandaag)}</b></div>
+    <div class="stat"><small>Totale omzet</small><b>${eur(s.omzet)}</b></div>
+    <div class="stat"><small>NFC-tags verkocht</small><b>${s.stuks}</b></div>
+    <div class="stat"><small>Verkopen</small><b>${DB.verkopen.length}</b></div>
+    <div class="stat"><small>Stock totaal</small><b>${stockTot}</b></div>
+    <div class="stat"><small>Facturen nog te maken</small><b style="color:${s.factuurOpen?'var(--rood)':'inherit'}">${s.factuurOpen}</b></div>
+    <div class="stat"><small>Open leads</small><b>${openLeads.length}</b></div>
+    <div class="stat"><small>Open tickets</small><b style="color:${DB.tickets.filter(t=>t.status!=='opgelost').length?'var(--rood)':'inherit'}">${DB.tickets.filter(t=>t.status!=='opgelost').length}</b></div>
+  </div>
+  ${(()=>{const m=meldingenLijst();return m.length?`<div class="kaart" style="margin-bottom:1rem;border-left:4px solid var(--rood)">
+    <h3>🔔 Niet vergeten (${m.length})</h3>
+    ${m.slice(0,5).map(x=>`<div class="li-item" style="margin-top:.5rem">${x.i} ${esc(x.t)}</div>`).join("")}
+    ${m.length>5?`<p class="subtxt" style="margin-top:.4rem">+ nog ${m.length-5} — zie 🔔 Meldingen</p>`:""}
+  </div>`:""})()}
+  <div class="kaart" style="margin-bottom:1rem">
+    <h3>Omzet per dag — laatste 14 dagen</h3>
+    ${(()=>{const dagen=laatsteDagen(14);
+      const data=dagen.map(d=>({label:d.slice(8)+"/"+d.slice(5,7),waarde:+DB.verkopen.filter(v=>v.datum===d).reduce((s,v)=>s+v.totaal,0).toFixed(0)}));
+      return data.some(d=>d.waarde)?svgStaaf(data,{euro:true}):'<div class="leeg">Nog geen verkopen in deze periode.</div>'})()}
+    <h3 style="margin-top:1.2rem">Tags verkocht per dag</h3>
+    ${(()=>{const dagen=laatsteDagen(14);
+      const data=dagen.map(d=>({label:d.slice(8)+"/"+d.slice(5,7),waarde:DB.verkopen.filter(v=>v.datum===d).reduce((s,v)=>s+Number(v.aantal),0)}));
+      return data.some(d=>d.waarde)?svgStaaf(data):'<div class="leeg">Nog geen verkopen in deze periode.</div>'})()}
+  </div>
+  <div class="rij c2">
+    <div class="kaart">
+      <h3>Verkocht per accountmanager</h3>
+      ${VERKOPERS.map(n=>`<div style="margin-top:.9rem"><div style="display:flex;justify-content:space-between;font-size:.85rem"><b>${n}</b><span>${eur(s.per[n].omzet)} · ${s.per[n].stuks} tags · ${s.per[n].aantal} verkopen</span></div><div class="balkje"><i style="width:${Math.round(s.per[n].omzet/maxOmzet*100)}%"></i></div></div>`).join("")}
+      <h3 style="margin-top:1.4rem">Per betaalwijze</h3>
+      <table style="margin-top:.4rem"><tr><td>Cash</td><td style="text-align:right"><b>${eur(s.betaal.cash)}</b></td></tr>
+      <tr><td>Kaart (SumUp)</td><td style="text-align:right"><b>${eur(s.betaal.kaart)}</b></td></tr>
+      <tr><td>Payconiq</td><td style="text-align:right"><b>${eur(s.betaal.payconiq)}</b></td></tr>
+      <tr><td>Overschrijving (factuur)</td><td style="text-align:right"><b>${eur(s.betaal.overschrijving)}</b></td></tr></table>
+    </div>
+    <div class="kaart">
+      <h3>Stock per locatie</h3>
+      <table style="margin:.4rem 0 1rem"><tr><td>Magazijn</td><td style="text-align:right"><b>${DB.stock.magazijn}</b></td></tr>
+      <tr><td>Bij Giannis</td><td style="text-align:right"><b>${DB.stock.Giannis}</b></td></tr>
+      <tr><td>Bij Jano</td><td style="text-align:right"><b>${DB.stock.Jano}</b></td></tr></table>
+      <h3>Laatste verkopen</h3>
+      ${recent.length?`<table>${recent.map(v=>`<tr><td>${nlDatum(v.datum)}</td><td>${esc(klantNaam(v.klantId))}</td><td>${v.aantal}×</td><td>${eur(v.totaal)}</td><td>${esc(v.verkoper)}</td></tr>`).join("")}</table>`:'<div class="leeg">Nog geen verkopen.</div>'}
+    </div>
+  </div>`;
+  document.getElementById("snelVerkoop").addEventListener("click",()=>verkoopFormulier({}));
+  document.getElementById("snelKlant").addEventListener("click",()=>klantFormulier());
+  document.getElementById("snelLead").addEventListener("click",()=>leadFormulier());
+}
+
+/* ============================================================ KLANTEN */
+function renderKlanten(filter=""){
+  const lijst=DB.klanten.filter(k=>(k.naam+" "+(k.email||"")+" "+(k.btw||"")).toLowerCase().includes(filter.toLowerCase()))
+    .sort((a,b)=>a.naam.localeCompare(b.naam));
+  inhoud.innerHTML=`
+  <div class="koppel"><h2 style="margin:0">Klanten (${DB.klanten.length})</h2>
+    <div style="display:flex;gap:.6rem"><input id="klantZoek" placeholder="Zoeken…" style="width:220px" value="${esc(filter)}">
+    <button class="knop" id="nieuweKlant">+ Nieuwe klant</button></div></div>
+  <div class="kaart">${lijst.length?`
+    <table><tr><th>Bedrijf / naam</th><th>Contact</th><th>BTW</th><th>Gekocht</th><th></th></tr>
+    ${lijst.map(k=>{const kopen=DB.verkopen.filter(v=>v.klantId==k.id);const tags=kopen.reduce((s,v)=>s+Number(v.aantal),0);
+      return `<tr><td><b>${esc(k.naam)}</b><br><span class="subtxt">${esc(k.adres||"")}</span></td>
+      <td>${esc(k.email||"")}<br><span class="subtxt">${esc(k.tel||"")}</span></td>
+      <td>${esc(k.btw||"—")}</td><td>${tags} tags · ${eur(kopen.reduce((s,v)=>s+v.totaal,0))}</td>
+      <td style="white-space:nowrap"><button class="knop klein lijnk" data-open="${k.id}">Openen</button></td></tr>`}).join("")}
+    </table>`:'<div class="leeg">Nog geen klanten. Voeg je eerste klant toe.</div>'}
+  </div>`;
+  document.getElementById("klantZoek").addEventListener("input",e=>renderKlanten(e.target.value));
+  document.getElementById("nieuweKlant").addEventListener("click",()=>klantFormulier());
+  inhoud.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>klantDetail(Number(b.dataset.open))));
+}
+function klantFormulier(k){
+  k=k||{};
+  openModal(`
+    <h3>${k.id?"Klant bewerken":"Nieuwe klant"}</h3>
+    <label>Bedrijf / naam *</label><input id="f_naam" value="${esc(k.naam||"")}">
+    <div class="rij c2"><div><label>E-mail</label><input id="f_email" value="${esc(k.email||"")}"></div>
+    <div><label>Telefoon</label><input id="f_tel" value="${esc(k.tel||"")}"></div></div>
+    <label>Adres</label><input id="f_adres" value="${esc(k.adres||"")}">
+    <label>BTW-nummer</label><input id="f_btw" value="${esc(k.btw||"")}" placeholder="BE 0xxx.xxx.xxx">
+    <label>Notities</label><textarea id="f_not" rows="3">${esc(k.notities||"")}</textarea>
+    <div style="margin-top:1rem;display:flex;gap:.6rem"><button class="knop" id="f_bewaar">Bewaren</button></div>`);
+  document.getElementById("f_bewaar").addEventListener("click",()=>{
+    const naam=document.getElementById("f_naam").value.trim();
+    if(!naam){alert("Naam is verplicht.");return}
+    const obj={naam,email:document.getElementById("f_email").value.trim(),tel:document.getElementById("f_tel").value.trim(),
+      adres:document.getElementById("f_adres").value.trim(),btw:document.getElementById("f_btw").value.trim(),
+      notities:document.getElementById("f_not").value.trim()};
+    if(k.id){Object.assign(DB.klanten.find(x=>x.id==k.id),obj)}
+    else{obj.id=nieuwId();obj.aangemaakt=vandaagStr();DB.klanten.push(obj)}
+    bewaar();sluitModal();renderKlanten();
+  });
+}
+function klantDetail(id){
+  const k=DB.klanten.find(x=>x.id==id); if(!k)return;
+  const kopen=DB.verkopen.filter(v=>v.klantId==id).sort((a,b)=>b.datum.localeCompare(a.datum));
+  openModal(`
+    <h3>${esc(k.naam)}</h3>
+    <p class="subtxt" style="margin:.3rem 0 .8rem">${esc(k.adres||"Geen adres")} · ${esc(k.email||"geen e-mail")} · ${esc(k.tel||"geen nr")}<br>BTW: ${esc(k.btw||"—")} · Klant sinds ${nlDatum(k.aangemaakt)}</p>
+    ${k.notities?`<div class="li-item">📝 ${esc(k.notities)}</div>`:""}
+    <h3 style="margin-top:1rem">Aankopen (${kopen.length})</h3>
+    ${kopen.length?`<table><tr><th>Datum</th><th>Aantal</th><th>Totaal</th><th>Betaling</th><th>Factuur</th><th>Verkoper</th></tr>
+      ${kopen.map(v=>`<tr><td>${nlDatum(v.datum)}</td><td>${v.aantal}× à ${eur(v.prijs)}</td><td>${eur(v.totaal)}</td><td>${esc(v.betaalwijze)}</td>
+      <td>${v.factuur?'<span class="tag t-groen">gemaakt</span>':'<span class="tag t-rood">nog niet</span>'}</td><td>${esc(v.verkoper)}</td></tr>`).join("")}</table>`
+      :'<div class="leeg">Nog geen aankopen.</div>'}
+    ${(()=>{const tk=DB.tickets.filter(t=>t.klantId==id);return tk.length?`<h3 style="margin-top:1rem">Tickets (${tk.length})</h3>`+tk.map(t=>`<div class="li-item">🎫 #${t.id} ${esc(t.onderwerp)} — <span class="tag ${t.status==='opgelost'?'t-groen':'t-rood'}">${esc(t.status)}</span></div>`).join(""):""})()}
+    <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap">
+      <button class="knop klein" id="d_verkoop">+ Verkoop registreren</button>
+      <button class="knop klein lijnk" id="d_ticket">+ Ticket</button>
+      <button class="knop klein lijnk" id="d_bewerk">Gegevens bewerken</button>
+      <button class="knop klein roodk" id="d_weg">Verwijderen</button></div>`);
+  document.getElementById("d_bewerk").addEventListener("click",()=>klantFormulier(k));
+  document.getElementById("d_verkoop").addEventListener("click",()=>verkoopFormulier({klantId:k.id}));
+  document.getElementById("d_ticket").addEventListener("click",()=>ticketFormulier({klantId:k.id}));
+  document.getElementById("d_weg").addEventListener("click",()=>{
+    if(confirm("Klant \""+k.naam+"\" verwijderen? De verkopen blijven bestaan.")){
+      DB.klanten=DB.klanten.filter(x=>x.id!=id);bewaar();sluitModal();renderKlanten();}});
+}
+
+/* ============================================================ VERKOPEN */
+let vkFilter={verkoper:"",betaal:"",factuur:""};
+function renderVerkopen(){
+  let lijst=[...DB.verkopen].sort((a,b)=>b.datum.localeCompare(a.datum)||b.id-a.id);
+  if(vkFilter.verkoper)lijst=lijst.filter(v=>v.verkoper===vkFilter.verkoper);
+  if(vkFilter.betaal)lijst=lijst.filter(v=>v.betaalwijze===vkFilter.betaal);
+  if(vkFilter.factuur==="open")lijst=lijst.filter(v=>!v.factuur);
+  const totOmzet=lijst.reduce((s,v)=>s+v.totaal,0), totTags=lijst.reduce((s,v)=>s+Number(v.aantal),0);
+  inhoud.innerHTML=`
+  <div class="koppel"><h2 style="margin:0">Verkopen</h2>
+    <div style="display:flex;gap:.5rem"><button class="knop klein lijnk" id="csvKnop">⬇ CSV</button>
+    <button class="knop" id="nieuweVerkoop">+ Verkoop registreren</button></div></div>
+  <div class="filterbalk">
+    <select id="fltVerkoper"><option value="">Alle verkopers</option>${VERKOPERS.map(n=>`<option ${vkFilter.verkoper===n?"selected":""}>${n}</option>`).join("")}</select>
+    <select id="fltBetaal"><option value="">Alle betaalwijzen</option><option value="cash" ${vkFilter.betaal==="cash"?"selected":""}>Cash</option><option value="kaart" ${vkFilter.betaal==="kaart"?"selected":""}>Kaart</option><option value="payconiq" ${vkFilter.betaal==="payconiq"?"selected":""}>Payconiq</option><option value="overschrijving" ${vkFilter.betaal==="overschrijving"?"selected":""}>Overschrijving</option></select>
+    <select id="fltFactuur"><option value="">Alles</option><option value="open" ${vkFilter.factuur==="open"?"selected":""}>Factuur nog te maken</option></select>
+    <span class="subtxt"><b>${lijst.length}</b> verkopen · <b>${totTags}</b> tags · <b>${eur(totOmzet)}</b></span>
+  </div>
+  <div class="kaart">${lijst.length?`
+    <table><tr><th>Datum</th><th>Klant</th><th>Aantal</th><th>Totaal</th><th>Betaling</th><th>Factuur</th><th>Verkoper</th><th></th></tr>
+    ${lijst.map(v=>`<tr>
+      <td>${nlDatum(v.datum)}</td><td><b>${esc(klantNaam(v.klantId))}</b>${v.notitie?`<br><span class="subtxt">${esc(v.notitie)}</span>`:""}</td>
+      <td>${v.aantal}× à ${eur(v.prijs)}</td><td><b>${eur(v.totaal)}</b></td>
+      <td><span class="tag ${v.betaalwijze==='cash'?'t-groen':v.betaalwijze==='kaart'?'t-blauw':v.betaalwijze==='payconiq'?'t-grijs':'t-goud'}">${esc(v.betaalwijze)}</span></td>
+      <td>${v.factuur?'<span class="tag t-groen">gemaakt ✓</span>':`<button class="knop klein lijnk" data-factuur="${v.id}">markeer gemaakt</button>`}</td>
+      <td>${esc(v.verkoper)}</td>
+      <td><button class="knop klein roodk" data-weg="${v.id}">✕</button></td></tr>`).join("")}
+    </table>`:'<div class="leeg">Nog geen verkopen geregistreerd.</div>'}
+  </div>`;
+  document.getElementById("nieuweVerkoop").addEventListener("click",()=>verkoopFormulier({}));
+  document.getElementById("csvKnop").addEventListener("click",()=>{
+    const kop=["datum","klant","aantal","prijs_per_stuk","totaal","betaalwijze","factuur_gemaakt","verkoper","notitie"];
+    const rijen=lijst.map(v=>[v.datum,klantNaam(v.klantId),v.aantal,String(v.prijs).replace(".",","),String(v.totaal).replace(".",","),v.betaalwijze,v.factuur?"ja":"nee",v.verkoper,v.notitie||""]);
+    const csv=[kop,...rijen].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(";")).join("\r\n");
+    const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="trusttap-verkopen-"+vandaagStr()+".csv";a.click();});
+  document.getElementById("fltVerkoper").addEventListener("change",e=>{vkFilter.verkoper=e.target.value;renderVerkopen()});
+  document.getElementById("fltBetaal").addEventListener("change",e=>{vkFilter.betaal=e.target.value;renderVerkopen()});
+  document.getElementById("fltFactuur").addEventListener("change",e=>{vkFilter.factuur=e.target.value;renderVerkopen()});
+  inhoud.querySelectorAll("[data-factuur]").forEach(b=>b.addEventListener("click",()=>{
+    DB.verkopen.find(v=>v.id==b.dataset.factuur).factuur=true;bewaar();renderVerkopen();}));
+  inhoud.querySelectorAll("[data-weg]").forEach(b=>b.addEventListener("click",()=>{
+    const v=DB.verkopen.find(x=>x.id==b.dataset.weg);
+    if(!confirm("Deze verkoop verwijderen?"))return;
+    if(v.bron&&confirm("Deze verkoop was afgeboekt van voorraad \""+v.bron+"\". "+v.aantal+" stuks terugzetten?")){
+      DB.stock[v.bron]+=Number(v.aantal);
+      DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"retour",aantal:Number(v.aantal),van:"klant: "+klantNaam(v.klantId),naar:v.bron,actie:"Verkoop verwijderd: +"+v.aantal+" terug naar "+v.bron});
+    }
+    DB.verkopen=DB.verkopen.filter(x=>x.id!=b.dataset.weg);bewaar();renderVerkopen();}));
+}
+function verkoopFormulier(voorkeur){
+  if(!DB.klanten.length){alert("Voeg eerst een klant toe (of maak de lead klant).");return}
+  const klantOpties=DB.klanten.slice().sort((a,b)=>a.naam.localeCompare(b.naam))
+    .map(k=>`<option value="${k.id}" ${voorkeur.klantId==k.id?"selected":""}>${esc(k.naam)}</option>`).join("");
+  openModal(`
+    <h3>Verkoop registreren</h3>
+    <div class="rij c2"><div><label>Datum</label><input type="date" id="v_datum" value="${voorkeur.datum||vandaagStr()}"></div>
+    <div><label>Verkoper</label><select id="v_verkoper">${VERKOPERS.map(n=>`<option ${n===ingelogd?"selected":""}>${n}</option>`).join("")}</select></div></div>
+    <label>Klant</label><select id="v_klant">${klantOpties}</select>
+    <div class="rij c3">
+      <div><label>Aantal tags</label><input type="number" id="v_aantal" min="1" value="1"></div>
+      <div><label>Prijs per stuk</label><input type="number" step="0.01" id="v_prijs" value="30.00"></div>
+      <div><label>Totaal</label><input id="v_totaal" value="€ 30,00" disabled></div>
+    </div>
+    <p class="subtxt">Prijsregel: 1 stuk = € 30,00 · vanaf 2 stuks = € 25,00 per stuk (bv. 2 voor € 50). Handmatig aanpasbaar voor bulk-deals.</p>
+    <div class="rij c2">
+      <div><label>Betaalwijze</label><select id="v_betaal"><option value="cash">Cash</option><option value="kaart">Kaart (SumUp)</option><option value="payconiq">Payconiq</option><option value="overschrijving">Overschrijving (factuur)</option></select></div>
+      <div id="v_factuurwrap"><label>Factuur al gemaakt?</label><select id="v_factuur"><option value="nee">Nog niet</option><option value="ja">Ja, gemaakt</option></select></div>
+    </div>
+    <div class="rij c2">
+      <div><label>Stock afboeken van</label><select id="v_stockbron"><option value="">Niet afboeken</option><option value="Giannis">Voorraad Giannis</option><option value="Jano">Voorraad Jano</option><option value="magazijn">Magazijn</option></select></div>
+      <div><label>Notitie</label><input id="v_not" placeholder="optioneel"></div>
+    </div>
+    <div style="margin-top:1rem"><button class="knop" id="v_bewaar">Verkoop bewaren</button></div>`);
+  const va=document.getElementById("v_aantal"), vp=document.getElementById("v_prijs"), vt=document.getElementById("v_totaal");
+  let prijsHandmatig=false;
+  function herbereken(auto){
+    const n=Math.max(1,Number(va.value)||1);
+    if(auto&&!prijsHandmatig)vp.value=prijsPerStuk(n).toFixed(2);
+    vt.value=eur(n*Number(vp.value||0));
+  }
+  va.addEventListener("input",()=>herbereken(true));
+  vp.addEventListener("input",()=>{prijsHandmatig=true;herbereken(false)});
+  const bronSel=document.getElementById("v_stockbron"), verkSel=document.getElementById("v_verkoper");
+  bronSel.value=VERKOPERS.includes(verkSel.value)?verkSel.value:"";
+  verkSel.addEventListener("change",()=>{if(VERKOPERS.includes(verkSel.value))bronSel.value=verkSel.value});
+  document.getElementById("v_bewaar").addEventListener("click",()=>{
+    const aantal=Math.max(1,Number(va.value)||1), prijs=Number(vp.value)||0;
+    const betaal=document.getElementById("v_betaal").value;
+    const bron=document.getElementById("v_stockbron").value;
+    if(bron&&DB.stock[bron]<aantal&&!confirm("Let op: voorraad \""+bron+"\" heeft maar "+DB.stock[bron]+" stuks. Toch doorgaan (voorraad wordt negatief)?"))return;
+    const rec={id:nieuwId(),datum:document.getElementById("v_datum").value||vandaagStr(),
+      klantId:Number(document.getElementById("v_klant").value),aantal,prijs,totaal:+(aantal*prijs).toFixed(2),
+      betaalwijze:betaal,factuur:document.getElementById("v_factuur").value==="ja",
+      verkoper:document.getElementById("v_verkoper").value,bron:bron||"",notitie:document.getElementById("v_not").value.trim()};
+    DB.verkopen.push(rec);
+    if(bron){DB.stock[bron]-=aantal;DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"verkoop",aantal:aantal,van:bron,naar:"klant: "+klantNaam(rec.klantId),actie:"Verkoop \u2212"+aantal+" van "+bron+" \u2192 "+klantNaam(rec.klantId)})}
+    bewaar();sluitModal();toon(document.querySelector("#hoofdnav a.actief").dataset.view);
+  });
+}
+
+/* ============================================================ LEADS */
+const LEADSTATUS=["nieuw","interesse","langsgaan","gecontacteerd","gewonnen","verloren"];
+function renderLeads(){
+  const open=DB.leads.filter(l=>!["gewonnen","verloren"].includes(l.status));
+  const dicht=DB.leads.filter(l=>["gewonnen","verloren"].includes(l.status));
+  const rij=l=>`<tr><td><b>${esc(l.naam)}</b>${l.notities?`<br><span class="subtxt">${esc(l.notities)}</span>`:""}</td>
+    <td>${esc(l.contact||"")}</td>
+    <td><select data-status="${l.id}" style="width:auto">${LEADSTATUS.map(s=>`<option ${s===l.status?"selected":""}>${s}</option>`).join("")}</select></td>
+    <td>${l.actieDatum?nlDatum(l.actieDatum):"—"}</td><td>${esc(l.eigenaar)}</td>
+    <td style="white-space:nowrap"><button class="knop klein lijnk" data-bewerk="${l.id}">✎</button>
+    <button class="knop klein" data-klant="${l.id}">→ klant</button>
+    <button class="knop klein roodk" data-weg="${l.id}">✕</button></td></tr>`;
+  inhoud.innerHTML=`
+  <div class="koppel"><h2 style="margin:0">Leads (${open.length} open)</h2><button class="knop" id="nieuweLead">+ Nieuwe lead</button></div>
+  <div class="kaart">
+    ${open.length?`<table><tr><th>Naam</th><th>Contact</th><th>Status</th><th>Volgende actie</th><th>Eigenaar</th><th></th></tr>${open.map(rij).join("")}</table>`:'<div class="leeg">Geen open leads.</div>'}
+    ${dicht.length?`<h3 style="margin-top:1.4rem">Afgesloten</h3><table>${dicht.map(rij).join("")}</table>`:""}
+  </div>`;
+  document.getElementById("nieuweLead").addEventListener("click",()=>leadFormulier());
+  inhoud.querySelectorAll("[data-status]").forEach(s=>s.addEventListener("change",()=>{
+    DB.leads.find(l=>l.id==s.dataset.status).status=s.value;bewaar();renderLeads();}));
+  inhoud.querySelectorAll("[data-bewerk]").forEach(b=>b.addEventListener("click",()=>leadFormulier(DB.leads.find(l=>l.id==b.dataset.bewerk))));
+  inhoud.querySelectorAll("[data-weg]").forEach(b=>b.addEventListener("click",()=>{
+    if(confirm("Lead verwijderen?")){DB.leads=DB.leads.filter(l=>l.id!=b.dataset.weg);bewaar();renderLeads()}}));
+  inhoud.querySelectorAll("[data-klant]").forEach(b=>b.addEventListener("click",()=>{
+    const l=DB.leads.find(x=>x.id==b.dataset.klant);
+    const k={id:nieuwId(),naam:l.naam,email:"",tel:l.contact||"",adres:"",btw:"",notities:"Uit lead: "+(l.notities||""),aangemaakt:vandaagStr()};
+    DB.klanten.push(k);l.status="gewonnen";bewaar();alert("\""+l.naam+"\" staat nu bij Klanten — vul de gegevens verder aan.");renderLeads();}));
+}
+function leadFormulier(l){
+  l=l||{};
+  openModal(`
+    <h3>${l.id?"Lead bewerken":"Nieuwe lead"}</h3>
+    <label>Naam / bedrijf *</label><input id="l_naam" value="${esc(l.naam||"")}">
+    <label>Contact (tel / e-mail / adres)</label><input id="l_contact" value="${esc(l.contact||"")}">
+    <div class="rij c3">
+      <div><label>Status</label><select id="l_status">${LEADSTATUS.map(s=>`<option ${s===(l.status||"nieuw")?"selected":""}>${s}</option>`).join("")}</select></div>
+      <div><label>Volgende actie op</label><input type="date" id="l_datum" value="${l.actieDatum||""}"></div>
+      <div><label>Eigenaar</label><select id="l_eig">${VERKOPERS.map(n=>`<option ${n===(l.eigenaar||ingelogd)?"selected":""}>${n}</option>`).join("")}</select></div>
+    </div>
+    <label>Notities</label><textarea id="l_not" rows="3">${esc(l.notities||"")}</textarea>
+    <div style="margin-top:1rem"><button class="knop" id="l_bewaar">Bewaren</button></div>`);
+  document.getElementById("l_bewaar").addEventListener("click",()=>{
+    const naam=document.getElementById("l_naam").value.trim();
+    if(!naam){alert("Naam is verplicht.");return}
+    const obj={naam,contact:document.getElementById("l_contact").value.trim(),status:document.getElementById("l_status").value,
+      actieDatum:document.getElementById("l_datum").value,eigenaar:document.getElementById("l_eig").value,
+      notities:document.getElementById("l_not").value.trim()};
+    if(l.id)Object.assign(DB.leads.find(x=>x.id==l.id),obj);
+    else{obj.id=nieuwId();DB.leads.push(obj)}
+    bewaar();sluitModal();renderLeads();
+  });
+}
+
+
+/* ============================================================ TICKETS */
+const TICKETTYPES=["garantie / vervanging","vraag","levering","klacht","ander"];
+const TICKETSTATUS=["open","in behandeling","opgelost"];
+const PRIORITEIT=["laag","normaal","hoog"];
+let tkFilter={status:"",wie:""};
+function renderTickets(){
+  let lijst=[...DB.tickets].sort((a,b)=>(a.status==="opgelost")-(b.status==="opgelost")||b.id-a.id);
+  if(tkFilter.status)lijst=lijst.filter(t=>t.status===tkFilter.status);
+  if(tkFilter.wie)lijst=lijst.filter(t=>t.toegewezen===tkFilter.wie);
+  const open=DB.tickets.filter(t=>t.status!=="opgelost").length;
+  inhoud.innerHTML=`
+  <div class="koppel"><h2 style="margin:0">Tickets (${open} open)</h2><button class="knop" id="nieuwTicket">+ Nieuw ticket</button></div>
+  <div class="filterbalk">
+    <select id="tkStatus"><option value="">Alle statussen</option>${TICKETSTATUS.map(s=>`<option ${tkFilter.status===s?"selected":""}>${s}</option>`).join("")}</select>
+    <select id="tkWie"><option value="">Iedereen</option>${VERKOPERS.map(n=>`<option ${tkFilter.wie===n?"selected":""}>${n}</option>`).join("")}</select>
+  </div>
+  <div class="kaart">${lijst.length?`
+    <table><tr><th>#</th><th>Onderwerp</th><th>Klant</th><th>Type</th><th>Prioriteit</th><th>Status</th><th>Toegewezen</th><th></th></tr>
+    ${lijst.map(t=>`<tr style="${t.status==='opgelost'?'opacity:.55':''}">
+      <td>${t.id}</td><td><b>${esc(t.onderwerp)}</b><br><span class="subtxt">${nlDatum(t.aangemaakt)} · ${t.updates.length} update${t.updates.length===1?"":"s"}</span></td>
+      <td>${t.klantId?esc(klantNaam(t.klantId)):esc(t.klantNaam||"—")}</td>
+      <td><span class="tag t-grijs">${esc(t.type)}</span></td>
+      <td><span class="tag ${t.prioriteit==='hoog'?'t-rood':t.prioriteit==='laag'?'t-grijs':'t-goud'}">${esc(t.prioriteit)}</span></td>
+      <td><span class="tag ${t.status==='opgelost'?'t-groen':t.status==='in behandeling'?'t-blauw':'t-rood'}">${esc(t.status)}</span></td>
+      <td>${esc(t.toegewezen)}</td>
+      <td><button class="knop klein lijnk" data-topen="${t.id}">Openen</button></td></tr>`).join("")}
+    </table>`:'<div class="leeg">Geen tickets. Maak er een aan bij een defect, vraag of klacht.</div>'}
+  </div>`;
+  document.getElementById("nieuwTicket").addEventListener("click",()=>ticketFormulier({}));
+  document.getElementById("tkStatus").addEventListener("change",e=>{tkFilter.status=e.target.value;renderTickets()});
+  document.getElementById("tkWie").addEventListener("change",e=>{tkFilter.wie=e.target.value;renderTickets()});
+  inhoud.querySelectorAll("[data-topen]").forEach(b=>b.addEventListener("click",()=>ticketDetail(Number(b.dataset.topen))));
+}
+function ticketFormulier(voorkeur){
+  const klantOpties='<option value="">— geen klant / prospect —</option>'+DB.klanten.slice().sort((a,b)=>a.naam.localeCompare(b.naam))
+    .map(k=>`<option value="${k.id}" ${voorkeur.klantId==k.id?"selected":""}>${esc(k.naam)}</option>`).join("");
+  openModal(`
+    <h3>Nieuw ticket</h3>
+    <label>Onderwerp *</label><input id="t_ond" placeholder="bv. NFC-tag werkt niet meer">
+    <label>Klant</label><select id="t_klant">${klantOpties}</select>
+    <div class="rij c3">
+      <div><label>Type</label><select id="t_type">${TICKETTYPES.map(t=>`<option>${t}</option>`).join("")}</select></div>
+      <div><label>Prioriteit</label><select id="t_prio">${PRIORITEIT.map(p=>`<option ${p==="normaal"?"selected":""}>${p}</option>`).join("")}</select></div>
+      <div><label>Toegewezen aan</label><select id="t_wie">${VERKOPERS.map(n=>`<option ${n===ingelogd?"selected":""}>${n}</option>`).join("")}</select></div>
+    </div>
+    <label>Omschrijving</label><textarea id="t_oms" rows="3" placeholder="Wat is er aan de hand?"></textarea>
+    <div style="margin-top:1rem"><button class="knop" id="t_bewaar">Ticket aanmaken</button></div>`);
+  document.getElementById("t_bewaar").addEventListener("click",()=>{
+    const ond=document.getElementById("t_ond").value.trim();
+    if(!ond){alert("Onderwerp is verplicht.");return}
+    const t={id:nieuwId(),onderwerp:ond,klantId:Number(document.getElementById("t_klant").value)||null,klantNaam:"",
+      type:document.getElementById("t_type").value,prioriteit:document.getElementById("t_prio").value,
+      status:"open",toegewezen:document.getElementById("t_wie").value,aangemaakt:vandaagStr(),
+      updates:[]};
+    const oms=document.getElementById("t_oms").value.trim();
+    if(oms)t.updates.push({datum:vandaagStr(),wie:ingelogd,tekst:oms});
+    DB.tickets.push(t);bewaar();sluitModal();
+    const actief=document.querySelector("#hoofdnav a.actief");
+    toon(actief?actief.dataset.view:"tickets");
+  });
+}
+function ticketDetail(id){
+  const t=DB.tickets.find(x=>x.id==id); if(!t)return;
+  openModal(`
+    <h3>#${t.id} — ${esc(t.onderwerp)}</h3>
+    <p class="subtxt" style="margin:.3rem 0 .8rem">${t.klantId?esc(klantNaam(t.klantId)):"Geen klant"} · ${esc(t.type)} · aangemaakt ${nlDatum(t.aangemaakt)}</p>
+    <div class="rij c3">
+      <div><label>Status</label><select id="td_status">${TICKETSTATUS.map(s=>`<option ${s===t.status?"selected":""}>${s}</option>`).join("")}</select></div>
+      <div><label>Prioriteit</label><select id="td_prio">${PRIORITEIT.map(p=>`<option ${p===t.prioriteit?"selected":""}>${p}</option>`).join("")}</select></div>
+      <div><label>Toegewezen aan</label><select id="td_wie">${VERKOPERS.map(n=>`<option ${n===t.toegewezen?"selected":""}>${n}</option>`).join("")}</select></div>
+    </div>
+    ${t.type==="garantie / vervanging"?`<div class="li-item" style="margin-top:.8rem">🛡️ <b>Levenslange garantie:</b> stuur gratis een nieuw exemplaar.
+      <button class="knop klein" id="td_vervang" style="margin-left:.5rem">Vervanging afboeken (−1 magazijn)</button></div>`:""}
+    <h3 style="margin-top:1rem">Updates (${t.updates.length})</h3>
+    ${t.updates.length?t.updates.map(u=>`<div class="li-item">${nlDatum(u.datum)} — <b>${esc(u.wie)}</b>: ${esc(u.tekst)}</div>`).join(""):'<div class="leeg" style="padding:.4rem 0">Nog geen updates.</div>'}
+    <label>Nieuwe update</label><textarea id="td_tekst" rows="2" placeholder="bv. gebeld, nieuwe tag verstuurd…"></textarea>
+    <div style="margin-top:.8rem;display:flex;gap:.6rem;flex-wrap:wrap">
+      <button class="knop klein" id="td_update">Update toevoegen</button>
+      <button class="knop klein zwartk" id="td_opgelost">Markeer opgelost ✓</button>
+      <button class="knop klein roodk" id="td_weg">Verwijderen</button></div>`);
+  function bewaarVeld(){t.status=document.getElementById("td_status").value;t.prioriteit=document.getElementById("td_prio").value;t.toegewezen=document.getElementById("td_wie").value;bewaar()}
+  ["td_status","td_prio","td_wie"].forEach(i=>document.getElementById(i).addEventListener("change",bewaarVeld));
+  document.getElementById("td_update").addEventListener("click",()=>{
+    const tekst=document.getElementById("td_tekst").value.trim();
+    if(!tekst){alert("Schrijf eerst een update.");return}
+    t.updates.push({datum:vandaagStr(),wie:ingelogd,tekst});bewaar();ticketDetail(id);});
+  document.getElementById("td_opgelost").addEventListener("click",()=>{
+    t.status="opgelost";t.updates.push({datum:vandaagStr(),wie:ingelogd,tekst:"Ticket opgelost."});bewaar();sluitModal();renderTickets();});
+  const vv=document.getElementById("td_vervang");
+  if(vv)vv.addEventListener("click",()=>{
+    DB.stock.magazijn-=1;
+    DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"vervanging",aantal:1,van:"magazijn",naar:"klant: "+(t.klantId?klantNaam(t.klantId):"?")+" (ticket #"+t.id+")",actie:"Garantievervanging \u22121 (magazijn) \u2014 ticket #"+t.id});
+    t.updates.push({datum:vandaagStr(),wie:ingelogd,tekst:"Vervangexemplaar afgeboekt van magazijn."});
+    bewaar();ticketDetail(id);});
+  document.getElementById("td_weg").addEventListener("click",()=>{
+    if(confirm("Ticket verwijderen?")){DB.tickets=DB.tickets.filter(x=>x.id!=id);bewaar();sluitModal();renderTickets();}});
+}
+
+
+/* ============================================================ MELDINGEN */
+function stockRecon(){
+  let inn=0,uit=0;
+  DB.stocklog.forEach(r=>{
+    if(!r.type)return;
+    const a=Math.abs(Number(r.aantal)||0);
+    if(r.type==="levering")inn+=a;
+    else if(r.type==="retour")inn+=a;
+    else if(r.type==="verkoop"||r.type==="vervanging")uit+=a;
+    else if(r.type==="correctie"){const d=Number(r.aantal)||0; if(d>0)inn+=d; else uit+=Math.abs(d);}
+  });
+  const huidig=DB.stock.magazijn+DB.stock.Giannis+DB.stock.Jano;
+  return {inn,uit,verwacht:inn-uit,huidig,verschil:huidig-(inn-uit)};
+}
+function meldingenLijst(){
+  const m=[]; const vandaag=vandaagStr();
+  const fOpen=DB.verkopen.filter(v=>!v.factuur).length;
+  if(fOpen)m.push({i:"🧾",t:fOpen+" "+(fOpen>1?"verkopen":"verkoop")+" zonder factuur",view:"verkopen"});
+  DB.leads.filter(l=>!["gewonnen","verloren"].includes(l.status)&&l.actieDatum&&l.actieDatum<=vandaag)
+    .forEach(l=>m.push({i:"🎯",t:"Lead opvolgen: "+l.naam+(l.actieDatum<vandaag?" (verlopen: "+nlDatum(l.actieDatum)+")":" (vandaag)"),view:"leads"}));
+  DB.tickets.filter(t=>t.status!=="opgelost"&&t.prioriteit==="hoog")
+    .forEach(t=>m.push({i:"🎫",t:"Hoog-prioriteit ticket #"+t.id+": "+t.onderwerp,view:"tickets"}));
+  DB.tickets.filter(t=>t.status==="open"&&t.prioriteit!=="hoog").length&&m.push({i:"🎫",t:DB.tickets.filter(t=>t.status==="open"&&t.prioriteit!=="hoog").length+" open ticket(s)",view:"tickets"});
+  const opTeVolgen=DB.bezoeken.filter(b=>b.resultaat==="opvolgen"&&!b.opgevolgd).length;
+  if(opTeVolgen)m.push({i:"\ud83d\udeb6",t:opTeVolgen+" bezoek"+(opTeVolgen>1?"en":"")+" met interesse nog op te volgen (maak er een lead van)",view:"agenda"});
+  DB.taken.filter(t=>!t.klaar&&t.deadline&&t.deadline<vandaag).forEach(t=>m.push({i:"⏰",t:"Taak verlopen: "+t.titel+" ("+nlDatum(t.deadline)+")",view:"taken"}));
+  DB.taken.filter(t=>!t.klaar&&t.deadline===vandaag).forEach(t=>m.push({i:"✅",t:"Taak vandaag: "+t.titel,view:"taken"}));
+  ["Giannis","Jano"].forEach(w=>{if(DB.stock[w]<=2)m.push({i:"📦",t:"Stock bijna op bij "+w+" ("+DB.stock[w]+" stuks) — bijvullen!",view:"stock"})});
+  if(DB.stock.magazijn<=5)m.push({i:"📦",t:"Magazijnvoorraad laag ("+DB.stock.magazijn+" stuks) — nieuwe levering bestellen?",view:"stock"});
+  const rec=stockRecon();
+  if(rec.verschil!==0&&(rec.inn||rec.uit))m.push({i:"⚠️",t:"Stockverschil: "+Math.abs(rec.verschil)+" tag(s) "+(rec.verschil<0?"onverklaard weg":"te veel")+" — controleer het logboek",view:"stock"});
+  // gisteren (werkdag) niets ingegeven?
+  const g=new Date();g.setDate(g.getDate()-1);
+  const gi=g.toISOString().slice(0,10), wd=g.getDay();
+  if(wd>=1&&wd<=6&&!DB.verkopen.some(v=>v.datum===gi)&&!DB.dagstatus.some(s=>s.datum===gi)&&!DB.bezoeken.some(b=>b.datum===gi))
+    m.push({i:"📅",t:"Gisteren ("+nlDatum(gi)+") is nog niet ingegeven of afgesloten",view:"agenda"});
+  return m;
+}
+function renderMeldingen(){
+  const m=meldingenLijst();
+  inhoud.innerHTML=`
+  <h2>Meldingen (${m.length})</h2>
+  <p class="subtxt" style="margin:-.6rem 0 1rem">Automatisch samengesteld zodat jullie niets vergeten: facturen, opvolgacties, taken, tickets en stock.</p>
+  ${m.length?m.map((x,i)=>`<div class="li-item" style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
+    <span>${x.i} ${esc(x.t)}</span><button class="knop klein lijnk" data-ga="${x.view}">Bekijk →</button></div>`).join("")
+  :'<div class="kaart"><div class="leeg">🎉 Niets te melden — alles is bij!</div></div>'}`;
+  inhoud.querySelectorAll("[data-ga]").forEach(b=>b.addEventListener("click",()=>{
+    document.querySelectorAll("#hoofdnav a").forEach(x=>x.classList.toggle("actief",x.dataset.view===b.dataset.ga));
+    toon(b.dataset.ga);}));
+}
+
+/* ============================================================ TAKEN */
+function renderTaken(){
+  const vandaag=vandaagStr();
+  const open=DB.taken.filter(t=>!t.klaar).sort((a,b)=>(a.deadline||"9999").localeCompare(b.deadline||"9999"));
+  const klaar=DB.taken.filter(t=>t.klaar).slice(-10).reverse();
+  const rij=t=>`<div class="li-item" style="display:flex;align-items:flex-start;gap:.7rem;${t.klaar?'opacity:.55':''}">
+    <input type="checkbox" style="width:auto;margin-top:.2rem" data-vink="${t.id}" ${t.klaar?"checked":""}>
+    <div style="flex:1"><b>${esc(t.titel)}</b>${t.omschrijving?`<br><span class="subtxt">${esc(t.omschrijving)}</span>`:""}
+    <br><span class="subtxt">${t.deadline?("📅 "+nlDatum(t.deadline)+(!t.klaar&&t.deadline<vandaag?' <span class="tag t-rood">verlopen</span>':!t.klaar&&t.deadline===vandaag?' <span class="tag t-goud">vandaag</span>':"")):"geen deadline"} · voor ${esc(t.voor)}</span></div>
+    <button class="knop klein roodk" data-tweg="${t.id}">✕</button></div>`;
+  inhoud.innerHTML=`
+  <div class="koppel"><h2 style="margin:0">Taken (${open.length} open)</h2><button class="knop" id="nieuweTaak">+ Nieuwe taak</button></div>
+  ${open.length?open.map(rij).join(""):'<div class="kaart"><div class="leeg">Geen open taken.</div></div>'}
+  ${klaar.length?`<h3 style="margin:1.2rem 0 .6rem">Afgewerkt</h3>`+klaar.map(rij).join(""):""}`;
+  document.getElementById("nieuweTaak").addEventListener("click",()=>taakFormulier());
+  inhoud.querySelectorAll("[data-vink]").forEach(c=>c.addEventListener("change",()=>{
+    const t=DB.taken.find(x=>x.id==c.dataset.vink);t.klaar=c.checked;bewaar();renderTaken();}));
+  inhoud.querySelectorAll("[data-tweg]").forEach(b=>b.addEventListener("click",()=>{
+    if(confirm("Taak verwijderen?")){DB.taken=DB.taken.filter(x=>x.id!=b.dataset.tweg);bewaar();renderTaken();}}));
+}
+function taakFormulier(){
+  openModal(`
+    <h3>Nieuwe taak</h3>
+    <label>Titel *</label><input id="k_titel" placeholder="bv. Factuur maken voor Ideal BV">
+    <label>Omschrijving</label><textarea id="k_oms" rows="2"></textarea>
+    <div class="rij c2"><div><label>Deadline</label><input type="date" id="k_dead"></div>
+    <div><label>Voor</label><select id="k_voor"><option>Beiden</option>${VERKOPERS.map(n=>`<option ${n===ingelogd?"selected":""}>${n}</option>`).join("")}</select></div></div>
+    <div style="margin-top:1rem"><button class="knop" id="k_bewaar">Taak toevoegen</button></div>`);
+  document.getElementById("k_bewaar").addEventListener("click",()=>{
+    const titel=document.getElementById("k_titel").value.trim();
+    if(!titel){alert("Titel is verplicht.");return}
+    DB.taken.push({id:nieuwId(),titel,omschrijving:document.getElementById("k_oms").value.trim(),
+      deadline:document.getElementById("k_dead").value,voor:document.getElementById("k_voor").value,
+      klaar:false,aangemaakt:vandaagStr(),door:ingelogd});
+    bewaar();sluitModal();renderTaken();});
+}
+
+/* ============================================================ STOCK */
+function renderStock(){
+  inhoud.innerHTML=`
+  <h2>Stock</h2>
+  <p class="subtxt" style="margin:-.6rem 0 1rem">Bij elke verkoop met "stock afboeken" gaat de voorraad automatisch omlaag (standaard van de verkoper zelf). Hier kun je ook rechtstreeks bijstellen.</p>
+  <div class="statgrid">
+    ${["magazijn","Giannis","Jano"].map(w=>`<div class="stat"><small>${w==="magazijn"?"Magazijn":"Bij "+w}</small><b>${DB.stock[w]}</b>
+      <div style="display:flex;gap:.35rem;margin-top:.55rem">
+        <button class="knop klein lijnk" data-min="${w}">−1</button>
+        <button class="knop klein lijnk" data-plus="${w}">+1</button>
+        <button class="knop klein lijnk" data-exact="${w}">✎</button>
+      </div></div>`).join("")}
+    <div class="stat"><small>Totaal</small><b>${DB.stock.magazijn+DB.stock.Giannis+DB.stock.Jano}</b></div>
+  </div>
+  <div class="rij c2">
+    <div class="kaart">
+      <h3>Voorraad toevoegen (nieuwe levering)</h3>
+      <div class="rij c2"><div><label>Aantal</label><input type="number" id="s_in_aantal" min="1" value="50"></div>
+      <div><label>Naar</label><select id="s_in_waar"><option value="magazijn">Magazijn</option><option value="Giannis">Giannis</option><option value="Jano">Jano</option></select></div></div>
+      <div style="margin-top:.8rem"><button class="knop klein" id="s_in">+ Toevoegen</button></div>
+      <h3 style="margin-top:1.4rem">Verplaatsen / meenemen</h3>
+      <div class="rij c3"><div><label>Aantal</label><input type="number" id="s_mv_aantal" min="1" value="10"></div>
+      <div><label>Van</label><select id="s_mv_van"><option value="magazijn">Magazijn</option><option value="Giannis">Giannis</option><option value="Jano">Jano</option></select></div>
+      <div><label>Naar</label><select id="s_mv_naar"><option value="Giannis">Giannis</option><option value="Jano">Jano</option><option value="magazijn">Magazijn</option></select></div></div>
+      <div style="margin-top:.8rem"><button class="knop klein" id="s_mv">Verplaatsen</button></div>
+      <h3 style="margin-top:1.4rem">Correctie (telling)</h3>
+      <div class="rij c3"><div><label>Locatie</label><select id="s_c_waar"><option value="magazijn">Magazijn</option><option value="Giannis">Giannis</option><option value="Jano">Jano</option></select></div>
+      <div><label>Nieuw aantal</label><input type="number" id="s_c_aantal" min="0" value="0"></div>
+      <div style="align-self:end"><button class="knop klein lijnk" id="s_c">Corrigeer</button></div></div>
+    </div>
+    <div class="kaart">
+      <h3>Sluit de rekening: klopt alles?</h3>
+      ${(()=>{const r=stockRecon();return `
+      <table style="margin-top:.4rem">
+        <tr><td>Binnengekomen (leveringen + retours + pos. correcties)</td><td style="text-align:right"><b>${r.inn}</b></td></tr>
+        <tr><td>Buitengegaan (verkocht + vervangingen + neg. correcties)</td><td style="text-align:right"><b>${r.uit}</b></td></tr>
+        <tr><td>Verwachte voorraad</td><td style="text-align:right"><b>${r.verwacht}</b></td></tr>
+        <tr><td>Werkelijke voorraad (som locaties)</td><td style="text-align:right"><b>${r.huidig}</b></td></tr>
+        <tr><td><b>Verschil</b></td><td style="text-align:right">${r.verschil===0?'<span class="tag t-groen">0 — alles verklaard ✓</span>':`<span class="tag t-rood">${r.verschil>0?"+":""}${r.verschil} onverklaard!</span>`}</td></tr>
+      </table>
+      <p class="subtxt" style="margin-top:.5rem">Berekend uit alle geregistreerde bewegingen. Staat hier een verschil, kijk dan in het logboek hieronder wat er ontbreekt.</p>`})()}
+      <h3 style="margin-top:1.3rem">Waar zijn de tags naartoe?</h3>
+      ${(()=>{
+        const perKlant={};
+        DB.verkopen.forEach(v=>{const n=klantNaam(v.klantId);perKlant[n]=(perKlant[n]||0)+Number(v.aantal)});
+        DB.stocklog.filter(r=>r.type==="vervanging").forEach(r=>{perKlant[r.naar]=(perKlant[r.naar]||0)+Math.abs(r.aantal)});
+        const rijen=Object.entries(perKlant).sort((a,b)=>b[1]-a[1]);
+        return rijen.length?`<table style="margin-top:.4rem"><tr><th>Klant</th><th style="text-align:right">Tags</th></tr>${rijen.map(([n,a])=>`<tr><td>${esc(n)}</td><td style="text-align:right"><b>${a}</b></td></tr>`).join("")}
+        <tr><td><b>Totaal bij klanten</b></td><td style="text-align:right"><b>${rijen.reduce((s,[,a])=>s+a,0)}</b></td></tr></table>`:'<div class="leeg">Nog geen tags bij klanten.</div>'})()}
+    </div>
+  </div>
+  <div class="kaart" style="margin-top:.9rem">
+    <div class="koppel"><h3 style="margin:0">Volledig stock-logboek (${DB.stocklog.length})</h3>
+      <select id="logFilter" style="width:auto"><option value="">Alle types</option>
+      <option value="levering">Leveringen</option><option value="verkoop">Verkopen</option><option value="verplaatsing">Verplaatsingen</option>
+      <option value="vervanging">Vervangingen</option><option value="correctie">Correcties</option><option value="retour">Retours</option></select></div>
+    <div id="logLijst"></div>
+  </div>`;
+  function stockZet(w,nieuw,reden){
+    nieuw=Number(nieuw); if(isNaN(nieuw))return;
+    const delta=nieuw-DB.stock[w];
+    DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"correctie",aantal:delta,van:w,naar:w,actie:reden+" "+w+": "+DB.stock[w]+" \u2192 "+nieuw+" ("+(delta>=0?"+":"")+delta+")"});
+    DB.stock[w]=nieuw; bewaar(); renderStock();
+  }
+  function logToon(f){
+    const lijst=DB.stocklog.filter(r=>!f||r.type===f).slice(0,80);
+    document.getElementById("logLijst").innerHTML=lijst.length?lijst.map(r=>`<div class="li-item">${nlDatum(r.datum)} — <b>${esc(r.wie)}</b> · ${r.type?`<span class="tag t-grijs">${esc(r.type)}</span> `:""}${esc(r.actie)}</div>`).join(""):'<div class="leeg">Geen bewegingen van dit type.</div>';
+  }
+  logToon("");
+  document.getElementById("logFilter").addEventListener("change",e=>logToon(e.target.value));
+  inhoud.querySelectorAll("[data-plus]").forEach(b=>b.addEventListener("click",()=>stockZet(b.dataset.plus,DB.stock[b.dataset.plus]+1,"Handmatig +1")));
+  inhoud.querySelectorAll("[data-min]").forEach(b=>b.addEventListener("click",()=>stockZet(b.dataset.min,DB.stock[b.dataset.min]-1,"Handmatig −1")));
+  inhoud.querySelectorAll("[data-exact]").forEach(b=>b.addEventListener("click",()=>{
+    const w=b.dataset.exact, n=prompt("Nieuw aantal voor "+w+":",DB.stock[w]);
+    if(n!==null)stockZet(w,n,"Handmatig gezet");
+  }));
+  document.getElementById("s_in").addEventListener("click",()=>{
+    const n=Number(document.getElementById("s_in_aantal").value)||0; if(n<1)return;
+    const w=document.getElementById("s_in_waar").value;
+    DB.stock[w]+=n; DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"levering",aantal:n,van:"leverancier",naar:w,actie:"Levering +"+n+" \u2192 "+w});
+    bewaar();renderStock();});
+  document.getElementById("s_mv").addEventListener("click",()=>{
+    const n=Number(document.getElementById("s_mv_aantal").value)||0; if(n<1)return;
+    const van=document.getElementById("s_mv_van").value, naar=document.getElementById("s_mv_naar").value;
+    if(van===naar){alert("Van en naar zijn hetzelfde.");return}
+    if(DB.stock[van]<n&&!confirm("Voorraad \""+van+"\" heeft maar "+DB.stock[van]+" stuks. Toch doorgaan?"))return;
+    DB.stock[van]-=n;DB.stock[naar]+=n;
+    DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"verplaatsing",aantal:n,van:van,naar:naar,actie:"Verplaatst "+n+": "+van+" \u2192 "+naar});
+    bewaar();renderStock();});
+  document.getElementById("s_c").addEventListener("click",()=>{
+    const w=document.getElementById("s_c_waar").value, n=Number(document.getElementById("s_c_aantal").value)||0;
+    DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"correctie",aantal:n-DB.stock[w],van:w,naar:w,actie:"Correctie (telling) "+w+": "+DB.stock[w]+" \u2192 "+n});
+    DB.stock[w]=n;bewaar();renderStock();});
+}
+
+/* ---------- bezoekresultaten ---------- */
+const BEZOEKRES={verkocht:{txt:"Verkocht",tag:"t-groen",ic:"\u2705"},opvolgen:{txt:"Interesse \u2014 opvolgen",tag:"t-goud",ic:"\ud83d\udd01"},geen:{txt:"Geen interesse",tag:"t-rood",ic:"\u274c"},afwezig:{txt:"Niet aanwezig",tag:"t-grijs",ic:"\ud83d\udeaa"},anders:{txt:"Anders",tag:"t-blauw",ic:"\ud83d\udcdd"}};
+function resBadge(r){if(!r)return '<span class="tag t-grijs">\ud83d\udccd genoteerd</span>';const b=BEZOEKRES[r]||BEZOEKRES.anders;return `<span class="tag ${b.tag}">${b.ic} ${b.txt}</span>`}
+
+/* ============================================================ AGENDA */
+let kalMaand=(new Date()).getMonth(), kalJaar=(new Date()).getFullYear(), kalGeselecteerd=vandaagStr();
+const MAANDEN=["januari","februari","maart","april","mei","juni","juli","augustus","september","oktober","november","december"];
+function dagInfo(iso){
+  return {verkopen:DB.verkopen.filter(v=>v.datum===iso),
+          bezoeken:DB.bezoeken.filter(b=>b.datum===iso),
+          status:DB.dagstatus.filter(d=>d.datum===iso)};
+}
+function renderAgenda(){
+  const eerste=new Date(kalJaar,kalMaand,1);
+  let startDag=(eerste.getDay()+6)%7; /* maandag eerst */
+  const dagenInMaand=new Date(kalJaar,kalMaand+1,0).getDate();
+  const vandaag=vandaagStr();
+  let cellen="";
+  for(let i=0;i<startDag;i++)cellen+=`<div class="kal-dag buiten"></div>`;
+  for(let d=1;d<=dagenInMaand;d++){
+    const iso=kalJaar+"-"+String(kalMaand+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    const info=dagInfo(iso);
+    const weekdag=new Date(kalJaar,kalMaand,d).getDay();
+    const werkdag=weekdag>=1&&weekdag<=6;
+    const mist = werkdag && iso<vandaag && !info.verkopen.length && !info.status.length && !info.bezoeken.length;
+    cellen+=`<div class="kal-dag ${iso===vandaag?'vandaag':''} ${iso===kalGeselecteerd?'geselecteerd':''} ${mist?'mist':''}" data-dag="${iso}">
+      <b>${d}</b>${info.verkopen.length?`<div class="subtxt" style="font-size:.62rem;margin-top:1px">${eur(info.verkopen.reduce((s,v)=>s+v.totaal,0))}</div>`:""}<div class="stipjes">${info.verkopen.length?'<span class="stip s-groen"></span>':''}${info.bezoeken.length?'<span class="stip s-blauw"></span>':''}</div></div>`;
+  }
+  const sel=dagInfo(kalGeselecteerd);
+  const mijnStatus=sel.status.find(s=>s.gebruiker===ingelogd);
+  inhoud.innerHTML=`
+  <h2>Agenda & dagboek</h2>
+  <p class="subtxt" style="margin:-.6rem 0 1rem">Geef élke dag je verkopen en bezoeken in. Dagen met een <span class="tag t-rood">!</span> hebben nog geen invoer. <span class="stip s-groen" style="display:inline-block"></span> verkoop · <span class="stip s-blauw" style="display:inline-block"></span> bezoek</p>
+  <div class="rij c2">
+    <div class="kaart">
+      <div class="kal-kop"><button class="knop klein lijnk" id="kalVorige">←</button><h3>${MAANDEN[kalMaand]} ${kalJaar}</h3><div style="display:flex;gap:.4rem"><button class="knop klein lijnk" id="kalVandaag">Vandaag</button><button class="knop klein lijnk" id="kalVolgende">→</button></div></div>
+      <div class="kal-grid">${["Ma","Di","Wo","Do","Vr","Za","Zo"].map(d=>`<div class="kal-dagnaam">${d}</div>`).join("")}${cellen}</div>
+    </div>
+    <div class="kaart">
+      <h3>${nlDatum(kalGeselecteerd)}</h3>
+      <div class="detailblok">
+        <b style="font-size:.85rem">Verkopen die dag</b>
+        ${sel.verkopen.length?sel.verkopen.map(v=>`<div class="li-item">💰 ${esc(klantNaam(v.klantId))} — ${v.aantal}× · ${eur(v.totaal)} · ${esc(v.betaalwijze)} · <i>${esc(v.verkoper)}</i></div>`).join(""):'<div class="leeg" style="padding:.4rem 0">Geen verkopen geregistreerd.</div>'}
+        <button class="knop klein" id="agVerkoop">+ Verkoop op deze dag</button>
+      </div>
+      <div class="detailblok">
+        <b style="font-size:.85rem">Bezoeken / langsgegaan</b>
+        ${sel.bezoeken.length?sel.bezoeken.map(b=>`<div class="li-item">📍 <b>${esc(b.plaats)}</b> ${resBadge(b.resultaat)}${b.info?`<br><span class="subtxt">${esc(b.info)}</span>`:""} <i class="subtxt">(${esc(b.gebruiker)})</i>
+          <span style="float:right;display:flex;gap:.3rem">${b.resultaat==="opvolgen"&&!b.opgevolgd?`<button class="knop klein" data-blead="${b.id}">\u2192 lead</button>`:""}<button class="knop klein roodk" data-bweg="${b.id}">✕</button></span></div>`).join(""):'<div class="leeg" style="padding:.4rem 0">Nog geen bezoeken genoteerd.</div>'}
+        <div class="rij c3" style="margin-top:.4rem"><input id="agPlaats" placeholder="Waar langsgegaan? (zaak)"><input id="agInfo" placeholder="Notities (wat gezegd, wie gesproken\u2026)">
+        <select id="agRes"><option value="verkocht">\u2705 Verkocht</option><option value="opvolgen" selected>\ud83d\udd01 Interesse \u2014 opvolgen</option><option value="geen">\u274c Geen interesse</option><option value="afwezig">\ud83d\udeaa Niet aanwezig</option><option value="anders">\ud83d\udcdd Anders</option></select></div>
+        <button class="knop klein" id="agBezoek" style="margin-top:.5rem">+ Bezoek noteren</button>
+      </div>
+      <div class="detailblok">
+        ${mijnStatus?`<span class="tag t-groen">Dag ingegeven door ${esc(ingelogd)} ✓</span>${mijnStatus.nota?` <span class="subtxt">${esc(mijnStatus.nota)}</span>`:""}`:
+        `<div class="rij c2"><input id="agNota" placeholder="Dagnotitie (optioneel)"><button class="knop klein zwartk" id="agKlaar">Dag afsluiten ✓</button></div>
+        <p class="subtxt" style="margin-top:.4rem">Ook zonder verkopen: sluit de dag af zodat het overzicht klopt.</p>`}
+      </div>
+    </div>
+  </div>
+  <div class="kaart" style="margin-top:.9rem">
+    ${(()=>{const B=DB.bezoeken; const c=r=>B.filter(b=>b.resultaat===r).length;
+      const conv=B.length?Math.round(c("verkocht")/B.length*100):0;
+      return `<div class="koppel"><h3 style="margin:0">Bezoekenregister \u2014 elk fysiek bezoek (${B.length})</h3>
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <span class="subtxt">\u2705 ${c("verkocht")} \u00b7 \ud83d\udd01 ${c("opvolgen")} \u00b7 \u274c ${c("geen")} \u00b7 conversie <b>${conv}%</b></span>
+        <select id="bzFilter" style="width:auto"><option value="">Alle resultaten</option><option value="verkocht">Verkocht</option><option value="opvolgen">Opvolgen</option><option value="geen">Geen interesse</option><option value="afwezig">Niet aanwezig</option><option value="anders">Anders</option></select>
+        <select id="bzWie" style="width:auto"><option value="">Iedereen</option>${VERKOPERS.map(n=>`<option>${n}</option>`).join("")}</select>
+      </div></div>
+      <div id="bzLijst"></div>`})()}
+  </div>`;
+  renderBezoekRegister();
+  document.getElementById("kalVorige").addEventListener("click",()=>{kalMaand--;if(kalMaand<0){kalMaand=11;kalJaar--}renderAgenda()});
+  document.getElementById("kalVandaag").addEventListener("click",()=>{const n=new Date();kalMaand=n.getMonth();kalJaar=n.getFullYear();kalGeselecteerd=vandaagStr();renderAgenda()});
+  document.getElementById("kalVolgende").addEventListener("click",()=>{kalMaand++;if(kalMaand>11){kalMaand=0;kalJaar++}renderAgenda()});
+  inhoud.querySelectorAll("[data-dag]").forEach(c=>c.addEventListener("click",()=>{kalGeselecteerd=c.dataset.dag;renderAgenda()}));
+  document.getElementById("agVerkoop").addEventListener("click",()=>verkoopFormulier({datum:kalGeselecteerd}));
+  document.getElementById("agBezoek").addEventListener("click",()=>{
+    const plaats=document.getElementById("agPlaats").value.trim();
+    if(!plaats){alert("Vul in waar je bent langsgegaan.");return}
+    DB.bezoeken.push({id:nieuwId(),datum:kalGeselecteerd,gebruiker:ingelogd,plaats,info:document.getElementById("agInfo").value.trim(),resultaat:document.getElementById("agRes").value,opgevolgd:false});
+    bewaar();renderAgenda();});
+  inhoud.querySelectorAll("[data-bweg]").forEach(b=>b.addEventListener("click",()=>{
+    DB.bezoeken=DB.bezoeken.filter(x=>x.id!=b.dataset.bweg);bewaar();renderAgenda();}));
+  const klaar=document.getElementById("agKlaar");
+  if(klaar)klaar.addEventListener("click",()=>{
+    DB.dagstatus.push({datum:kalGeselecteerd,gebruiker:ingelogd,nota:document.getElementById("agNota").value.trim()});
+    bewaar();renderAgenda();});
+}
+
+function renderBezoekRegister(){
+  const el=document.getElementById("bzLijst"); if(!el)return;
+  const f=(document.getElementById("bzFilter")||{}).value||"", wie=(document.getElementById("bzWie")||{}).value||"";
+  let B=[...DB.bezoeken].sort((a,b)=>b.datum.localeCompare(a.datum)||b.id-a.id);
+  if(f)B=B.filter(b=>b.resultaat===f); if(wie)B=B.filter(b=>b.gebruiker===wie);
+  el.innerHTML=B.length?`<table style="margin-top:.6rem"><tr><th>Datum</th><th>Zaak</th><th>Resultaat</th><th>Notities</th><th>Door</th><th></th></tr>
+    ${B.slice(0,100).map(b=>`<tr><td style="white-space:nowrap">${nlDatum(b.datum)}</td><td><b>${esc(b.plaats)}</b></td><td>${resBadge(b.resultaat)}</td>
+    <td>${esc(b.info||"")}</td><td>${esc(b.gebruiker)}</td>
+    <td style="white-space:nowrap">${b.resultaat==="opvolgen"&&!b.opgevolgd?`<button class="knop klein" data-blead="${b.id}">\u2192 lead</button>`:(b.opgevolgd?'<span class="tag t-groen">lead \u2713</span>':"")}</td></tr>`).join("")}</table>`
+    :'<div class="leeg">Geen bezoeken gevonden.</div>';
+  const fl=document.getElementById("bzFilter"), wl=document.getElementById("bzWie");
+  if(fl&&!fl.dataset.gehecht){fl.dataset.gehecht=1;fl.addEventListener("change",renderBezoekRegister)}
+  if(wl&&!wl.dataset.gehecht){wl.dataset.gehecht=1;wl.addEventListener("change",renderBezoekRegister)}
+  document.querySelectorAll("[data-blead]").forEach(k=>{ if(k.dataset.gehecht)return; k.dataset.gehecht=1;
+    k.addEventListener("click",()=>{
+      const b=DB.bezoeken.find(x=>x.id==k.dataset.blead);
+      DB.leads.push({id:nieuwId(),naam:b.plaats,contact:"",status:"interesse",actieDatum:"",eigenaar:b.gebruiker,notities:"Uit bezoek "+nlDatum(b.datum)+": "+(b.info||"")});
+      b.opgevolgd=true;bewaar();renderAgenda();
+    });});
+}
+
+/* ============================================================ INSTELLINGEN */
+function renderInstellingen(){
+  inhoud.innerHTML=`
+  <h2>Instellingen & back-up</h2>
+  <div class="rij c2">
+    <div class="kaart"><h3>Back-up</h3>
+      <p class="subtxt" style="margin:.4rem 0 1rem">De gegevens staan in jullie gedeelde online database — elke wijziging is meteen zichtbaar voor Giannis én Jano, op elk toestel. Een back-up blijft verstandig als extra zekerheid.</p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <button class="knop klein" id="expKnop">⬇ Back-up downloaden</button>
+        <label class="knop klein lijnk" style="display:inline-flex;align-items:center">⬆ Back-up inladen<input type="file" id="impBestand" accept=".json" style="display:none"></label>
+      </div>
+      <p class="subtxt" style="margin-top:.8rem">Inladen <b>vervangt</b> alle huidige gegevens door de back-up.</p>
+    </div>
+    <div class="kaart"><h3>Gegevens</h3>
+      <table style="margin-top:.4rem">
+        <tr><td>Klanten</td><td style="text-align:right"><b>${DB.klanten.length}</b></td></tr>
+        <tr><td>Verkopen</td><td style="text-align:right"><b>${DB.verkopen.length}</b></td></tr>
+        <tr><td>Leads</td><td style="text-align:right"><b>${DB.leads.length}</b></td></tr>
+        <tr><td>Bezoeken</td><td style="text-align:right"><b>${DB.bezoeken.length}</b></td></tr>
+        <tr><td>Tickets</td><td style="text-align:right"><b>${DB.tickets.length}</b></td></tr>
+      </table>
+      <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap"><button class="knop klein lijnk" id="herSeed">Startgegevens (13\u201315/08) herladen</button><button class="knop klein roodk" id="wisAlles">Alles wissen</button></div>
+    </div>
+  </div>`;
+  document.getElementById("expKnop").addEventListener("click",()=>{
+    const blob=new Blob([JSON.stringify(DB,null,1)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+    a.download="trusttap-crm-backup-"+vandaagStr()+".json";a.click();});
+  document.getElementById("impBestand").addEventListener("change",e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{try{const d=JSON.parse(r.result);
+      if(!d.klanten||!d.stock)throw new Error("geen geldig CRM-bestand");
+      if(confirm("Back-up inladen en huidige gegevens vervangen?")){DB=Object.assign(leegeData(),d);bewaar();alert("Back-up ingeladen.");renderInstellingen();}}
+      catch(err){alert("Kon bestand niet lezen: "+err.message)}};
+    r.readAsText(f);});
+  document.getElementById("herSeed").addEventListener("click",()=>{
+    if(confirm("Alle huidige gegevens vervangen door de startgegevens van 13\u201315 augustus? Maak eerst een back-up!")){
+      DB=seedData();bewaar();alert("Startgegevens geladen.");renderInstellingen();}});
+  document.getElementById("wisAlles").addEventListener("click",()=>{
+    if(confirm("ALLE gegevens wissen? Dit kan niet ongedaan worden.")&&confirm("Zeker? Maak eerst een back-up!")){
+      DB=leegeData();bewaar();renderInstellingen();}});
+}
+
+/* ---------- sessie herstellen ---------- */
+SB.auth.getSession().then(({data})=>{
+  if(data&&data.session){ingelogd=NAAM_VAN[(data.session.user.email||"").toLowerCase()]||data.session.user.email;start();}
+});
+</script>
+</body>
+</html>
