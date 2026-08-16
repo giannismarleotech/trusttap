@@ -408,7 +408,7 @@ footer a:hover{color:var(--goud)}
       </div>
     </div></div></div>
       <h3 data-i18n="pk1_t"></h3><p class="sub" data-i18n="pk1_s"></p>
-      <div class="prijs"><span class="nu">&euro; 29,99</span><span class="per" data-i18n="prijs_per"></span></div>
+      <div class="prijs"><span class="nu">&euro; 30,00</span><span class="per" data-i18n="prijs_per"></span></div>
       <ul><li data-i18n="p_f1"></li><li data-i18n="p_f3"></li><li data-i18n="p_f4"></li><li data-i18n="p_f5"></li></ul>
       <a href="#bestellen" data-p="k1" class="btn btn-lijn" data-i18n="p_btn"></a>
     </div>
@@ -434,7 +434,7 @@ footer a:hover{color:var(--goud)}
       </div>
     </div></div></div></div>
       <h3 data-i18n="pk2_t"></h3><p class="sub" data-i18n="pk2_s"></p>
-      <div class="prijs"><span class="nu">&euro; 49,99</span><span class="per" data-i18n="prijs_per"></span></div>
+      <div class="prijs"><span class="nu">&euro; 50,00</span><span class="per" data-i18n="prijs_per"></span></div>
       <ul><li data-i18n="p_f1"></li><li data-i18n="p_f3"></li><li data-i18n="p_f4"></li><li data-i18n="p_f5"></li></ul>
       <a href="#bestellen" data-p="k2" class="btn btn-goud" data-i18n="p_btn"></a>
     </div>
@@ -453,8 +453,8 @@ footer a:hover{color:var(--goud)}
   <form id="bestelForm" class="bestel-grid" onsubmit="return false">
     <div class="veld">
       <label data-i18n="v_product"></label>
-      <select name="product"><option value="k1">1 TrustTap Kaart &mdash; &euro; 29,99</option><option value="k2">2 TrustTap Kaarten &mdash; &euro; 49,99</option></select>
-      <label data-i18n="v_aantal"></label><input type="number" name="aantal" min="1" value="1">
+      <select name="product"><option value="k1">1 TrustTap Kaart &mdash; &euro; 30,00</option><option value="k2">2 TrustTap Kaarten &mdash; &euro; 50,00</option></select>
+      
       <label data-i18n="v_naam"></label><input name="naam" autocomplete="name">
       <label data-i18n="v_zaak"></label><input name="zaak" autocomplete="organization">
       <label data-i18n="v_email"></label><input type="email" name="email" autocomplete="email">
@@ -468,12 +468,14 @@ footer a:hover{color:var(--goud)}
       <h3 data-i18n="sam_t"></h3>
       <table>
         <tr><td data-i18n="sam_prod"></td><td id="samProd"></td></tr>
-        <tr><td data-i18n="sam_aantal"></td><td id="samAantal"></td></tr>
+        
         <tr><td data-i18n="sam_lever"></td><td data-i18n="sam_gratis"></td></tr>
+        <tr><td data-i18n="sam_kosten"></td><td id="samKost">&euro; 0,75</td></tr>
         <tr><td data-i18n="sam_tot"></td><td id="samTot"></td></tr>
       </table>
       <p style="font-size:.8rem;margin:.8rem 0 1.2rem" data-i18n="sam_note"></p>
-      <button class="btn btn-goud" id="verstuurMail" style="width:100%" data-i18n="best_knop"></button>
+      <button class="btn btn-goud" id="verstuurSumup" style="width:100%">Bestellen &amp; betalen (Bancontact/kaart)</button>
+      <button class="btn btn-lijn" id="verstuurMail" style="width:100%;margin-top:.6rem" data-i18n="best_knop"></button>
       <button class="btn btn-lijn" id="verstuurWa" style="width:100%;margin-top:.6rem" data-i18n="best_wa"></button>
     </aside>
   </form>
@@ -599,7 +601,7 @@ nl:{
  best_eyebrow:"Bestellen",best_h2:"Uw bestelling",best_p:"Vul uw gegevens in en verstuur — de bestelling komt rechtstreeks bij ons binnen. Wij nemen persoonlijk contact op voor de betaling (overschrijving, Payconiq of kaart) en de personalisatie van uw kaart. U betaalt dus pas ná contact.",
  best_st1:"1 · Kies product",best_st2:"2 · Uw gegevens",best_st3:"3 · Wij contacteren u",
  v_product:"Product",v_aantal:"Aantal pakketten",v_naam:"Naam *",v_zaak:"Zaaknaam",v_email:"E-mailadres *",v_tel:"Telefoon *",v_adres:"Leveradres",v_btw:"BTW-nummer (voor factuur)",v_gr:"Google-reviewlink of naam van uw zaak op Google",v_opm:"Opmerkingen",
- sam_t:"Samenvatting",sam_prod:"Product",sam_aantal:"Aantal",sam_lever:"Levering",sam_gratis:"Gratis",sam_tot:"Totaal",
+ sam_t:"Samenvatting", sam_kosten:"Transactiekosten online betaling (SumUp)",sam_prod:"Product",sam_aantal:"Aantal",sam_lever:"Levering",sam_gratis:"Gratis",sam_tot:"Totaal",
  sam_note:"Na verzending nemen wij binnen 1 werkdag contact op voor betaling en personalisatie. Let op: eenmaal uw kaart geconfigureerd is, is de bestelling niet terugbetaalbaar (zie voorwaarden).",
  best_knop:"Bestelling versturen per e-mail",best_wa:"Of bestel via WhatsApp",
  best_fout:"Vul minstens naam, e-mail en telefoon in.",
@@ -650,7 +652,7 @@ en:{
  best_eyebrow:"Order",best_h2:"Your order",best_p:"Fill in your details and send — the order arrives directly in our inbox. We'll contact you personally for payment (bank transfer, Payconiq or card) and to personalise your card. You only pay after we've been in touch.",
  best_st1:"1 · Choose product",best_st2:"2 · Your details",best_st3:"3 · We contact you",
  v_product:"Product",v_aantal:"Number of packs",v_naam:"Name *",v_zaak:"Business name",v_email:"E-mail *",v_tel:"Phone *",v_adres:"Delivery address",v_btw:"VAT number (for invoice)",v_gr:"Google review link or your business name on Google",v_opm:"Remarks",
- sam_t:"Summary",sam_prod:"Product",sam_aantal:"Quantity",sam_lever:"Shipping",sam_gratis:"Free",sam_tot:"Total",
+ sam_t:"Summary", sam_kosten:"Online payment fee (SumUp)",sam_prod:"Product",sam_aantal:"Quantity",sam_lever:"Shipping",sam_gratis:"Free",sam_tot:"Total",
  sam_note:"After sending we'll contact you within 1 business day for payment and personalisation. Note: once your card has been configured, the order is non-refundable (see terms).",
  best_knop:"Send order by e-mail",best_wa:"Or order via WhatsApp",
  best_fout:"Please fill in at least name, e-mail and phone.",
@@ -701,7 +703,7 @@ fr:{
  best_eyebrow:"Commander",best_h2:"Votre commande",best_p:"Remplissez vos coordonnées et envoyez — la commande arrive directement chez nous. Nous vous contactons personnellement pour le paiement (virement, Payconiq ou carte) et la personnalisation. Vous ne payez qu'après notre contact.",
  best_st1:"1 · Choisir le produit",best_st2:"2 · Vos coordonnées",best_st3:"3 · Nous vous contactons",
  v_product:"Produit",v_aantal:"Nombre de packs",v_naam:"Nom *",v_zaak:"Nom du commerce",v_email:"E-mail *",v_tel:"Téléphone *",v_adres:"Adresse de livraison",v_btw:"Numéro de TVA (facture)",v_gr:"Lien d'avis Google ou nom de votre commerce sur Google",v_opm:"Remarques",
- sam_t:"Résumé",sam_prod:"Produit",sam_aantal:"Quantité",sam_lever:"Livraison",sam_gratis:"Gratuite",sam_tot:"Total",
+ sam_t:"Résumé", sam_kosten:"Frais de paiement en ligne (SumUp)",sam_prod:"Produit",sam_aantal:"Quantité",sam_lever:"Livraison",sam_gratis:"Gratuite",sam_tot:"Total",
  sam_note:"Après l'envoi, nous vous contactons sous 1 jour ouvrable pour le paiement et la personnalisation. Attention : une fois votre carte configurée, la commande n'est pas remboursable (voir conditions).",
  best_knop:"Envoyer la commande par e-mail",best_wa:"Ou commander via WhatsApp",
  best_fout:"Veuillez remplir au moins le nom, l'e-mail et le téléphone.",
@@ -751,22 +753,42 @@ document.addEventListener("DOMContentLoaded",()=>{
   vertaal();
 });
 /* ---------------- bestelpagina ---------------- */
-const PRODUCTEN={k1:{naam:"1 TrustTap Kaart",prijs:29.99},k2:{naam:"2 TrustTap Kaarten",prijs:49.99}};
+const PRODUCTEN={k1:{naam:"1 TrustTap Kaart",prijs:30.00,tags:1,sumup:"https://pay.sumup.com/b2c/QTQ9RTLZ"},k2:{naam:"2 TrustTap Kaarten",prijs:50.00,tags:2,sumup:"https://pay.sumup.com/b2c/QTEARYAM"}};
+const BETAALKOST=0.75;
 function eurF(n){return "€ "+n.toFixed(2).replace(".",",")}
 function veld(f,n){return f.querySelector('[name="'+n+'"]')}
 function bestelUpdate(){
   const f=document.getElementById("bestelForm"); if(!f)return;
   const p=PRODUCTEN[veld(f,"product").value]||PRODUCTEN.k1;
-  const n=Math.max(1,parseInt(veld(f,"aantal").value)||1);
+  const n=1;
   document.getElementById("samProd").textContent=p.naam;
-  document.getElementById("samAantal").textContent=n+"×";
-  document.getElementById("samTot").textContent=eurF(p.prijs*n);
+  
+  document.getElementById("samTot").textContent=eurF(p.prijs*n+BETAALKOST);
 }
 function bestelInit(){
   const f=document.getElementById("bestelForm");
 
   f.addEventListener("input",bestelUpdate);
   bestelUpdate();
+  document.getElementById("verstuurSumup").addEventListener("click",async e=>{
+    e.preventDefault();
+    const D=T[taal]||T.nl, v=n=>veld(f,n).value;
+    if(!v("naam").trim()||!v("email").trim()||!v("tel").trim()){alert(D.best_fout);return}
+    const p=PRODUCTEN[v("product")];
+    const knop=e.target; knop.disabled=true; knop.textContent="Bezig…";
+    try{
+      const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/webshop_orders",{method:"POST",
+        headers:{apikey:"sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh",Authorization:"Bearer sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh","Content-Type":"application/json",Prefer:"return=minimal"},
+        body:JSON.stringify({gegevens:{product:v("product"),productnaam:p.naam,totaal:+(p.prijs+BETAALKOST).toFixed(2),tags:p.tags,
+          naam:v("naam"),zaak:v("zaak"),email:v("email"),tel:v("tel"),adres:v("adres"),btw:v("btw"),
+          googlelink:v("googlelink"),opm:v("opm")}})});
+      if(!r.ok)throw new Error("status "+r.status);
+      location.href=p.sumup;
+    }catch(err){
+      knop.disabled=false;knop.textContent="Bestellen & betalen (Bancontact/kaart)";
+      alert("De bestelling kon niet worden doorgestuurd. Probeer opnieuw of bestel via WhatsApp.");
+    }
+  });
   document.getElementById("verstuurMail").addEventListener("click",e=>{
     e.preventDefault();
     const D=T[taal]||T.nl;

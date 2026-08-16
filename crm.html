@@ -353,6 +353,8 @@ async function start(){
   document.getElementById("gebruikerNaam").textContent="👤 "+ingelogd;
   ticketBadgeUpdate();
   toon("dashboard");
+  await webshopImport();
+  SB.channel("crm2").on("postgres_changes",{event:"INSERT",schema:"public",table:"webshop_orders"},()=>webshopImport()).subscribe();
   SB.channel("crm").on("postgres_changes",{event:"UPDATE",schema:"public",table:"crm_state"},p=>{
     if(p.new&&p.new.versie>dbVersie){DB=Object.assign(leegeData(),p.new.data);dbVersie=p.new.versie;
       const a=document.querySelector("#hoofdnav a.actief");
@@ -428,6 +430,8 @@ function laatsteDagen(n){
 }
 
 /* ============================================================ DASHBOARD */
+function comm(v){const t=Number(v.totaal)||0;
+  return v.verkoper==="Giannis"?{g:t/2,j:t/2,uitTeBetalen:!v.janoBetaald}:{g:0,j:t,uitTeBetalen:false}}
 function statsBerekenen(){
   const v=DB.verkopen;
   const omzet=v.reduce((s,x)=>s+x.totaal,0);
@@ -437,9 +441,11 @@ function statsBerekenen(){
   const betaal={cash:0,kaart:0,payconiq:0,overschrijving:0};
   v.forEach(x=>{betaal[x.betaalwijze]=(betaal[x.betaalwijze]||0)+x.totaal});
   const factuurOpen=v.filter(x=>!x.factuur).length;
+  let comG=0,comJ=0,openJano=0,openN=0;
+  v.forEach(x=>{const c=comm(x);comG+=c.g;comJ+=c.j;if(c.uitTeBetalen){openJano+=c.j;openN++}});
   const vandaag=vandaagStr();
   const omzetVandaag=v.filter(x=>x.datum===vandaag).reduce((s,x)=>s+x.totaal,0);
-  return {omzet,stuks,per,betaal,factuurOpen,omzetVandaag};
+  return {omzet,stuks,per,betaal,factuurOpen,omzetVandaag,comG,comJ,openJano,openN};
 }
 function renderDashboard(){
   const s=statsBerekenen();
@@ -478,6 +484,15 @@ function renderDashboard(){
     ${(()=>{const dagen=laatsteDagen(14);
       const data=dagen.map(d=>({label:d.slice(8)+"/"+d.slice(5,7),waarde:DB.verkopen.filter(v=>v.datum===d).reduce((s,v)=>s+Number(v.aantal),0)}));
       return data.some(d=>d.waarde)?svgStaaf(data):'<div class="leeg">Nog geen verkopen in deze periode.</div>'})()}
+  </div>
+  <div class="kaart" style="margin-bottom:1rem;border-left:4px solid var(--goud)">
+    <h3>💶 Commissies</h3>
+    <table style="margin-top:.5rem">
+      <tr><td><b>Giannis</b> verdiend (50% van eigen verkopen)</td><td style="text-align:right"><b>${eur(s.comG)}</b></td></tr>
+      <tr><td><b>Jano</b> verdiend (50% Giannis-verkopen + 100% eigen/webshop)</td><td style="text-align:right"><b>${eur(s.comJ)}</b></td></tr>
+      <tr><td>Nog aan Jano over te maken (uit Giannis-verkopen)</td><td style="text-align:right">${s.openN?`<span class="tag t-rood">${eur(s.openJano)} · ${s.openN} verkopen</span>`:'<span class="tag t-groen">alles uitbetaald ✓</span>'}</td></tr>
+    </table>
+    <p class="subtxt" style="margin-top:.5rem">Vink per verkoop "→ Jano ✓" af zodra Giannis het Jano-deel heeft overgemaakt.</p>
   </div>
   <div class="rij c2">
     <div class="kaart">
@@ -591,13 +606,15 @@ function renderVerkopen(){
     <span class="subtxt"><b>${lijst.length}</b> verkopen · <b>${totTags}</b> tags · <b>${eur(totOmzet)}</b></span>
   </div>
   <div class="kaart">${lijst.length?`
-    <table><tr><th>Datum</th><th>Klant</th><th>Aantal</th><th>Totaal</th><th>Betaling</th><th>Factuur</th><th>Verkoper</th><th></th></tr>
+    <table><tr><th>Datum</th><th>Klant</th><th>Aantal</th><th>Totaal</th><th>Betaling</th><th>Factuur</th><th>Verkoper</th><th>Commissie</th><th></th></tr>
     ${lijst.map(v=>`<tr>
       <td>${nlDatum(v.datum)}</td><td><b>${esc(klantNaam(v.klantId))}</b>${v.notitie?`<br><span class="subtxt">${esc(v.notitie)}</span>`:""}</td>
       <td>${v.aantal}× à ${eur(v.prijs)}</td><td><b>${eur(v.totaal)}</b></td>
       <td><span class="tag ${v.betaalwijze==='cash'?'t-groen':v.betaalwijze==='kaart'?'t-blauw':v.betaalwijze==='payconiq'?'t-grijs':'t-goud'}">${esc(v.betaalwijze)}</span></td>
-      <td>${v.factuur?'<span class="tag t-groen">gemaakt ✓</span>':`<button class="knop klein lijnk" data-factuur="${v.id}">markeer gemaakt</button>`}</td>
+      <td>${v.webshop&&!v.betaald?`<button class="knop klein" data-betaald="${v.id}">SumUp betaald ✓</button><br>`:""}${v.factuur?'<span class="tag t-groen">gemaakt ✓</span>':`<button class="knop klein lijnk" data-factuur="${v.id}">markeer gemaakt</button>`}</td>
       <td>${esc(v.verkoper)}</td>
+      <td style="white-space:nowrap;font-size:.78rem">${(()=>{const c=comm(v);
+        return `G ${eur(c.g)} · J ${eur(c.j)}`+(v.verkoper==="Giannis"?(v.janoBetaald?`<br><span class="tag t-groen">→ Jano ✓ ${nlDatum(v.janoBetaald.datum)}</span>`:`<br><button class="knop klein lijnk" data-jano="${v.id}">→ Jano uitbetaald ✓</button>`):"")})()}</td>
       <td><button class="knop klein roodk" data-weg="${v.id}">✕</button></td></tr>`).join("")}
     </table>`:'<div class="leeg">Nog geen verkopen geregistreerd.</div>'}
   </div>`;
@@ -611,6 +628,10 @@ function renderVerkopen(){
   document.getElementById("fltVerkoper").addEventListener("change",e=>{vkFilter.verkoper=e.target.value;renderVerkopen()});
   document.getElementById("fltBetaal").addEventListener("change",e=>{vkFilter.betaal=e.target.value;renderVerkopen()});
   document.getElementById("fltFactuur").addEventListener("change",e=>{vkFilter.factuur=e.target.value;renderVerkopen()});
+  inhoud.querySelectorAll("[data-jano]").forEach(b=>b.addEventListener("click",()=>{
+    DB.verkopen.find(v=>v.id==b.dataset.jano).janoBetaald={datum:vandaagStr(),door:ingelogd};bewaar();renderVerkopen();}));
+  inhoud.querySelectorAll("[data-betaald]").forEach(b=>b.addEventListener("click",()=>{
+    DB.verkopen.find(v=>v.id==b.dataset.betaald).betaald=true;bewaar();renderVerkopen();}));
   inhoud.querySelectorAll("[data-factuur]").forEach(b=>b.addEventListener("click",()=>{
     DB.verkopen.find(v=>v.id==b.dataset.factuur).factuur=true;bewaar();renderVerkopen();}));
   inhoud.querySelectorAll("[data-weg]").forEach(b=>b.addEventListener("click",()=>{
@@ -850,6 +871,10 @@ function meldingenLijst(){
   DB.tickets.filter(t=>t.status!=="opgelost"&&t.prioriteit==="hoog")
     .forEach(t=>m.push({i:"🎫",t:"Hoog-prioriteit ticket #"+t.id+": "+t.onderwerp,view:"tickets"}));
   DB.tickets.filter(t=>t.status==="open"&&t.prioriteit!=="hoog").length&&m.push({i:"🎫",t:DB.tickets.filter(t=>t.status==="open"&&t.prioriteit!=="hoog").length+" open ticket(s)",view:"tickets"});
+  const oj=DB.verkopen.filter(v=>v.verkoper==="Giannis"&&!v.janoBetaald);
+  if(oj.length)m.push({i:"💶",t:eur(oj.reduce((s2,v)=>s2+v.totaal/2,0))+" commissie uit "+oj.length+" Giannis-verkopen nog aan Jano over te maken",view:"verkopen"});
+  const wb=DB.verkopen.filter(v=>v.webshop&&!v.betaald).length;
+  if(wb)m.push({i:"\ud83d\uded2",t:wb+" webshopbestelling"+(wb>1?"en":"")+" wachten op SumUp-betaalbevestiging",view:"verkopen"});
   const opTeVolgen=DB.bezoeken.filter(b=>b.resultaat==="opvolgen"&&!b.opgevolgd).length;
   if(opTeVolgen)m.push({i:"\ud83d\udeb6",t:opTeVolgen+" bezoek"+(opTeVolgen>1?"en":"")+" met interesse nog op te volgen (maak er een lead van)",view:"agenda"});
   DB.taken.filter(t=>!t.klaar&&t.deadline&&t.deadline<vandaag).forEach(t=>m.push({i:"⏰",t:"Taak verlopen: "+t.titel+" ("+nlDatum(t.deadline)+")",view:"taken"}));
@@ -1174,6 +1199,28 @@ function renderInstellingen(){
       DB=leegeData();bewaar();renderInstellingen();}});
 }
 
+async function webshopImport(){
+  const {data,error}=await SB.from("webshop_orders").select("id,gegevens").eq("verwerkt",false);
+  if(error||!data||!data.length)return;
+  for(const o of data){
+    const g=o.gegevens||{};
+    let k=DB.klanten.find(x=>g.email&&x.email&&x.email.toLowerCase()===String(g.email).toLowerCase());
+    if(!k){k={id:nieuwId(),naam:g.zaak||g.naam||"Webshopklant",email:g.email||"",tel:g.tel||"",adres:g.adres||"",btw:g.btw||"",
+      notities:"Via webshop. Contact: "+(g.naam||"")+(g.googlelink?" · Google: "+g.googlelink:""),aangemaakt:vandaagStr()};DB.klanten.push(k);}
+    const aantal=Number(g.tags)||1, totaal=Number(g.totaal)||0;
+    DB.verkopen.push({id:nieuwId(),datum:vandaagStr(),klantId:k.id,aantal,prijs:+(totaal/aantal).toFixed(2),totaal,
+      betaalwijze:"kaart",factuur:false,verkoper:"Jano",bron:"magazijn",webshop:true,betaald:false,
+      notitie:"WEBSHOP (SumUp) — "+(g.productnaam||"")+(g.opm?" · "+g.opm:"")});
+    DB.stock.magazijn-=aantal;
+    DB.stocklog.unshift({datum:vandaagStr(),wie:"Webshop",type:"verkoop",aantal,van:"magazijn",naar:"klant: "+k.naam,actie:"Webshopverkoop \u2212"+aantal+" (magazijn) \u2192 "+k.naam});
+    await SB.from("webshop_orders").update({verwerkt:true}).eq("id",o.id);
+  }
+  bewaar();
+  const a=document.querySelector("#hoofdnav a.actief");
+  if(!modalOverlay||modalOverlay.hidden)toon(a?a.dataset.view:"dashboard");
+  try{if(typeof Notification!=="undefined"&&Notification&&Notification.permission==="granted")
+    new Notification("Nieuwe webshopbestelling!",{body:"Automatisch geregistreerd op naam van Jano \u2014 wacht op betaalbevestiging.",icon:"tt-icon.png"});}catch(e){}
+}
 function meldCollega(){
   try{
     if(typeof Notification==="undefined"||!Notification||Notification.permission!=="granted")return;
