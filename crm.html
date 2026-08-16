@@ -84,7 +84,30 @@ tr:hover td{background:#FCF9F0}
 .zijbalk .gebruiker b{color:#fff;display:block}
 .zijbalk .gebruiker button{background:none;border:none;color:var(--goud);font-size:.75rem;font-weight:700;padding:0;margin-top:.3rem}
 .hoofd{margin-left:230px;padding:2rem 2.2rem;max-width:1200px}
+.tabbar,.meer-sheet,.meer-achter{display:none}
 @media(max-width:900px){
+  .zijbalk nav{display:none!important}
+  .hoofd{padding-bottom:6.2rem}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:70;background:rgba(17,17,17,.97);backdrop-filter:blur(8px);
+    border-top:1px solid rgba(216,178,102,.35);padding:.4rem .2rem calc(.5rem + env(safe-area-inset-bottom))}
+  .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:#B9B29C;text-decoration:none;
+    font-size:.6rem;font-weight:700;letter-spacing:.02em;padding:.2rem 0;position:relative}
+  .tabbar a span{font-size:1.25rem;line-height:1}
+  .tabbar a.actief{color:var(--goud)}
+  .tabbar .dot{position:absolute;top:0;right:22%;width:9px;height:9px;border-radius:50%;background:var(--rood);display:none}
+  .tabbar .dot.aan{display:block}
+  .meer-achter{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:71}
+  .meer-achter:not([hidden]){display:block}
+  .meer-sheet{position:fixed;left:0;right:0;bottom:0;z-index:72;background:#fff;border-radius:20px 20px 0 0;
+    padding:.5rem 1.1rem calc(1rem + env(safe-area-inset-bottom));box-shadow:0 -14px 40px rgba(0,0,0,.25);animation:sheetOp .22s ease}
+  .meer-sheet:not([hidden]){display:block}
+  .meer-sheet .greep{width:42px;height:5px;border-radius:99px;background:#DDD;margin:.4rem auto .6rem}
+  .meer-sheet a{display:flex;align-items:center;gap:.6rem;padding:.95rem .3rem;font-size:1rem;font-weight:600;color:var(--ink);
+    text-decoration:none;border-bottom:1px solid var(--lijn)}
+  .meer-sheet a:last-child{border-bottom:none}
+  .sheetbadge:not(:empty){background:var(--rood);color:#fff;border-radius:99px;font-size:.66rem;padding:.12rem .5rem;font-weight:800;margin-left:auto}
+  @keyframes sheetOp{from{transform:translateY(40%)}to{transform:none}}
+
   #app{flex-direction:column}
   .zijbalk{position:sticky;top:0;bottom:auto;width:100%;flex-direction:row;flex-wrap:wrap;align-items:center;gap:.2rem;
     padding:.55rem .9rem;padding-top:calc(.55rem + env(safe-area-inset-top))}
@@ -167,6 +190,23 @@ tr:hover td{background:#FCF9F0}
   <main class="hoofd" id="inhoud"></main>
 </div>
 
+<nav class="tabbar" id="tabBar">
+  <a href="#" data-view="dashboard" class="actief"><span>📊</span>Dashboard</a>
+  <a href="#" data-view="agenda"><span>📅</span>Agenda</a>
+  <a href="#" data-view="verkopen"><span>💰</span>Verkopen</a>
+  <a href="#" data-view="klanten"><span>👥</span>Klanten</a>
+  <a href="#" id="meerKnop"><span>☰</span>Meer<i class="dot" id="meerDot"></i></a>
+</nav>
+<div class="meer-achter" id="meerAchter" hidden></div>
+<div class="meer-sheet" id="meerSheet" hidden>
+  <div class="greep"></div>
+  <a href="#" data-view="meldingen">🔔 Meldingen<span class="sheetbadge" id="meldBadge2"></span></a>
+  <a href="#" data-view="leads">🎯 Leads</a>
+  <a href="#" data-view="tickets">🎫 Tickets<span class="sheetbadge" id="ticketBadge2"></span></a>
+  <a href="#" data-view="taken">✅ Taken<span class="sheetbadge" id="taakBadge2"></span></a>
+  <a href="#" data-view="stock">📦 Stock</a>
+  <a href="#" data-view="instellingen">⚙️ Instellingen</a>
+</div>
 <div class="overlay" id="modalOverlay" hidden><div class="modal"><button class="sluit" id="modalSluit">×</button><div id="modalInhoud"></div></div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -268,9 +308,11 @@ async function pushDb(){
   const nog=bewaarBezig==="opnieuw"; bewaarBezig=false; if(nog)pushDb();
 }
 function ticketBadgeUpdate(){
-  const tb=document.getElementById("ticketBadge");if(tb)tb.textContent=DB.tickets.filter(t=>t.status!=="opgelost").length||"";
-  const kb=document.getElementById("taakBadge");if(kb)kb.textContent=DB.taken.filter(t=>!t.klaar).length||"";
-  const mb=document.getElementById("meldBadge");if(mb)mb.textContent=meldingenLijst().length||"";
+  const zet=(id,n)=>{const el=document.getElementById(id);if(el)el.textContent=n||""};
+  const t=DB.tickets.filter(x=>x.status!=="opgelost").length, k=DB.taken.filter(x=>!x.klaar).length, m=meldingenLijst().length;
+  zet("ticketBadge",t);zet("taakBadge",k);zet("meldBadge",m);
+  zet("ticketBadge2",t);zet("taakBadge2",k);zet("meldBadge2",m);
+  const dot=document.getElementById("meerDot");if(dot)dot.classList.toggle("aan",(t+k+m)>0);
 }
 function nieuwId(){return DB.teller++}
 
@@ -321,13 +363,28 @@ async function start(){
 }
 
 /* ---------- navigatie ---------- */
+document.querySelectorAll("#tabBar a[data-view], #meerSheet a[data-view]").forEach(a=>a.addEventListener("click",e=>{
+  e.preventDefault();sheetDicht();
+  document.querySelectorAll("#hoofdnav a").forEach(x=>x.classList.toggle("actief",x.dataset.view===a.dataset.view));
+  toon(a.dataset.view);
+}));
+document.getElementById("meerKnop").addEventListener("click",e=>{e.preventDefault();
+  document.getElementById("meerSheet").hidden=false;document.getElementById("meerAchter").hidden=false;});
+document.getElementById("meerAchter").addEventListener("click",sheetDicht);
 document.getElementById("hoofdnav").addEventListener("click",e=>{
   const a=e.target.closest("a[data-view]"); if(!a)return; e.preventDefault();
   document.querySelectorAll("#hoofdnav a").forEach(x=>x.classList.remove("actief"));
   a.classList.add("actief"); toon(a.dataset.view);
 });
 const inhoud=document.getElementById("inhoud");
+function tabbarSync(view){
+  document.querySelectorAll("#tabBar a[data-view]").forEach(a=>a.classList.toggle("actief",a.dataset.view===view));
+  const inSheet=["meldingen","leads","tickets","taken","stock","instellingen"].includes(view);
+  const mk=document.getElementById("meerKnop"); if(mk)mk.classList.toggle("actief",inSheet);
+}
+function sheetDicht(){document.getElementById("meerSheet").hidden=true;document.getElementById("meerAchter").hidden=true}
 function toon(view){
+  tabbarSync(view);
   if(view==="dashboard")renderDashboard();
   else if(view==="agenda")renderAgenda();
   else if(view==="verkopen")renderVerkopen();
