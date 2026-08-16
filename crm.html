@@ -2,13 +2,20 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>TrustTap CRM</title>
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TrustTap CRM">
+<link rel="apple-touch-icon" href="tt-icon.png">
+<link rel="manifest" href='data:application/manifest+json,{"name":"TrustTap CRM","short_name":"TrustTap CRM","display":"standalone","background_color":"%23111111","theme_color":"%23111111","start_url":".","icons":[{"src":"tt-icon.png","sizes":"180x180","type":"image/png"}]}'>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--goud:#D8B266;--goud-d:#B08A3E;--zwart:#111;--ink:#1a1a1a;--grijs:#6b6552;--lijn:#e8e0cc;--ivoor:#FBF8F1;--rood:#C0392B;--groen:#1E8E4E;--blauw:#2563EB}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Montserrat',sans-serif;background:var(--ivoor);color:var(--ink);font-size:15px}
+body{padding-bottom:env(safe-area-inset-bottom);font-family:'Montserrat',sans-serif;background:var(--ivoor);color:var(--ink);font-size:15px}
 button{font-family:inherit;cursor:pointer}
 input,select,textarea{font-family:inherit;font-size:.92rem;padding:.6rem .7rem;border:1px solid var(--lijn);border-radius:8px;background:#fff;width:100%}
 input:focus,select:focus,textarea:focus{outline:2px solid var(--goud);border-color:var(--goud)}
@@ -21,7 +28,30 @@ label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:upper
 .knop.roodk{background:var(--rood)}
 h2{font-size:1.3rem;font-weight:800;margin-bottom:1rem}
 h3{font-size:1rem;font-weight:700}
-.kaart{background:#fff;border:1px solid var(--lijn);border-radius:14px;padding:1.3rem}
+.kaart{background:#fff;border:1px solid var(--lijn);border-radius:14px;padding:1.3rem;overflow-x:auto}
+@media(max-width:640px){
+  .modal{width:96vw;padding:1.1rem .9rem;overflow-x:auto;border-radius:12px}
+  .koppel{flex-direction:column;align-items:stretch}
+  .koppel>div{justify-content:flex-start;flex-wrap:wrap}
+  .knop{padding:.65rem 1.1rem}
+  .li-item{font-size:.82rem}
+  .rij{gap:.6rem}
+  .balkje{height:8px}
+  .bestel-grid{grid-template-columns:1fr}
+
+  .hoofd{padding:1rem .8rem}
+  .kaart{padding:1rem .8rem}
+  h2{font-size:1.15rem}
+  table{font-size:.8rem}
+  td,th{padding:.45rem .4rem}
+  .statgrid{grid-template-columns:repeat(2,1fr);gap:.6rem}
+  .stat b{font-size:1.2rem}
+  .kal-dag{min-height:52px;font-size:.7rem}
+  .filterbalk select,.filterbalk input{min-width:120px;font-size:.85rem}
+  .koppel{gap:.6rem}
+  .modal{padding:1.1rem}
+  input,select,textarea,button.knop{font-size:16px}
+}
 table{width:100%;border-collapse:collapse;font-size:.87rem}
 th{text-align:left;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--grijs);padding:.55rem .6rem;border-bottom:2px solid var(--lijn)}
 td{padding:.6rem;border-bottom:1px solid var(--lijn);vertical-align:top}
@@ -54,15 +84,18 @@ tr:hover td{background:#FCF9F0}
 .zijbalk .gebruiker b{color:#fff;display:block}
 .zijbalk .gebruiker button{background:none;border:none;color:var(--goud);font-size:.75rem;font-weight:700;padding:0;margin-top:.3rem}
 .hoofd{margin-left:230px;padding:2rem 2.2rem;max-width:1200px}
-@media(max-width:860px){
-  .zijbalk{position:static;width:100%;flex-direction:row;align-items:center;padding:.6rem .8rem;overflow-x:auto}
-  .zijbalk .merk{padding:0 1rem 0 .4rem;border:none;white-space:nowrap}
-  .zijbalk nav{display:flex;padding:0}
-  .zijbalk nav a{padding:.55rem .8rem;border-left:none;border-bottom:3px solid transparent;white-space:nowrap}
-  .zijbalk nav a.actief{border-bottom-color:var(--goud)}
-  .zijbalk .gebruiker{display:flex;gap:.6rem;align-items:center;border:none;padding:.4rem .8rem;white-space:nowrap}
-  .hoofd{margin-left:0;padding:1.2rem}
-  #app{display:none;flex-direction:column}
+@media(max-width:900px){
+  #app{flex-direction:column}
+  .zijbalk{position:sticky;top:0;bottom:auto;width:100%;flex-direction:row;flex-wrap:wrap;align-items:center;gap:.2rem;
+    padding:.55rem .9rem;padding-top:calc(.55rem + env(safe-area-inset-top))}
+  .zijbalk .merk{border:none;padding:0;margin-right:auto}
+  .zijbalk .merk small{display:none}
+  .zijbalk .gebruiker{border:none;padding:0;display:flex;gap:.7rem;align-items:baseline;font-size:.78rem}
+  .zijbalk nav{order:3;flex:0 0 100%;display:flex;overflow-x:auto;padding:.4rem 0 0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .zijbalk nav::-webkit-scrollbar{display:none}
+  .zijbalk nav a{padding:.6rem .9rem;border-left:none;border-bottom:3px solid transparent;white-space:nowrap;font-size:.86rem}
+  .zijbalk nav a.actief,.zijbalk nav a:hover{border-bottom-color:var(--goud);background:none}
+  .hoofd{margin-left:0;padding:1rem .9rem 3rem;max-width:100%}
 }
 /* ---- dashboard ---- */
 .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.9rem;margin-bottom:1.2rem}
@@ -282,7 +315,8 @@ async function start(){
     if(p.new&&p.new.versie>dbVersie){DB=Object.assign(leegeData(),p.new.data);dbVersie=p.new.versie;
       const a=document.querySelector("#hoofdnav a.actief");
       if(!modalOverlay||modalOverlay.hidden)toon(a?a.dataset.view:"dashboard");
-      ticketBadgeUpdate();}
+      ticketBadgeUpdate();
+      meldCollega();}
   }).subscribe();
 }
 
@@ -1038,6 +1072,7 @@ function renderInstellingen(){
     <div class="kaart"><h3>Back-up</h3>
       <p class="subtxt" style="margin:.4rem 0 1rem">De gegevens staan in jullie gedeelde online database — elke wijziging is meteen zichtbaar voor Giannis én Jano, op elk toestel. Een back-up blijft verstandig als extra zekerheid.</p>
       <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <button class="knop klein lijnk" id="meldKnop">🔔 Meldingen op dit toestel aanzetten</button>
         <button class="knop klein" id="expKnop">⬇ Back-up downloaden</button>
         <label class="knop klein lijnk" style="display:inline-flex;align-items:center">⬆ Back-up inladen<input type="file" id="impBestand" accept=".json" style="display:none"></label>
       </div>
@@ -1054,6 +1089,14 @@ function renderInstellingen(){
       <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap"><button class="knop klein lijnk" id="herSeed">Startgegevens (13\u201315/08) herladen</button><button class="knop klein roodk" id="wisAlles">Alles wissen</button></div>
     </div>
   </div>`;
+  const mk=document.getElementById("meldKnop");
+  if(typeof Notification==="undefined"||!Notification)mk.style.display="none";
+  else if(Notification.permission==="granted"){mk.textContent="🔔 Meldingen staan aan ✓";mk.disabled=true;}
+  else mk.addEventListener("click",async()=>{
+    const p=await Notification.requestPermission();
+    if(p==="granted"){mk.textContent="🔔 Meldingen staan aan ✓";mk.disabled=true;}
+    else alert("Meldingen geweigerd. Zet ze aan via de browserinstellingen van dit toestel.");
+  });
   document.getElementById("expKnop").addEventListener("click",()=>{
     const blob=new Blob([JSON.stringify(DB,null,1)],{type:"application/json"});
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);
@@ -1074,6 +1117,12 @@ function renderInstellingen(){
       DB=leegeData();bewaar();renderInstellingen();}});
 }
 
+function meldCollega(){
+  try{
+    if(typeof Notification==="undefined"||!Notification||Notification.permission!=="granted")return;
+    new Notification("TrustTap CRM bijgewerkt",{body:"Je collega heeft zonet iets aangepast \u2014 de nieuwste gegevens staan klaar.",icon:"tt-icon.png"});
+  }catch(e){}
+}
 /* ---------- sessie herstellen ---------- */
 SB.auth.getSession().then(({data})=>{
   if(data&&data.session){ingelogd=NAAM_VAN[(data.session.user.email||"").toLowerCase()]||data.session.user.email;start();}
