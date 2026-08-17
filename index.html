@@ -839,6 +839,7 @@ function bestelInit(){
           naam:v("naam"),zaak:v("zaak"),email:v("email"),tel:v("tel"),adres:v("adres"),btw:v("btw"),
           googlelink:v("googlelink"),opm:v("opm")}})});
       if(!r.ok)throw new Error("status "+r.status);
+      stat("afrekenen",v("product"));
       location.href=p.sumup;
     }catch(err){
       knop.disabled=false;vertaal();
@@ -848,7 +849,16 @@ function bestelInit(){
 }
 
 const PAGINAS=["home","producten","bestellen","hoe","voorwaarden"];
+const STAT_URL="https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/site_events";
+const STAT_KEY="sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh";
+function statSessie(){try{let s=sessionStorage.getItem("tt_s");if(!s){s=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem("tt_s",s)}return s}catch(e){return "anoniem"}}
+function stat(type,info){
+  try{fetch(STAT_URL,{method:"POST",keepalive:true,
+    headers:{apikey:STAT_KEY,Authorization:"Bearer "+STAT_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},
+    body:JSON.stringify({sessie:statSessie(),type,info:String(info||"").slice(0,120)})}).catch(function(){});}catch(e){}
+}
 function toonPagina(naam){
+  stat("weergave",naam);
   if(!PAGINAS.includes(naam))naam="home";
   document.querySelectorAll(".pagina").forEach(p=>p.classList.toggle("actief",p.id==="pg-"+naam));
   document.querySelectorAll(".nav-links a").forEach(a=>a.classList.toggle("hier",(a.getAttribute("href")||"")==="#"+naam));
@@ -861,7 +871,8 @@ document.addEventListener("DOMContentLoaded",()=>{
       try{history.replaceState(null,"","#"+doel)}catch(err){}
       toonPagina(doel);
       if(doel==="bestellen"&&a.dataset.p){const f=document.getElementById("bestelForm");
-        if(f){veld(f,"product").value=a.dataset.p;bestelUpdate();}}
+        if(f){veld(f,"product").value=a.dataset.p;bestelUpdate();}
+        stat("winkelwagen",a.dataset.p);}
     }}));
   window.addEventListener("hashchange",()=>toonPagina(location.hash.slice(1)));
   toonPagina((location.hash||"#home").slice(1));

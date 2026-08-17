@@ -30,6 +30,14 @@ h2{font-size:1.3rem;font-weight:800;margin-bottom:1rem}
 h3{font-size:1rem;font-weight:700}
 .kaart{background:#fff;border:1px solid var(--lijn);border-radius:14px;padding:1.3rem;overflow-x:auto}
 @media(max-width:640px){
+  td,th{padding:.38rem .3rem;font-size:.74rem}
+  .t-verkopen td:nth-child(5),.t-verkopen th:nth-child(5),
+  .t-verkopen td:nth-child(6),.t-verkopen th:nth-child(6){display:none}
+  .t-verkopen td:nth-child(2){max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .filterbalk{gap:.4rem}
+  .filterbalk select,.filterbalk input{min-width:0;flex:1 1 45%}
+  h2{overflow-wrap:anywhere}
+
   .modal{width:96vw;padding:1.1rem .9rem;overflow-x:auto;border-radius:12px}
   .koppel{flex-direction:column;align-items:stretch}
   .koppel>div{justify-content:flex-start;flex-wrap:wrap}
@@ -277,7 +285,7 @@ function isB(){return ROL==="beheerder"}
 
 /* ---------- opslag ---------- */
 const SLEUTEL = "trusttap_crm_v1";
-function leegeData(){return {klanten:[],verkopen:[],leads:[],bezoeken:[],dagstatus:[],tickets:[],taken:[],webshopWacht:[],verkopers:[],mails:[],stock:{magazijn:0,Giannis:0,Jano:0},stocklog:[],teller:1}}
+function leegeData(){return {klanten:[],verkopen:[],leads:[],bezoeken:[],dagstatus:[],tickets:[],taken:[],webshopWacht:[],verkopers:[],mails:[],logboek:[],stock:{magazijn:0,Giannis:0,Jano:0},stocklog:[],teller:1}}
 
 /* ---------- startgegevens (verkopen & leads Giannis, 13-15/08/2026) ---------- */
 function seedData(){
@@ -389,6 +397,15 @@ async function start(){
   await webshopImport();
   SB.channel("crm2").on("postgres_changes",{event:"INSERT",schema:"public",table:"webshop_orders"},()=>webshopImport()).subscribe();
   if(isB()){
+    await webStatsLaden();
+    {const a=document.querySelector("#hoofdnav a.actief");
+     if(a&&a.dataset.view==="dashboard")renderDashboard();}
+    SB.channel("crm4").on("postgres_changes",{event:"INSERT",schema:"public",table:"site_events"},()=>{
+      webStatsLaden().then(()=>{const a=document.querySelector("#hoofdnav a.actief");
+        if(a&&a.dataset.view==="dashboard"&&(!modalOverlay||modalOverlay.hidden))renderDashboard();});
+    }).subscribe();
+    setInterval(()=>{if(document.visibilityState==="visible")webStatsLaden().then(()=>{const a=document.querySelector("#hoofdnav a.actief");
+      if(a&&a.dataset.view==="dashboard"&&(!modalOverlay||modalOverlay.hidden))renderDashboard();})},60000);
     await postTellerVerversen();
     SB.channel("crm3").on("postgres_changes",{event:"INSERT",schema:"public",table:"mail_inbox"},p=>{
       postOngelezen++; ticketBadgeUpdate();
@@ -399,11 +416,13 @@ async function start(){
     }).subscribe();
   }
   SB.channel("crm").on("postgres_changes",{event:"UPDATE",schema:"public",table:"crm_state"},p=>{
-    if(p.new&&p.new.versie>dbVersie){DB=Object.assign(leegeData(),p.new.data);dbVersie=p.new.versie;
+    if(p.new&&p.new.versie>dbVersie){const oudTopLog=(DB.logboek&&DB.logboek[0]?DB.logboek[0].id:0);
+      DB=Object.assign(leegeData(),p.new.data);dbVersie=p.new.versie;
       const a=document.querySelector("#hoofdnav a.actief");
       if(!modalOverlay||modalOverlay.hidden)toon(a?a.dataset.view:"dashboard");
       ticketBadgeUpdate();
-      meldCollega();}
+      const nw=(DB.logboek||[]).find(e=>e.wie!==ingelogd&&e.id>oudTopLog);
+      if(nw)meldCollega(nw.wie+": "+nw.tekst); else meldCollega();}
   }).subscribe((status)=>{
     if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){setTimeout(()=>{try{dbLaden().then(()=>{const a=document.querySelector("#hoofdnav a.actief");if(!modalOverlay||modalOverlay.hidden)toon(a?a.dataset.view:"dashboard")})}catch(e){}},4000)}
   });
@@ -516,6 +535,31 @@ function statsBerekenen(){
   const omzetVandaag=v.filter(x=>x.datum===vandaag).reduce((s,x)=>s+x.totaal,0);
   return {omzet,stuks,per,betaal,factuurOpen,omzetVandaag,comG,comJ,openJano,openN};
 }
+let webStats={laden:true,weergaven:0,bezoekers:0,winkelwagen:0,afrekenen:0,live:0};
+async function webStatsLaden(){
+  try{
+    const vandaag=new Date();vandaag.setHours(0,0,0,0);
+    const {data,error}=await SB.from("site_events").select("sessie,type,t").gte("t",vandaag.toISOString()).limit(5000);
+    if(error){webStats={fout:true};return}
+    const uniek=new Set(data.map(e=>e.sessie));
+    const vijf=Date.now()-5*60*1000;
+    webStats={laden:false,weergaven:data.filter(e=>e.type==="weergave").length,bezoekers:uniek.size,
+      winkelwagen:data.filter(e=>e.type==="winkelwagen").length,afrekenen:data.filter(e=>e.type==="afrekenen").length,
+      live:new Set(data.filter(e=>new Date(e.t).getTime()>vijf).map(e=>e.sessie)).size};
+  }catch(e){webStats={fout:true}}
+}
+function webStatsKaart(){
+  if(!isB())return "";
+  if(webStats.fout)return `<div class="kaart" style="margin-bottom:1rem"><h3>\ud83c\udf10 Website</h3><div class="leeg">Statistieken nog niet ge\u00efnstalleerd (draai supabase-setup-stats.sql).</div></div>`;
+  return `<div class="kaart" style="margin-bottom:1rem">
+    <h3>\ud83c\udf10 Website vandaag <span class="tag ${webStats.live?"t-groen":"t-grijs"}" style="float:right">\u25cf ${webStats.live} nu live</span></h3>
+    <div class="statgrid" style="margin-top:.6rem">
+      <div class="stat"><b>${webStats.bezoekers}</b><span>bezoekers</span></div>
+      <div class="stat"><b>${webStats.weergaven}</b><span>paginaweergaven</span></div>
+      <div class="stat"><b>${webStats.winkelwagen}</b><span>\ud83d\uded2 product gekozen</span></div>
+      <div class="stat"><b>${webStats.afrekenen}</b><span>naar afrekenen</span></div>
+    </div></div>`;
+}
 function renderDashboard(){
   const s=statsBerekenen();
   const stockTot=VERKLIJST().reduce((s,n)=>s+(DB.stock[n]||0),DB.stock.magazijn);
@@ -523,6 +567,7 @@ function renderDashboard(){
   const recent=[...DB.verkopen].sort((a,b)=>b.datum.localeCompare(a.datum)).slice(0,6);
   const openLeads=DB.leads.filter(l=>!["gewonnen","verloren"].includes(l.status));
   inhoud.innerHTML=`
+  ${webStatsKaart()}
   <div class="koppel"><h2 style="margin:0">Dashboard</h2>
     <div style="display:flex;gap:.5rem;flex-wrap:wrap">
       <button class="knop klein" id="snelVerkoop">+ Verkoop</button>
@@ -554,6 +599,23 @@ function renderDashboard(){
       const data=dagen.map(d=>({label:d.slice(8)+"/"+d.slice(5,7),waarde:DB.verkopen.filter(v=>v.datum===d).reduce((s,v)=>s+Number(v.aantal),0)}));
       return data.some(d=>d.waarde)?svgStaaf(data):'<div class="leeg">Nog geen verkopen in deze periode.</div>'})()}
   </div>
+  ${isB()?(()=>{
+    const rij=VERKLIJST().map(n=>{
+      const vk=DB.verkopen.filter(v=>v.verkoper===n);
+      return {n,omzet:vk.reduce((s2,v)=>s2+(v.totaal||0),0),verkopen:vk.length,
+        stuks:vk.reduce((s2,v)=>s2+(Number(v.aantal)||0),0),
+        bezoeken:DB.bezoeken.filter(b=>b.gebruiker===n).length};
+    }).sort((a,b)=>b.omzet-a.omzet);
+    const top=(veld)=>Math.max(1,...rij.map(r=>r[veld]));
+    const med=["\ud83e\udd47","\ud83e\udd48","\ud83e\udd49"];
+    return `<div class="kaart" style="margin-bottom:1rem">
+      <h3>\ud83c\udfc6 Ranglijst</h3>
+      <table class="t-rang" style="margin-top:.5rem"><tr><th></th><th>Omzet</th><th>Verkopen</th><th>Tags</th><th>Bezoeken</th></tr>
+      ${rij.map((r,i)=>`<tr>
+        <td><b>${med[i]||"\u2004\u2004"} ${esc(r.n)}</b></td>
+        <td><b>${eur(r.omzet)}</b><div class="balkje" style="max-width:90px"><i style="width:${Math.round(r.omzet/top("omzet")*100)}%"></i></div></td>
+        <td>${r.verkopen}</td><td>${r.stuks}</td><td>${r.bezoeken}</td></tr>`).join("")}
+      </table></div>`;})():""}
   <div class="kaart" style="margin-bottom:1rem;border-left:4px solid var(--goud)">
     <h3>💶 Commissies</h3>
     ${isB()?"":`<p>Jouw verdiende commissie (50% van je eigen verkopen): <b>${eur(DB.verkopen.filter(v=>v.verkoper===ingelogd).reduce((s2,v)=>s2+(v.totaal||0)/2,0))}</b></p>`}
@@ -596,6 +658,7 @@ function renderDashboard(){
     const sl=b.dataset.wkbetaald;
     DB.verkopen.filter(v=>v.verkoper==="Giannis"&&!v.janoBetaald&&weekVan(v.datum).sleutel===sl)
       .forEach(v=>v.janoBetaald={datum:vandaagStr(),door:ingelogd,week:sl});
+    logAct("commissieweek uitbetaald aan Jano \u2014 week "+sl);
     bewaar();renderDashboard();}));
   document.getElementById("snelVerkoop").addEventListener("click",()=>verkoopFormulier({}));
   document.getElementById("snelKlant").addEventListener("click",()=>klantFormulier());
@@ -794,7 +857,7 @@ function renderVerkopen(){
       <span style="float:right;display:flex;gap:.3rem"><button class="knop klein" data-wsbetaald="${w.id}">Betaald ✓ → verkoop</button><button class="knop klein roodk" data-wsweg="${w.id}">✕</button></span></div>`).join("")}
   </div>`:""}
   <div class="kaart">${lijst.length?`
-    <table><tr><th>Datum</th><th>Klant</th><th>Aantal</th><th>Totaal</th><th>Betaling</th><th>Factuur</th><th>Verkoper</th><th>Commissie</th><th></th></tr>
+    <table class="t-verkopen"><tr><th>Datum</th><th>Klant</th><th>Aantal</th><th>Totaal</th><th>Betaling</th><th>Factuur</th><th>Verkoper</th><th>Commissie</th><th></th></tr>
     ${lijst.map(v=>`<tr>
       <td>${nlDatum(v.datum)}</td><td><b>${esc(klantNaam(v.klantId))}</b>${v.notitie?`<br><span class="subtxt">${esc(v.notitie)}</span>`:""}</td>
       <td>${v.aantal}× à ${eur(v.prijs)}</td><td><b>${eur(v.totaal)}</b></td>
@@ -803,7 +866,7 @@ function renderVerkopen(){
       <td>${esc(v.verkoper)}</td>
       <td style="white-space:nowrap;font-size:.78rem">${(()=>{const c=comm(v);
         return `G ${eur(c.g)} · J ${eur(c.j)}`+(v.verkoper==="Giannis"?(v.janoBetaald?`<br><span class="tag t-groen">→ Jano ✓ ${nlDatum(v.janoBetaald.datum)}</span>`:`<br><span class="tag t-goud">wekelijkse uitbetaling</span>`):"")})()}</td>
-      <td><button class="knop klein roodk" data-weg="${v.id}">✕</button></td></tr>`).join("")}
+      <td>${v.verkoper===ingelogd?`<button class="knop klein roodk" data-weg="${v.id}">✕</button>`:""}</td></tr>`).join("")}
     </table>`:'<div class="leeg">Nog geen verkopen geregistreerd.</div>'}
   </div>`;
   document.getElementById("nieuweVerkoop").addEventListener("click",()=>verkoopFormulier({}));
@@ -825,7 +888,9 @@ function renderVerkopen(){
     DB.verkopen.find(v=>v.id==b.dataset.factuur).factuur=true;bewaar();renderVerkopen();}));
   inhoud.querySelectorAll("[data-weg]").forEach(b=>b.addEventListener("click",()=>{
     const v=DB.verkopen.find(x=>x.id==b.dataset.weg);
+    if(v.verkoper!==ingelogd){alert("Je kunt alleen je eigen verkopen verwijderen.");return}
     if(!confirm("Deze verkoop verwijderen?"))return;
+    logAct("verkoop verwijderd \u2014 "+(klantNaam(v.klantId)||"?")+" \u00b7 "+eur(v.totaal));
     if(v.bron&&confirm("Deze verkoop was afgeboekt van voorraad \""+v.bron+"\". "+v.aantal+" stuks terugzetten?")){
       DB.stock[v.bron]=(DB.stock[v.bron]||0)+Number(v.aantal);
       DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"retour",aantal:Number(v.aantal),van:"klant: "+klantNaam(v.klantId),naar:v.bron,actie:"Verkoop verwijderd: +"+v.aantal+" terug naar "+v.bron});
@@ -877,6 +942,7 @@ function verkoopFormulier(voorkeur){
       klantId:Number(document.getElementById("v_klant").value),aantal,prijs,totaal:+(aantal*prijs).toFixed(2),
       betaalwijze:betaal,factuur:document.getElementById("v_factuur").value==="ja",
       verkoper:document.getElementById("v_verkoper").value,bron:bron||"",notitie:document.getElementById("v_not").value.trim()};
+    logAct((voorkeur&&voorkeur.bewerkId?"verkoop bewerkt":"verkoop toegevoegd")+" \u2014 "+(klantNaam(rec.klantId)||"?")+" \u00b7 "+rec.aantal+" st \u00b7 "+eur(rec.totaal));
     DB.verkopen.push(rec);
     if(bron){DB.stock[bron]=(DB.stock[bron]||0)-aantal;DB.stocklog.unshift({datum:vandaagStr(),wie:ingelogd,type:"verkoop",aantal:aantal,van:bron,naar:"klant: "+klantNaam(rec.klantId),actie:"Verkoop \u2212"+aantal+" van "+bron+" \u2192 "+klantNaam(rec.klantId)})}
     bewaar();sluitModal();toon(document.querySelector("#hoofdnav a.actief").dataset.view);
@@ -894,7 +960,7 @@ function renderLeads(){
     <td>${l.actieDatum?nlDatum(l.actieDatum):"—"}</td><td>${esc(l.eigenaar)}</td>
     <td style="white-space:nowrap"><button class="knop klein lijnk" data-bewerk="${l.id}">✎</button>
     <button class="knop klein" data-klant="${l.id}">→ klant</button>
-    <button class="knop klein roodk" data-weg="${l.id}">✕</button></td></tr>`;
+    ${l.eigenaar===ingelogd?`<button class="knop klein roodk" data-weg="${l.id}">✕</button>`:""}</td></tr>`;
   inhoud.innerHTML=`
   <div class="koppel"><h2 style="margin:0">Leads (${open.length} open)</h2><button class="knop" id="nieuweLead">+ Nieuwe lead</button></div>
   <div class="kaart">
@@ -906,7 +972,9 @@ function renderLeads(){
     DB.leads.find(l=>l.id==s.dataset.status).status=s.value;bewaar();renderLeads();}));
   inhoud.querySelectorAll("[data-bewerk]").forEach(b=>b.addEventListener("click",()=>leadFormulier(DB.leads.find(l=>l.id==b.dataset.bewerk))));
   inhoud.querySelectorAll("[data-weg]").forEach(b=>b.addEventListener("click",()=>{
-    if(confirm("Lead verwijderen?")){DB.leads=DB.leads.filter(l=>l.id!=b.dataset.weg);bewaar();renderLeads()}}));
+    const ld0=DB.leads.find(l=>l.id==b.dataset.weg);
+    if(ld0&&ld0.eigenaar!==ingelogd){alert("Alleen "+ld0.eigenaar+" kan deze lead verwijderen.");return}
+    if(confirm("Lead verwijderen?")){const ld=DB.leads.find(l=>l.id==b.dataset.weg);logAct("lead verwijderd \u2014 "+(ld?ld.naam:"?"));DB.leads=DB.leads.filter(l=>l.id!=b.dataset.weg);bewaar();renderLeads()}}));
   inhoud.querySelectorAll("[data-klant]").forEach(b=>b.addEventListener("click",()=>{
     const l=DB.leads.find(x=>x.id==b.dataset.klant);
     const k={id:nieuwId(),naam:l.naam,email:"",tel:l.contact||"",adres:"",btw:"",notities:"Uit lead: "+(l.notities||""),aangemaakt:vandaagStr()};
@@ -1082,6 +1150,13 @@ function meldingenLijst(){
     m.push({i:"📅",t:"Gisteren ("+nlDatum(gi)+") is nog niet ingegeven of afgesloten",view:"agenda"});
   return m;
 }
+function logboekHtml(){
+  const L=(DB.logboek||[]).slice(0,50);
+  return `<div class="kaart" style="margin-top:1rem"><h3>\ud83d\udcdc Logboek \u2014 wie deed wat</h3>
+  ${L.length?L.map(e=>`<div class="li-item"><b>${esc(e.wie)}</b> \u2014 ${esc(e.tekst)}
+    <span style="float:right" class="subtxt">${new Date(e.t).toLocaleString("nl-BE",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</span></div>`).join("")
+  :'<div class="leeg">Nog geen activiteit geregistreerd.</div>'}</div>`;
+}
 function renderMeldingen(){
   const m=meldingenLijst();
   inhoud.innerHTML=`
@@ -1090,6 +1165,7 @@ function renderMeldingen(){
   ${m.length?m.map((x,i)=>`<div class="li-item" style="display:flex;justify-content:space-between;align-items:center;gap:1rem">
     <span>${x.i} ${esc(x.t)}</span><button class="knop klein lijnk" data-ga="${x.view}">Bekijk →</button></div>`).join("")
   :'<div class="kaart"><div class="leeg">🎉 Niets te melden — alles is bij!</div></div>'}`;
+  inhoud.insertAdjacentHTML("beforeend",logboekHtml());
   inhoud.querySelectorAll("[data-ga]").forEach(b=>b.addEventListener("click",()=>{
     document.querySelectorAll("#hoofdnav a").forEach(x=>x.classList.toggle("actief",x.dataset.view===b.dataset.ga));
     toon(b.dataset.ga);}));
@@ -1126,6 +1202,7 @@ function taakFormulier(){
   document.getElementById("k_bewaar").addEventListener("click",()=>{
     const titel=document.getElementById("k_titel").value.trim();
     if(!titel){alert("Titel is verplicht.");return}
+    logAct("taak toegevoegd \u2014 "+titel);
     DB.taken.push({id:nieuwId(),titel,omschrijving:document.getElementById("k_oms").value.trim(),
       deadline:document.getElementById("k_dead").value,voor:document.getElementById("k_voor").value,
       klaar:false,aangemaakt:vandaagStr(),door:ingelogd});
@@ -1289,7 +1366,7 @@ function renderAgenda(){
       <div class="detailblok">
         <b style="font-size:.85rem">Bezoeken / langsgegaan</b>
         ${sel.bezoeken.length?sel.bezoeken.map(b=>`<div class="li-item">📍 <b>${esc(b.plaats)}</b> ${resBadge(b.resultaat)}${b.info?`<br><span class="subtxt">${esc(b.info)}</span>`:""} <i class="subtxt">(${esc(b.gebruiker)})</i>
-          <span style="float:right;display:flex;gap:.3rem">${b.resultaat==="opvolgen"&&!b.opgevolgd?`<button class="knop klein" data-blead="${b.id}">\u2192 lead</button>`:""}<button class="knop klein roodk" data-bweg="${b.id}">✕</button></span></div>`).join(""):'<div class="leeg" style="padding:.4rem 0">Nog geen bezoeken genoteerd.</div>'}
+          <span style="float:right;display:flex;gap:.3rem">${b.resultaat==="opvolgen"&&!b.opgevolgd?`<button class="knop klein" data-blead="${b.id}">\u2192 lead</button>`:""}${b.gebruiker===ingelogd?`<button class="knop klein roodk" data-bweg="${b.id}">✕</button>`:""}</span></div>`).join(""):'<div class="leeg" style="padding:.4rem 0">Nog geen bezoeken genoteerd.</div>'}
         <div class="rij c3" style="margin-top:.4rem"><input id="agPlaats" placeholder="Waar langsgegaan? (zaak)"><input id="agInfo" placeholder="Notities (wat gezegd, wie gesproken\u2026)">
         <select id="agRes"><option value="verkocht">\u2705 Verkocht</option><option value="opvolgen" selected>\ud83d\udd01 Interesse \u2014 opvolgen</option><option value="geen">\u274c Geen interesse</option><option value="afwezig">\ud83d\udeaa Niet aanwezig</option><option value="anders">\ud83d\udcdd Anders</option></select></div>
         <button class="knop klein" id="agBezoek" style="margin-top:.5rem">+ Bezoek noteren</button>
@@ -1324,8 +1401,10 @@ function renderAgenda(){
     const res=document.getElementById("agRes").value;
     const bez={id:nieuwId(),datum:kalGeselecteerd,gebruiker:ingelogd,plaats,info:document.getElementById("agInfo").value.trim(),resultaat:res,opgevolgd:false};
     DB.bezoeken.push(bez);
+    logAct("bezoek toegevoegd \u2014 "+plaats+" ("+res+")");
     if(res==="opvolgen"){
       if(!DB.leads.some(l=>(l.naam||"").toLowerCase()===plaats.toLowerCase())){
+        logAct("lead automatisch aangemaakt uit bezoek \u2014 "+plaats);
         DB.leads.push({id:nieuwId(),naam:plaats,contact:"",status:"interesse",actieDatum:"",eigenaar:ingelogd,notities:"Automatisch uit bezoek "+nlDatum(bez.datum)+(bez.info?": "+bez.info:"")});
         bez.opgevolgd=true;
       }
@@ -1337,6 +1416,10 @@ function renderAgenda(){
       verkoopFormulier({datum:bez.datum,klantId:k.id});
     }});
   inhoud.querySelectorAll("[data-bweg]").forEach(b=>b.addEventListener("click",()=>{
+    const bz=DB.bezoeken.find(x=>x.id==b.dataset.bweg);
+    if(!bz||bz.gebruiker!==ingelogd){alert("Je kunt alleen je eigen bezoeken verwijderen.");return}
+    if(!confirm("Dit bezoek verwijderen?"))return;
+    logAct("bezoek verwijderd \u2014 "+bz.plaats+" ("+nlDatum(bz.datum)+")");
     DB.bezoeken=DB.bezoeken.filter(x=>x.id!=b.dataset.bweg);bewaar();renderAgenda();}));
   const klaar=document.getElementById("agKlaar");
   if(klaar)klaar.addEventListener("click",()=>{
@@ -1518,12 +1601,18 @@ function webshopBetaald(wid){
   DB.stock.magazijn-=aantal;
   DB.stocklog.unshift({datum:vandaagStr(),wie:"Webshop",type:"verkoop",aantal,van:"magazijn",naar:"klant: "+k.naam,actie:"Webshopverkoop \u2212"+aantal+" (magazijn) \u2192 "+k.naam});
   DB.webshopWacht=DB.webshopWacht.filter(x=>x.id!=wid);
+  logAct("webshopbestelling bevestigd als betaald \u2014 "+k.naam+" \u00b7 "+eur(totaal));
   bewaar();renderVerkopen();
 }
-function meldCollega(){
+function logAct(tekst){
+  DB.logboek=DB.logboek||[];
+  DB.logboek.unshift({id:nieuwId(),t:new Date().toISOString(),wie:ingelogd,tekst});
+  if(DB.logboek.length>300)DB.logboek.length=300;
+}
+function meldCollega(tekst){
   try{
     if(typeof Notification==="undefined"||!Notification||Notification.permission!=="granted")return;
-    new Notification("TrustTap CRM bijgewerkt",{body:"Je collega heeft zonet iets aangepast \u2014 de nieuwste gegevens staan klaar.",icon:"tt-icon.png"});
+    new Notification("TrustTap CRM",{body:tekst||"Je collega heeft zonet iets aangepast \u2014 de nieuwste gegevens staan klaar.",icon:"tt-icon.png"});
   }catch(e){}
 }
 /* ---------- sessie herstellen ---------- */
