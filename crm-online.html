@@ -914,6 +914,7 @@ function renderLeads(){
 }
 function leadFormulier(l){
   l=l||{};
+  const magEig = !l.id || l.eigenaar===ingelogd;   // bestaand: alleen de eigenaar zelf
   openModal(`
     <h3>${l.id?"Lead bewerken":"Nieuwe lead"}</h3>
     <label>Naam / bedrijf *</label><input id="l_naam" value="${esc(l.naam||"")}">
@@ -921,7 +922,8 @@ function leadFormulier(l){
     <div class="rij c3">
       <div><label>Status</label><select id="l_status">${LEADSTATUS.map(s=>`<option ${s===(l.status||"nieuw")?"selected":""}>${s}</option>`).join("")}</select></div>
       <div><label>Volgende actie op</label><input type="date" id="l_datum" value="${l.actieDatum||""}"></div>
-      <div><label>Eigenaar</label><select id="l_eig">${VERKLIJST().map(n=>`<option ${n===(l.eigenaar||ingelogd)?"selected":""}>${n}</option>`).join("")}</select></div>
+      <div><label>Eigenaar${magEig?"":" \ud83d\udd12"}</label><select id="l_eig" ${magEig?"":"disabled"}>${(magEig?VERKLIJST():[l.eigenaar]).map(n=>`<option ${n===(l.eigenaar||ingelogd)?"selected":""}>${n}</option>`).join("")}</select>
+      ${magEig?"":`<div class="subtxt" style="margin-top:.2rem">Alleen ${esc(l.eigenaar)} kan de eigenaar wijzigen.</div>`}</div>
     </div>
     <label>Notities</label><textarea id="l_not" rows="3">${esc(l.notities||"")}</textarea>
     <div style="margin-top:1rem"><button class="knop" id="l_bewaar">Bewaren</button></div>`);
@@ -929,7 +931,7 @@ function leadFormulier(l){
     const naam=document.getElementById("l_naam").value.trim();
     if(!naam){alert("Naam is verplicht.");return}
     const obj={naam,contact:document.getElementById("l_contact").value.trim(),status:document.getElementById("l_status").value,
-      actieDatum:document.getElementById("l_datum").value,eigenaar:document.getElementById("l_eig").value,
+      actieDatum:document.getElementById("l_datum").value,eigenaar:(magEig?document.getElementById("l_eig").value:l.eigenaar),
       notities:document.getElementById("l_not").value.trim()};
     if(l.id)Object.assign(DB.leads.find(x=>x.id==l.id),obj);
     else{obj.id=nieuwId();DB.leads.push(obj)}
