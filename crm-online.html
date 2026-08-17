@@ -511,15 +511,18 @@ function weekVan(iso){const d=new Date(iso+"T12:00:00");const dag=(d.getDay()+6)
   return {sleutel:f(ma),einde:f(zo),label:nlDatum(f(ma))+" \u2013 "+nlDatum(f(zo))}}
 function commissieWeken(){
   const w={};
-  DB.verkopen.filter(v=>v.verkoper==="Giannis").forEach(v=>{
-    const wk=weekVan(v.datum);
-    (w[wk.sleutel]=w[wk.sleutel]||{label:wk.label,einde:wk.einde,bedrag:0,verkopen:[],open:0}).bedrag+=v.totaal/2;
-    w[wk.sleutel].verkopen.push(v); if(!v.janoBetaald)w[wk.sleutel].open+=v.totaal/2;
+  DB.verkopen.filter(v=>v.verkoper!=="Jano").forEach(v=>{
+    const wk=weekVan(v.datum), sl=wk.sleutel+"|"+v.verkoper;
+    const r=(w[sl]=w[sl]||{week:wk.sleutel,verkoper:v.verkoper,label:wk.label,einde:wk.einde,verkopen:[],saldo:0,openN:0,verdiend:0});
+    r.verkopen.push(v); r.verdiend+=v.totaal/2;
+    if(!v.janoBetaald){r.saldo+=(geldBijVerkoper(v)? v.totaal/2 : -v.totaal/2); r.openN++;}
   });
-  return Object.entries(w).sort((a,b)=>b[0].localeCompare(a[0]));
+  return Object.values(w).sort((a,b)=>b.week.localeCompare(a.week)||a.verkoper.localeCompare(b.verkoper));
 }
+function geldBijVerkoper(v){return v.betaalwijze==="cash"}  /* cash zit bij de verkoper; kaart/payconiq/webshop op de zakelijke rekening */
 function comm(v){const t=Number(v.totaal)||0;
-  return v.verkoper==="Giannis"?{g:t/2,j:t/2,uitTeBetalen:!v.janoBetaald}:{g:0,j:t,uitTeBetalen:false}}
+  if(v.verkoper==="Jano")return {mijn:0,jano:t,richting:null};
+  return {mijn:t/2,jano:t/2,richting:geldBijVerkoper(v)?"aanJano":"aanVerkoper",open:!v.janoBetaald}}
 function statsBerekenen(){
   const v=DB.verkopen;
   const omzet=v.reduce((s,x)=>s+x.totaal,0);
@@ -530,7 +533,6 @@ function statsBerekenen(){
   v.forEach(x=>{betaal[x.betaalwijze]=(betaal[x.betaalwijze]||0)+x.totaal});
   const factuurOpen=v.filter(x=>!x.factuur).length;
   let comG=0,comJ=0,openJano=0,openN=0;
-  v.forEach(x=>{const c=comm(x);comG+=c.g;comJ+=c.j;if(c.uitTeBetalen){openJano+=c.j;openN++}});
   const vandaag=vandaagStr();
   const omzetVandaag=v.filter(x=>x.datum===vandaag).reduce((s,x)=>s+x.totaal,0);
   return {omzet,stuks,per,betaal,factuurOpen,omzetVandaag,comG,comJ,openJano,openN};
@@ -618,22 +620,31 @@ function renderDashboard(){
       </table></div>`;})():""}
   <div class="kaart" style="margin-bottom:1rem;border-left:4px solid var(--goud)">
     <h3>💶 Commissies</h3>
-    ${isB()?"":`<p>Jouw verdiende commissie (50% van je eigen verkopen): <b>${eur(DB.verkopen.filter(v=>v.verkoper===ingelogd).reduce((s2,v)=>s2+(v.totaal||0)/2,0))}</b></p>`}
+    ${isB()?"":(()=>{const mijn=DB.verkopen.filter(v=>v.verkoper===ingelogd);
+      const verdiend=mijn.reduce((s2,v)=>s2+(v.totaal||0)/2,0);
+      const open=mijn.filter(v=>!v.janoBetaald).reduce((s2,v)=>s2+(geldBijVerkoper(v)?(v.totaal||0)/2:-(v.totaal||0)/2),0);
+      return `<p>Jouw verdiende commissie (50% van je eigen verkopen): <b>${eur(verdiend)}</b></p>
+      <p style="margin-top:.3rem">Nog te verrekenen: ${open===0?'<span class="tag t-groen">alles verrekend ✓</span>':open>0?`<b>jij \u2192 Jano ${eur(open)}</b> <span class="subtxt">(cash die je vasthoudt)</span>`:`<b>Jano \u2192 jou ${eur(-open)}</b> <span class="subtxt">(kaartverkopen op de zaakrekening)</span>`}</p>`})()}
     ${isB()?`
     <table style="margin-top:.5rem">
-      <tr><td><b>Giannis</b> verdiend (50% van eigen verkopen)</td><td style="text-align:right"><b>${eur(s.comG)}</b></td></tr>
-      <tr><td><b>Jano</b> verdiend (50% Giannis-verkopen + 100% eigen/webshop)</td><td style="text-align:right"><b>${eur(s.comJ)}</b></td></tr>
+      ${VERKLIJST().filter(n=>n!=="Jano").map(n=>{
+        const t2=DB.verkopen.filter(v=>v.verkoper===n).reduce((s2,v)=>s2+(v.totaal||0),0);
+        return `<tr><td><b>${esc(n)}</b> verdiend (50% eigen verkopen)</td><td style="text-align:right"><b>${eur(t2/2)}</b></td></tr>`}).join("")}
+      <tr><td><b>Jano</b> verdiend (100% eigen/webshop + 50% van alle verkopers)</td><td style="text-align:right"><b>${eur(
+        DB.verkopen.reduce((s2,v)=>s2+(v.verkoper==="Jano"?(v.totaal||0):(v.totaal||0)/2),0))}</b></td></tr>
     </table>
-    <h3 style="margin-top:1rem">Wekelijkse uitbetaling aan Jano</h3>
+    <p class="subtxt" style="margin-top:.4rem">Regel: <b>cash</b> zit bij de verkoper (die maakt Jano's helft over) \u00b7 <b>kaart/Payconiq/webshop</b> staat op de zakelijke rekening (Jano betaalt de verkoper zijn helft).</p>
+    <h3 style="margin-top:1rem">Wekelijkse verrekening per verkoper</h3>
     ${(()=>{const wk=commissieWeken();const vandaag=vandaagStr();
-      return wk.length?wk.slice(0,8).map(([sl,w])=>{
-        const betaald=w.open===0;
-        const bet=betaald?w.verkopen.map(v=>v.janoBetaald&&v.janoBetaald.datum).sort().pop():null;
+      return wk.length?wk.slice(0,10).map(w=>{
+        const betaald=w.openN===0;
+        const bet=betaald?w.verkopen.map(v=>v.janoBetaald&&v.janoBetaald.datum).filter(Boolean).sort().pop():null;
+        const richting=w.saldo>=0?`<b>${esc(w.verkoper)} \u2192 Jano ${eur(w.saldo)}</b>`:`<b>Jano \u2192 ${esc(w.verkoper)} ${eur(-w.saldo)}</b>`;
         return `<div class="li-item" style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap">
-          <span>Week ${esc(w.label)}${w.einde>=vandaag?' <span class="tag t-grijs">lopende week</span>':''} — <b>${eur(w.bedrag)}</b> voor Jano (${w.verkopen.length} verkopen)</span>
-          ${betaald?`<span class="tag t-groen">uitbetaald ✓ ${nlDatum(bet)}</span>`:`<button class="knop klein" data-wkbetaald="${sl}">Week uitbetaald aan Jano ✓</button>`}</div>`}).join("")
-      :'<div class="leeg">Nog geen Giannis-verkopen.</div>'})()}
-    <p class="subtxt" style="margin-top:.5rem">Eén klik per week: alle verkopen van die week worden samen als uitbetaald gemarkeerd, met datum.</p>`:""}
+          <span>Week ${esc(w.label)} \u00b7 ${esc(w.verkoper)}${w.einde>=vandaag?' <span class="tag t-grijs">lopende week</span>':''} \u2014 ${betaald?'verrekend':richting} <span class="subtxt">(${w.verkopen.length} verkopen)</span></span>
+          ${betaald?`<span class="tag t-groen">verrekend ✓ ${bet?nlDatum(bet):""}</span> <button class="knop klein lijnk" data-wkonged="${w.week}|${w.verkoper}">\u21ba ongedaan</button>`:`<button class="knop klein" data-wkbetaald="${w.week}|${w.verkoper}">Verrekend ✓</button>`}</div>`}).join("")
+      :'<div class="leeg">Nog geen verkopen van verkopers.</div>'})()}
+    <p class="subtxt" style="margin-top:.5rem">Eén klik per week per verkoper: het saldo verrekent cash- en kaartverkopen in één bedrag. Fout geklikt? \u21ba ongedaan zet alles terug.</p>`:""}
   </div>
   <div class="rij c2">
     <div class="kaart">
@@ -655,10 +666,17 @@ function renderDashboard(){
     </div>
   </div>`;
   inhoud.querySelectorAll("[data-wkbetaald]").forEach(b=>b.addEventListener("click",()=>{
-    const sl=b.dataset.wkbetaald;
-    DB.verkopen.filter(v=>v.verkoper==="Giannis"&&!v.janoBetaald&&weekVan(v.datum).sleutel===sl)
+    const [sl,wie]=b.dataset.wkbetaald.split("|");
+    DB.verkopen.filter(v=>v.verkoper===wie&&!v.janoBetaald&&weekVan(v.datum).sleutel===sl)
       .forEach(v=>v.janoBetaald={datum:vandaagStr(),door:ingelogd,week:sl});
-    logAct("commissieweek uitbetaald aan Jano \u2014 week "+sl);
+    logAct("commissie verrekend \u2014 week "+sl+" \u00b7 "+wie);
+    bewaar();renderDashboard();}));
+  inhoud.querySelectorAll("[data-wkonged]").forEach(b=>b.addEventListener("click",()=>{
+    const [sl,wie]=b.dataset.wkonged.split("|");
+    if(!confirm("Verrekening van "+wie+" (week "+sl+") ongedaan maken?"))return;
+    DB.verkopen.filter(v=>v.verkoper===wie&&v.janoBetaald&&weekVan(v.datum).sleutel===sl)
+      .forEach(v=>delete v.janoBetaald);
+    logAct("verrekening ongedaan gemaakt \u2014 week "+sl+" \u00b7 "+wie);
     bewaar();renderDashboard();}));
   document.getElementById("snelVerkoop").addEventListener("click",()=>verkoopFormulier({}));
   document.getElementById("snelKlant").addEventListener("click",()=>klantFormulier());
@@ -865,7 +883,10 @@ function renderVerkopen(){
       <td>${v.webshop&&!v.betaald?`<button class="knop klein" data-betaald="${v.id}">SumUp betaald ✓</button><br>`:""}${v.factuur?'<span class="tag t-groen">gemaakt ✓</span>':`<button class="knop klein lijnk" data-factuur="${v.id}">markeer gemaakt</button>`}</td>
       <td>${esc(v.verkoper)}</td>
       <td style="white-space:nowrap;font-size:.78rem">${(()=>{const c=comm(v);
-        return `G ${eur(c.g)} · J ${eur(c.j)}`+(v.verkoper==="Giannis"?(v.janoBetaald?`<br><span class="tag t-groen">→ Jano ✓ ${nlDatum(v.janoBetaald.datum)}</span>`:`<br><span class="tag t-goud">wekelijkse uitbetaling</span>`):"")})()}</td>
+        if(v.verkoper==="Jano")return `100% Jano \u00b7 ${eur(c.jano)}`;
+        const st=v.janoBetaald?`<span class="tag t-groen">verrekend ✓ ${nlDatum(v.janoBetaald.datum)}</span>`
+          :(geldBijVerkoper(v)?`<span class="tag t-goud">${esc(v.verkoper)} \u2192 Jano ${eur(c.jano)}</span>`:`<span class="tag t-goud">Jano \u2192 ${esc(v.verkoper)} ${eur(c.mijn)}</span>`);
+        return `${esc(v.verkoper)} ${eur(c.mijn)} \u00b7 Jano ${eur(c.jano)}<br>${st}`})()}</td>
       <td>${v.verkoper===ingelogd?`<button class="knop klein roodk" data-weg="${v.id}">✕</button>`:""}</td></tr>`).join("")}
     </table>`:'<div class="leeg">Nog geen verkopen geregistreerd.</div>'}
   </div>`;
@@ -1130,9 +1151,11 @@ function meldingenLijst(){
   DB.tickets.filter(t=>t.status!=="opgelost"&&t.prioriteit==="hoog")
     .forEach(t=>m.push({i:"🎫",t:"Hoog-prioriteit ticket #"+t.id+": "+t.onderwerp,view:"tickets"}));
   DB.tickets.filter(t=>t.status==="open"&&t.prioriteit!=="hoog").length&&m.push({i:"🎫",t:DB.tickets.filter(t=>t.status==="open"&&t.prioriteit!=="hoog").length+" open ticket(s)",view:"tickets"});
-  commissieWeken().forEach(([sl,w])=>{
-    if(w.open>0&&w.einde<vandaag)m.push({i:"💶",t:"Week "+w.label+": "+eur(w.open)+" commissie nog aan Jano uit te betalen",view:"dashboard"});
-  });
+  commissieWeken().forEach(w=>{
+    if(w.openN>0&&w.einde<vandaag){
+      const r=w.saldo>=0?w.verkoper+" \u2192 Jano "+eur(w.saldo):"Jano \u2192 "+w.verkoper+" "+eur(-w.saldo);
+      m.push({i:"💶",t:"Week "+w.label+" \u00b7 "+w.verkoper+": commissie nog te verrekenen ("+r+")",view:"dashboard"});
+    }});
   const wb=DB.webshopWacht.length;
   if(wb)m.push({i:"\ud83d\uded2",t:wb+" webshopbestelling"+(wb>1?"en":"")+" wachten op SumUp-betaling (nog niet in de cijfers)",view:"verkopen"});
   const opTeVolgen=DB.bezoeken.filter(b=>b.resultaat==="opvolgen"&&!b.opgevolgd).length;
