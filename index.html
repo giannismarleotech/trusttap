@@ -337,7 +337,7 @@ footer{border-top:2px solid var(--goud)}
     <a href="#producten"  data-i18n="nav_prod"></a>
     <a href="#hoe"  data-i18n="nav_hoe"></a>
     <a href="#bestellen"  data-i18n="nav_bestel"></a>
-    <a href="#contact" data-i18n="nav_contact"></a>
+    <a href="#contact" class="aanvraag-open" data-i18n="nav_contact"></a>
   </nav>
   <div style="display:flex;gap:.9rem;align-items:center">
     <div class="taal"><button data-taal="nl">NL</button><button data-taal="en">EN</button><button data-taal="fr">FR</button></div>
@@ -565,7 +565,7 @@ footer{border-top:2px solid var(--goud)}
       <div class="rij" style="border-bottom:none"><span class="pos">4</span><div>Concurrent D</div></div>
     </div></div></div>
 </div>
-<section class="cta"><div class="container"><h2 data-i18n="cta_h2"></h2><p data-i18n="cta_p"></p><a class="btn btn-goud" href="#bestellen" data-i18n="hp_cta"></a></div></section>
+<section class="cta"><div class="container"><h2 data-i18n="cta_h2"></h2><p data-i18n="cta_p"></p><a class="btn btn-goud" href="#bestellen" data-i18n="hp_cta"></a> <a class="btn btn-lijn aanvraag-open" href="#" data-i18n="cta_contact"></a></div></section>
 
 </div><div class="pagina" id="pg-voorwaarden">
 
@@ -615,6 +615,7 @@ footer{border-top:2px solid var(--goud)}
     <div><h4 data-i18n="foot_c"></h4>
       <a href="mailto:info@trusttap.be">info@trusttap.be</a>
       <a href="tel:+32492175552">+32 492 17 55 52</a>
+      <a href="#" class="aanvraag-open" style="color:var(--goud);font-weight:700" data-i18n="foot_aanvraag"></a>
       <a href="https://wa.me/32492175552" target="_blank" rel="noopener">WhatsApp</a>
       <a href="https://instagram.com/trusttap.be" target="_blank" rel="noopener">Instagram — @trusttap.be</a>
       <a href="#voorwaarden" data-i18n="foot_s4"></a>
@@ -641,7 +642,7 @@ footer{border-top:2px solid var(--goud)}
 /* ================= TrustTap — gedeeld script (i18n, nav, effecten, bestellen) ================= */
 const T={
 nl:{
- nav_home:"Home",nav_prod:"Producten",nav_hoe:"Hoe het werkt",nav_bestel:"Bestellen",nav_contact:"Contact",
+ nav_home:"Home",nav_prod:"Producten",nav_hoe:"Hoe het werkt",nav_bestel:"Bestellen",nav_contact:"Contact", cta_contact:"Vraag of offerte? Contacteer ons", foot_aanvraag:"\u2709\ufe0f Offerte / contactaanvraag",
  tick1:"Eénmalige betaling — onbeperkt gebruik",tick2:"Gratis verzending in de Benelux",tick3:"Werkt met alle moderne smartphones",tick4:"Levenslange chipgarantie",tick5:"NFC-specialisten — meer producten op komst",
  hero_kicker:"NFC-oplossingen voor ondernemers",
  hero_titel:"Wij maken <em>NFC</em> simpel. Te beginnen met méér Google reviews.",
@@ -692,7 +693,7 @@ nl:{
  wa_msg:"Hallo%2C%20ik%20wil%20graag%20TrustTap%20bestellen."
 },
 en:{
- nav_home:"Home",nav_prod:"Products",nav_hoe:"How it works",nav_bestel:"Order",nav_contact:"Contact",
+ nav_home:"Home",nav_prod:"Products",nav_hoe:"How it works",nav_bestel:"Order",nav_contact:"Contact", cta_contact:"Question or quote? Contact us", foot_aanvraag:"\u2709\ufe0f Quote / contact request",
  tick1:"One-time payment — unlimited use",tick2:"Free shipping in the Benelux",tick3:"Works with all modern smartphones",tick4:"Lifetime chip warranty",tick5:"NFC specialists — more products coming",
  hero_kicker:"NFC solutions for business owners",
  hero_titel:"We make <em>NFC</em> simple. Starting with more Google reviews.",
@@ -743,7 +744,7 @@ en:{
  wa_msg:"Hello%2C%20I%20would%20like%20to%20order%20TrustTap."
 },
 fr:{
- nav_home:"Accueil",nav_prod:"Produits",nav_hoe:"Fonctionnement",nav_bestel:"Commander",nav_contact:"Contact",
+ nav_home:"Accueil",nav_prod:"Produits",nav_hoe:"Fonctionnement",nav_bestel:"Commander",nav_contact:"Contact", cta_contact:"Question ou devis ? Contactez-nous", foot_aanvraag:"\u2709\ufe0f Devis / demande de contact",
  tick1:"Paiement unique — utilisation illimitée",tick2:"Livraison gratuite au Benelux",tick3:"Compatible avec tous les smartphones modernes",tick4:"Garantie à vie sur la puce",tick5:"Spécialistes NFC — d'autres produits arrivent",
  hero_kicker:"Solutions NFC pour entrepreneurs",
  hero_titel:"Nous rendons le <em>NFC</em> simple. À commencer par plus d'avis Google.",
@@ -877,7 +878,7 @@ function stat(type,info){
     headers:{apikey:STAT_KEY,Authorization:"Bearer "+STAT_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},
     body:JSON.stringify({sessie:statSessie(),type,info:String(info||"").slice(0,120)})}).catch(function(){});}catch(e){}
 }
-function avOpen(){document.getElementById("avModal").hidden=false;document.getElementById("avAchter").hidden=false;stat("aanvraag_open","")}
+function avOpen(){const nl=document.getElementById("navLinks");if(nl)nl.classList.remove("open");document.getElementById("avModal").hidden=false;document.getElementById("avAchter").hidden=false;stat("aanvraag_open","")}
 function avDicht(){document.getElementById("avModal").hidden=true;document.getElementById("avAchter").hidden=true}
 document.addEventListener("click",e=>{
   const a=e.target.closest(".aanvraag-open"); if(a){e.preventDefault();avOpen();}
