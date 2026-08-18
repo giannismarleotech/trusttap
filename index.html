@@ -272,6 +272,15 @@ footer a:hover{color:var(--goud)}
 @keyframes stijg{0%{transform:translateY(46px);opacity:.4}100%{transform:none;opacity:1}}
 .mini-kaart.echt{--pw:170px;background:#fff;overflow:hidden}
 .mini-kaart.echt::before,.mini-kaart.echt::after{content:none}
+/* aanvraagformulier */
+.av-achter{position:fixed;inset:0;background:rgba(10,10,10,.55);z-index:90}
+.av-modal{position:fixed;z-index:91;left:50%;top:50%;transform:translate(-50%,-50%);width:min(480px,92vw);
+  background:#fff;border-radius:18px;padding:1.6rem;box-shadow:0 40px 80px -30px rgba(0,0,0,.5);max-height:88vh;overflow:auto}
+.av-modal[hidden],.av-achter[hidden]{display:none}
+.av-modal label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.06em;color:#6B6552;margin:.6rem 0 .25rem}
+.av-modal input,.av-modal textarea{width:100%;border:1px solid #E2D9C2;border-radius:10px;padding:.6rem .8rem;font:inherit}
+.av-modal .rij2{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media(max-width:480px){.av-modal .rij2{grid-template-columns:1fr}}
 /* footer-verbetering + socials */
 footer{border-top:2px solid var(--goud)}
 .foot-grid>div:first-child{display:flex;flex-direction:column;align-items:flex-start;gap:1rem}
@@ -613,6 +622,17 @@ footer{border-top:2px solid var(--goud)}
   </div>
   <div class="foot-onder"><span data-i18n="foot_copy"></span><span>trusttap.be</span></div>
 </div></footer>
+<div class="av-achter" id="avAchter" hidden></div>
+<div class="av-modal" id="avModal" hidden>
+  <h3 data-i18n="av_t"></h3><p class="subtxt" data-i18n="av_p" style="margin:.2rem 0 .8rem"></p>
+  <label data-i18n="av_naam"></label><input id="av_naam">
+  <label data-i18n="av_zaak"></label><input id="av_zaak">
+  <div class="rij2"><div><label>E-mail *</label><input id="av_email" type="email"></div>
+  <div><label data-i18n="av_tel"></label><input id="av_tel"></div></div>
+  <label data-i18n="av_ber"></label><textarea id="av_ber" rows="4"></textarea>
+  <div class="subtxt" id="av_status" style="margin:.4rem 0"></div>
+  <button class="btn btn-goud" id="av_stuur" style="width:100%" data-i18n="av_knop"></button>
+</div>
 <a class="wa-zweef" href="https://wa.me/32492175552" target="_blank" rel="noopener" aria-label="WhatsApp">
   <svg viewBox="0 0 32 32" fill="#fff" aria-hidden="true"><path d="M16 3C9.4 3 4 8.3 4 14.9c0 2.5.8 4.8 2.1 6.7L4.5 27l5.6-1.6c1.8 1 3.8 1.6 5.9 1.6 6.6 0 12-5.3 12-11.9S22.6 3 16 3zm0 21.6c-1.9 0-3.7-.6-5.2-1.5l-.4-.2-3.3 1 1-3.2-.3-.4c-1.2-1.7-1.9-3.7-1.9-5.7C6 9.4 10.5 5 16 5s10 4.4 10 9.9-4.5 9.7-10 9.7zm5.5-7.3c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.6-.1-.2-.7-1.7-1-2.3-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.1 1.1-1.1 2.7s1.2 3.1 1.3 3.3c.2.2 2.3 3.5 5.6 4.9.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4z"/></svg>
 </a>
@@ -633,7 +653,7 @@ nl:{
  breed_eyebrow:"Meer dan reviews",breed_h2:"TrustTap is een NFC-huis, geen éénproductswinkel",
  breed_p:"Alles wat met een tap slimmer kan, bouwen wij. Vandaag helpen we ondernemers aan meer Google reviews. Binnenkort lanceren we nieuwe NFC-producten — tot en met volledig custom oplossingen op maat.",
  b1_t:"Nu verkrijgbaar",b1_p:"TrustTap Review Kaart — verzamel Google reviews met één tap.",
- b2_t:"Binnenkort",b2_p:"Nieuwe NFC-producten zijn in de maak. Hou onze kanalen in de gaten voor de lancering.", vid_eyebrow:"BEKIJK HET ZELF", vid_t:"TrustTap in 30 seconden", vid_p:"Van tap tot review \u2014 zo simpel werkt het.",
+ b2_t:"Binnenkort",b2_p:"Nieuwe NFC-producten zijn in de maak. Hou onze kanalen in de gaten voor de lancering.", av_t:"Offerte / contact aanvragen", av_p:"Laat uw gegevens achter \u2014 wij nemen binnen 1 werkdag contact op.", av_naam:"Uw naam", av_zaak:"Zaak / bedrijf", av_tel:"Telefoon", av_ber:"Uw vraag (aantal kaarten, wensen\u2026)", av_knop:"Aanvraag versturen", av_ok:"Bedankt! Uw aanvraag is goed ontvangen \u2014 wij nemen snel contact op.", av_fout:"Vul minstens uw naam of zaak \u00e9n een geldig e-mailadres in.", av_fout2:"Versturen lukte niet \u2014 probeer het zo opnieuw of bel ons.", vid_eyebrow:"BEKIJK HET ZELF", vid_t:"TrustTap in 30 seconden", vid_p:"Van tap tot review \u2014 zo simpel werkt het.",
  b3_t:"Custom op aanvraag",b3_p:"Een eigen NFC-idee? Wij ontwerpen en bouwen het op maat van uw zaak.",
  hoe_eyebrow:"Zo werkt het",hoe_h2:"Van tap tot review in 10 seconden",
  s1_t:"Klant tapt",s1_p:"Uw klant houdt zijn smartphone even tegen de kaart. Werkt op alle moderne telefoons — geen app nodig.",
@@ -658,7 +678,7 @@ nl:{
  best_st1:"1 · Kies product",best_st2:"2 · Uw gegevens",best_st3:"3 \u00b7 Reken veilig af",
  v_product:"Product",v_aantal:"Aantal pakketten",v_naam:"Naam *",v_zaak:"Zaaknaam",v_email:"E-mailadres *",v_tel:"Telefoon *",v_adres:"Leveradres",v_btw:"BTW-nummer (voor factuur)",v_gr:"Google-reviewlink of naam van uw zaak op Google",v_opm:"Opmerkingen",
  sam_t:"Samenvatting", best_knop2:"Bestellen en betalen", sam_kosten:"Transactiekosten online betaling",sam_prod:"Product",sam_aantal:"Aantal",sam_lever:"Levering",sam_gratis:"Gratis",sam_tot:"Totaal",
- sam_note:"Na betaling nemen wij binnen 1 werkdag contact op voor de personalisatie (uw Google-link). Let op: eenmaal geconfigureerd is de bestelling niet terugbetaalbaar (zie voorwaarden).", best_bulk:"Meer dan 2 kaarten of een eigen ontwerp? Dat regelen we via offerte \u2014 neem contact op via <a href=\"https://wa.me/32492175552\" target=\"_blank\" rel=\"noopener\"><b>WhatsApp</b></a> of <a href=\"mailto:info@trusttap.be?subject=Offerte%20TrustTap\"><b>e-mail</b></a>.",
+ sam_note:"Na betaling nemen wij binnen 1 werkdag contact op voor de personalisatie (uw Google-link). Let op: eenmaal geconfigureerd is de bestelling niet terugbetaalbaar (zie voorwaarden).", best_bulk:"Meer dan 2 kaarten of een eigen ontwerp? <a href=\"#\" class=\"aanvraag-open\"><b>Vraag hier uw offerte aan</b></a> \u2014 wij nemen snel contact op.",
  best_knop:"Bestelling versturen per e-mail",best_wa:"Of bestel via WhatsApp",
  best_fout:"Vul minstens naam, e-mail en telefoon in.",
  hp_eyebrow:"In de praktijk",hp_h2:"Zo verdient TrustTap zichzelf terug",hp_p:"Scroll door het verhaal van één klant, één tap en één review — en wat dat doet met uw zaak.",
@@ -684,7 +704,7 @@ en:{
  breed_eyebrow:"More than reviews",breed_h2:"TrustTap is an NFC house, not a one-product shop",
  breed_p:"If a tap can make it smarter, we build it. Today we help businesses collect Google reviews. Soon we'll launch new NFC products — all the way to fully custom solutions.",
  b1_t:"Available now",b1_p:"TrustTap Review Card — collect Google reviews with a single tap.",
- b2_t:"Coming soon",b2_p:"New NFC products are in the making. Keep an eye on our channels for the launch.", vid_eyebrow:"SEE IT IN ACTION", vid_t:"TrustTap in 30 seconds", vid_p:"From tap to review \u2014 this is how simple it works.",
+ b2_t:"Coming soon",b2_p:"New NFC products are in the making. Keep an eye on our channels for the launch.", av_t:"Request a quote / contact", av_p:"Leave your details \u2014 we\u2019ll get back to you within 1 business day.", av_naam:"Your name", av_zaak:"Business", av_tel:"Phone", av_ber:"Your request (number of cards, wishes\u2026)", av_knop:"Send request", av_ok:"Thank you! We received your request and will contact you soon.", av_fout:"Please enter at least your name or business and a valid e-mail.", av_fout2:"Sending failed \u2014 please try again shortly or call us.", vid_eyebrow:"SEE IT IN ACTION", vid_t:"TrustTap in 30 seconds", vid_p:"From tap to review \u2014 this is how simple it works.",
  b3_t:"Custom on request",b3_p:"Have your own NFC idea? We design and build it for your business.",
  hoe_eyebrow:"How it works",hoe_h2:"From tap to review in 10 seconds",
  s1_t:"Customer taps",s1_p:"Your customer briefly holds their smartphone against the card. Works on all modern phones — no app needed.",
@@ -709,7 +729,7 @@ en:{
  best_st1:"1 · Choose product",best_st2:"2 · Your details",best_st3:"3 \u00b7 Pay securely",
  v_product:"Product",v_aantal:"Number of packs",v_naam:"Name *",v_zaak:"Business name",v_email:"E-mail *",v_tel:"Phone *",v_adres:"Delivery address",v_btw:"VAT number (for invoice)",v_gr:"Google review link or your business name on Google",v_opm:"Remarks",
  sam_t:"Summary", best_knop2:"Order and pay", sam_kosten:"Online payment fee",sam_prod:"Product",sam_aantal:"Quantity",sam_lever:"Shipping",sam_gratis:"Free",sam_tot:"Total",
- sam_note:"After payment we contact you within 1 business day to personalise your card (your Google link). Note: once configured, the order is non-refundable (see terms).", best_bulk:"More than 2 cards or a custom design? We arrange that by quote \u2014 contact us via <a href=\"https://wa.me/32492175552\" target=\"_blank\" rel=\"noopener\"><b>WhatsApp</b></a> or <a href=\"mailto:info@trusttap.be?subject=Quote%20TrustTap\"><b>e-mail</b></a>.",
+ sam_note:"After payment we contact you within 1 business day to personalise your card (your Google link). Note: once configured, the order is non-refundable (see terms).", best_bulk:"More than 2 cards or a custom design? <a href=\"#\" class=\"aanvraag-open\"><b>Request your quote here</b></a> \u2014 we\u2019ll get back to you quickly.",
  best_knop:"Send order by e-mail",best_wa:"Or order via WhatsApp",
  best_fout:"Please fill in at least name, e-mail and phone.",
  hp_eyebrow:"In practice",hp_h2:"How TrustTap pays for itself",hp_p:"Scroll through the story of one customer, one tap and one review — and what it does for your business.",
@@ -735,7 +755,7 @@ fr:{
  breed_eyebrow:"Plus que des avis",breed_h2:"TrustTap est une maison NFC, pas une boutique mono-produit",
  breed_p:"Tout ce qu'un tap peut rendre plus intelligent, nous le créons. Aujourd'hui, nous aidons les commerces à récolter des avis Google. Bientôt : de nouveaux produits NFC — jusqu'aux solutions entièrement sur mesure.",
  b1_t:"Disponible",b1_p:"Carte TrustTap — récoltez des avis Google d'un seul tap.",
- b2_t:"Bientôt",b2_p:"De nouveaux produits NFC sont en préparation. Suivez nos canaux pour le lancement.", vid_eyebrow:"VOYEZ PAR VOUS-M\u00caME", vid_t:"TrustTap en 30 secondes", vid_p:"Du tap \u00e0 l\u2019avis \u2014 voil\u00e0 comme c\u2019est simple.",
+ b2_t:"Bientôt",b2_p:"De nouveaux produits NFC sont en préparation. Suivez nos canaux pour le lancement.", av_t:"Demande de devis / contact", av_p:"Laissez vos coordonn\u00e9es \u2014 nous vous recontactons sous 1 jour ouvrable.", av_naam:"Votre nom", av_zaak:"Entreprise", av_tel:"T\u00e9l\u00e9phone", av_ber:"Votre demande (nombre de cartes, souhaits\u2026)", av_knop:"Envoyer la demande", av_ok:"Merci ! Votre demande est bien re\u00e7ue \u2014 nous vous contactons rapidement.", av_fout:"Indiquez au moins votre nom ou entreprise et un e-mail valide.", av_fout2:"L\u2019envoi a \u00e9chou\u00e9 \u2014 r\u00e9essayez ou appelez-nous.", vid_eyebrow:"VOYEZ PAR VOUS-M\u00caME", vid_t:"TrustTap en 30 secondes", vid_p:"Du tap \u00e0 l\u2019avis \u2014 voil\u00e0 comme c\u2019est simple.",
  b3_t:"Sur mesure",b3_p:"Une idée NFC ? Nous la concevons et la réalisons pour votre commerce.",
  hoe_eyebrow:"Fonctionnement",hoe_h2:"Du tap à l'avis en 10 secondes",
  s1_t:"Le client tape",s1_p:"Votre client approche brièvement son smartphone de la carte. Fonctionne sur tous les téléphones modernes — sans application.",
@@ -760,7 +780,7 @@ fr:{
  best_st1:"1 · Choisir le produit",best_st2:"2 · Vos coordonnées",best_st3:"3 \u00b7 Payez en toute s\u00e9curit\u00e9",
  v_product:"Produit",v_aantal:"Nombre de packs",v_naam:"Nom *",v_zaak:"Nom du commerce",v_email:"E-mail *",v_tel:"Téléphone *",v_adres:"Adresse de livraison",v_btw:"Numéro de TVA (facture)",v_gr:"Lien d'avis Google ou nom de votre commerce sur Google",v_opm:"Remarques",
  sam_t:"Résumé", best_knop2:"Commander et payer", sam_kosten:"Frais de paiement en ligne",sam_prod:"Produit",sam_aantal:"Quantité",sam_lever:"Livraison",sam_gratis:"Gratuite",sam_tot:"Total",
- sam_note:"Apr\u00e8s le paiement, nous vous contactons sous 1 jour ouvrable pour la personnalisation. Attention : une fois configur\u00e9e, la commande n\u2019est pas remboursable (voir conditions).", best_bulk:"Plus de 2 cartes ou un design personnalis\u00e9 ? Nous r\u00e9glons cela par devis \u2014 contactez-nous via <a href=\"https://wa.me/32492175552\" target=\"_blank\" rel=\"noopener\"><b>WhatsApp</b></a> ou <a href=\"mailto:info@trusttap.be?subject=Devis%20TrustTap\"><b>e-mail</b></a>.",
+ sam_note:"Apr\u00e8s le paiement, nous vous contactons sous 1 jour ouvrable pour la personnalisation. Attention : une fois configur\u00e9e, la commande n\u2019est pas remboursable (voir conditions).", best_bulk:"Plus de 2 cartes ou un design personnalis\u00e9 ? <a href=\"#\" class=\"aanvraag-open\"><b>Demandez votre devis ici</b></a> \u2014 nous vous recontactons rapidement.",
  best_knop:"Envoyer la commande par e-mail",best_wa:"Ou commander via WhatsApp",
  best_fout:"Veuillez remplir au moins le nom, l'e-mail et le téléphone.",
  hp_eyebrow:"En pratique",hp_h2:"Comment TrustTap se rentabilise",hp_p:"Faites défiler l'histoire d'un client, d'un tap et d'un avis — et ce que cela apporte à votre commerce.",
@@ -857,6 +877,28 @@ function stat(type,info){
     headers:{apikey:STAT_KEY,Authorization:"Bearer "+STAT_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},
     body:JSON.stringify({sessie:statSessie(),type,info:String(info||"").slice(0,120)})}).catch(function(){});}catch(e){}
 }
+function avOpen(){document.getElementById("avModal").hidden=false;document.getElementById("avAchter").hidden=false;stat("aanvraag_open","")}
+function avDicht(){document.getElementById("avModal").hidden=true;document.getElementById("avAchter").hidden=true}
+document.addEventListener("click",e=>{
+  const a=e.target.closest(".aanvraag-open"); if(a){e.preventDefault();avOpen();}
+});
+document.getElementById("avAchter").addEventListener("click",avDicht);
+document.getElementById("av_stuur").addEventListener("click",async()=>{
+  const g={naam:av_naam.value.trim(),zaak:av_zaak.value.trim(),email:av_email.value.trim(),tel:av_tel.value.trim(),bericht:av_ber.value.trim(),taal:taal,pagina:location.hash};
+  const st=document.getElementById("av_status");
+  const D=T[taal]||T.nl;
+  if(!g.email.includes("@")||(!g.naam&&!g.zaak)){st.textContent=D.av_fout;return}
+  st.textContent="\u2026";
+  try{
+    const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/site_aanvragen",{method:"POST",
+      headers:{apikey:STAT_KEY,Authorization:"Bearer "+STAT_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},
+      body:JSON.stringify({gegevens:g})});
+    if(!r.ok)throw 0;
+    stat("aanvraag","offerte");
+    st.textContent=""; avDicht(); alert(D.av_ok);
+    av_naam.value=av_zaak.value=av_tel.value=av_ber.value=av_email.value="";
+  }catch(e){st.textContent=D.av_fout2}
+});
 function toonPagina(naam){
   stat("weergave",naam);
   if(!PAGINAS.includes(naam))naam="home";
