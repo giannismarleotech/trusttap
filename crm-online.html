@@ -739,6 +739,8 @@ function klantFormulier(k){
     <button type="button" class="knop klein lijnk" id="f_btwzoek" title="Zoek bedrijfsgegevens op BTW-nummer">🔎 opzoeken</button></div>
     <div class="subtxt" id="f_btwinfo" style="margin:.2rem 0 0"></div>
     <label>Notities</label><textarea id="f_not" rows="3">${esc(k.notities||"")}</textarea>
+    ${!k.id?`<label style="display:flex;align-items:center;gap:.5rem;margin-top:.8rem;cursor:pointer;text-transform:none;letter-spacing:0;font-size:.85rem">
+      <input type="checkbox" id="f_welkom" style="width:auto" checked> \ud83c\udf89 Welkomstmail in huisstijl sturen (als er een e-mailadres is)</label>`:""}
     <div style="margin-top:1rem;display:flex;gap:.6rem"><button class="knop" id="f_bewaar">Bewaren</button></div>`);
   const bz=document.getElementById("f_btwzoek");
   if(bz)bz.addEventListener("click",async()=>{
@@ -765,7 +767,9 @@ function klantFormulier(k){
       adres:document.getElementById("f_adres").value.trim(),btw:document.getElementById("f_btw").value.trim(),
       notities:document.getElementById("f_not").value.trim()};
     if(k.id){Object.assign(DB.klanten.find(x=>x.id==k.id),obj)}
-    else{obj.id=nieuwId();obj.aangemaakt=vandaagStr();DB.klanten.push(obj)}
+    else{obj.id=nieuwId();obj.aangemaakt=vandaagStr();DB.klanten.push(obj);
+      const fw=document.getElementById("f_welkom");
+      if(fw&&fw.checked&&obj.email.includes("@"))welkomstMailFysiek(obj);}
     bewaar();sluitModal();renderKlanten();
   });
 }
@@ -1638,10 +1642,132 @@ async function postOpen(m){
     if(confirm("E-mail verwijderen?")){await SB.from("mail_inbox").delete().eq("id",m.id);sluitModal();renderPostvak();}});
 }
 /* ============================================================ INSTELLINGEN */
+async function nbLaden(){
+  const el=document.getElementById("nbLijst"); if(!el)return;
+  const {data,error}=await SB.from("nieuwsbrief").select("*").order("t",{ascending:false});
+  if(error){el.innerHTML='<span class="subtxt">Nog niet ge\u00efnstalleerd \u2014 draai het SQL-deel \u201cNieuwsbrief\u201d.</span>';return}
+  const kMet=DB.klanten.filter(kk=>String(kk.email||"").includes("@")).length;
+  const lMet=DB.leads.filter(l=>/@/.test(String(l.contact||"")+String(l.notities||""))).length;
+  const strook='<div class="subtxt" style="margin-bottom:.3rem">Bereik: '+data.length+' abonnees \u00b7 '+kMet+' klanten met e-mail \u00b7 '+lMet+' leads met e-mail</div>';
+  if(!data.length){el.innerHTML=strook+'<span class="subtxt">Nog geen abonnees \u2014 de inschrijving staat in de footer van de site.</span>';return}
+  el.innerHTML=strook+'<b>'+data.length+' abonnee(s)</b><div style="max-height:130px;overflow:auto;margin-top:.3rem">'+
+    data.map(a=>`<div class="li-item">${esc(a.email)}<button class="knop klein roodk" style="float:right" data-nbweg="${esc(a.email)}">✕</button></div>`).join("")+'</div>';
+  el.querySelectorAll("[data-nbweg]").forEach(b=>b.addEventListener("click",async()=>{
+    if(!confirm(b.dataset.nbweg+" uitschrijven?"))return;
+    await SB.from("nieuwsbrief").delete().eq("email",b.dataset.nbweg);
+    logAct("nieuwsbrief-abonnee uitgeschreven \u2014 "+b.dataset.nbweg);bewaar();nbLaden();}));
+}
+async function kortingLaden(){
+  const el=document.getElementById("kortLijst"); if(!el)return;
+  const {data,error}=await SB.from("kortingscodes").select("*").order("t",{ascending:false});
+  if(error){el.innerHTML='<span class="subtxt">Nog niet ge\u00efnstalleerd \u2014 draai het SQL-deel \u201cKortingscodes\u201d.</span>';return}
+  if(!data.length){el.innerHTML='<span class="subtxt">Nog geen codes.</span>';return}
+  el.innerHTML=data.map(k=>`<div class="li-item" style="${k.actief?"":"opacity:.5"}"><b>${esc(k.code)}</b> \u2014 ${k.procent}% ${k.sumup_k1||k.sumup_k2?"\u00b7 \ud83d\udd17 eigen betaallink":""}
+    <span style="float:right;display:flex;gap:.4rem">
+    <button class="knop klein lijnk" data-kact="${esc(k.code)}">${k.actief?"uitzetten":"aanzetten"}</button>
+    <button class="knop klein roodk" data-kweg="${esc(k.code)}">✕</button></span></div>`).join("");
+  el.querySelectorAll("[data-kact]").forEach(b=>b.addEventListener("click",async()=>{
+    const k=data.find(x=>x.code===b.dataset.kact);
+    await SB.from("kortingscodes").update({actief:!k.actief}).eq("code",k.code);
+    logAct("kortingscode "+(k.actief?"uitgezet":"aangezet")+" \u2014 "+k.code);bewaar();kortingLaden();}));
+  el.querySelectorAll("[data-kweg]").forEach(b=>b.addEventListener("click",async()=>{
+    if(!confirm("Code "+b.dataset.kweg+" verwijderen?"))return;
+    await SB.from("kortingscodes").delete().eq("code",b.dataset.kweg);
+    logAct("kortingscode verwijderd \u2014 "+b.dataset.kweg);bewaar();kortingLaden();}));
+}
+function nfcKaartFormulier(){
+  openModal(`
+    <h3>💳 Digitale visitekaart</h3>
+    <div class="rij c2"><div><label>Naam *</label><input id="nk_naam" placeholder="Jan Bakker"></div>
+    <div><label>Functie</label><input id="nk_functie" placeholder="Zaakvoerder"></div></div>
+    <div class="rij c2"><div><label>Bedrijf</label><input id="nk_bedrijf" placeholder="Bakkerij Jan"></div>
+    <div><label>Telefoon</label><input id="nk_tel" placeholder="+32 4xx xx xx xx"></div></div>
+    <div class="rij c2"><div><label>E-mail</label><input id="nk_email"></div>
+    <div><label>Website</label><input id="nk_site" placeholder="https://…"></div></div>
+    <div class="rij c2"><div><label>Instagram (link)</label><input id="nk_insta" placeholder="https://instagram.com/…"></div>
+    <div><label>Adres</label><input id="nk_adres" placeholder="Straat 1, 9800 Deinze"></div></div>
+    <button class="knop" id="nk_maak" style="margin-top:.9rem">\u2b07 Kaartpagina downloaden</button>
+    <p class="subtxt" style="margin-top:.5rem">Daarna: upload het bestand in de map <b>kaart/</b> op GitHub en programmeer de NFC-tag met de link.</p>`);
+  document.getElementById("nk_maak").addEventListener("click",()=>{
+    const g=id=>document.getElementById(id).value.trim();
+    const naam=g("nk_naam"); if(!naam){alert("Vul minstens een naam in.");return}
+    const functie=g("nk_functie"),bedrijf=g("nk_bedrijf"),tel=g("nk_tel"),email=g("nk_email"),site=g("nk_site"),insta=g("nk_insta"),adres=g("nk_adres");
+    const ini=naam.split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
+    const vcf="BEGIN:VCARD\nVERSION:3.0\nFN:"+naam+(bedrijf?"\nORG:"+bedrijf:"")+(functie?"\nTITLE:"+functie:"")+(tel?"\nTEL;TYPE=CELL:"+tel.replace(/\s/g,""):"")+(email?"\nEMAIL:"+email:"")+(site?"\nURL:"+site:"")+(adres?"\nADR;TYPE=WORK:;;"+adres:"")+"\nEND:VCARD";
+    const knop=(href,ico,txt)=>href?`<a class="k" href="${href}"${href.startsWith("http")?' target="_blank" rel="noopener"':''}>${ico} ${txt}</a>`:"";
+    const html=`<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${naam}${bedrijf?" \u2014 "+bedrijf:""}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:#111;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#eee}
+.c{width:min(400px,100%);background:linear-gradient(170deg,#1a1a1a,#111);border:1px solid rgba(216,178,102,.5);border-radius:24px;padding:2.2rem 1.8rem;text-align:center;box-shadow:0 40px 80px -40px #000}
+.a{width:92px;height:92px;border-radius:50%;margin:0 auto 1rem;background:linear-gradient(135deg,#E9CE93,#D8B266 55%,#B98A3C);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:#111}
+h1{font-size:1.45rem;letter-spacing:-.01em}
+.f{color:#D8B266;font-size:.85rem;font-weight:600;margin:.25rem 0 .1rem}
+.b{color:#999;font-size:.85rem}
+.ks{margin-top:1.6rem;display:flex;flex-direction:column;gap:.6rem}
+.k{display:block;padding:.85rem;border:1px solid rgba(216,178,102,.45);border-radius:12px;color:#eee;text-decoration:none;font-weight:600;transition:.2s}
+.k:hover{background:#D8B266;color:#111}
+.k.goud{background:linear-gradient(135deg,#E9CE93,#D8B266 55%,#B98A3C);color:#111;border:none}
+.voet{margin-top:1.6rem;font-size:.66rem;color:#777;letter-spacing:.08em}
+.voet a{color:#B08D4A;text-decoration:none;font-weight:700}
+</style></head><body><div class="c">
+<div class="a">${ini}</div>
+<h1>${naam}</h1>
+${functie?`<div class="f">${functie}</div>`:""}
+${bedrijf?`<div class="b">${bedrijf}</div>`:""}
+<div class="ks">
+<a class="k goud" href="data:text/vcard;charset=utf-8,${encodeURIComponent(vcf)}" download="${naam.replace(/\s+/g,"-").toLowerCase()}.vcf">\ud83d\udcbe Bewaar contact</a>
+${knop(tel?"tel:"+tel.replace(/\s/g,""):"","\ud83d\udcde","Bellen")}
+${knop(tel?"https://wa.me/"+tel.replace(/[^0-9]/g,"").replace(/^0/,"32"):"","\ud83d\udcac","WhatsApp")}
+${knop(email?"mailto:"+email:"","\u2709\ufe0f","E-mail")}
+${knop(site,"\ud83c\udf10","Website")}
+${knop(insta,"\ud83d\udcf7","Instagram")}
+${knop(adres?"https://maps.google.com/?q="+encodeURIComponent(adres):"","\ud83d\udccd","Route")}
+</div>
+<div class="voet">DIGITAAL VISITEKAARTJE DOOR <a href="https://trusttap.be">TRUSTTAP</a></div>
+</div></body></html>`;
+    const bestand=naam.replace(/\s+/g,"-").toLowerCase().replace(/[^a-z0-9-]/g,"")+".html";
+    const b=new Blob([html],{type:"text/html"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=bestand;a.click();
+    logAct("digitale NFC-kaart gemaakt \u2014 "+naam+(bedrijf?" ("+bedrijf+")":""));
+    bewaar();
+    alert("Kaartpagina gedownload: "+bestand+"\n\n1. Upload in de map kaart/ op GitHub\n2. Link wordt: trusttap.be/kaart/"+bestand+"\n3. Programmeer de NFC-tag met die link");
+  });
+}
 function renderInstellingen(){
   inhoud.innerHTML=`
   <h2>Instellingen${isB()?" & back-up":""}</h2>
-  ${isB()?`<div class="kaart" style="margin-bottom:1rem"><h3>👥 Verkopers beheren</h3>
+  ${isB()?`<div class="kaart" style="margin-bottom:1rem"><h3>📣 E-mailmarketing</h3>
+    <p class="subtxt">Abonnees schrijven zich in via de nieuwsbrief-inschrijving in de footer van trusttap.be. Nieuwe webshopklanten krijgen na \u201cBetaald \u2713\u201d automatisch een welkomstmail in huisstijl.</p>
+    <div id="nbLijst" style="margin:.6rem 0">Laden\u2026</div>
+    <label>Doelgroep</label><select id="camp_doel">
+      <option value="alles">Iedereen met een e-mailadres (abonnees + klanten + leads)</option>
+      <option value="abonnees">Alleen nieuwsbrief-abonnees</option>
+      <option value="klanten">Alleen klanten</option>
+      <option value="leads">Alleen leads</option>
+    </select>
+    <label>Onderwerp</label><input id="camp_ond" placeholder="Nieuw bij TrustTap: \u2026">
+    <label>Bericht (gewone tekst \u2014 wordt automatisch in huisstijl verpakt)</label><textarea id="camp_txt" rows="5"></textarea>
+    <button class="knop klein" id="camp_stuur" style="margin-top:.6rem">\ud83d\udce9 Versturen naar alle abonnees</button>
+    <div class="subtxt" id="camp_status" style="margin-top:.4rem"></div>
+  </div>
+  <div class="kaart" style="margin-bottom:1rem"><h3>🏷️ Kortingscodes website</h3>
+    <p class="subtxt">Codes werken meteen op trusttap.be. Tip: maak in SumUp een betaallink met de verlaagde prijs en plak die hier \u2014 dan rekent de klant direct het juiste bedrag af. Zonder link wordt de bestelling geregistreerd en stuur je zelf een betaalverzoek.</p>
+    <div id="kortLijst" style="margin:.6rem 0">Laden\u2026</div>
+    <div class="rij c3"><div><label>Code</label><input id="kc_code" placeholder="TRUST10"></div>
+    <div><label>Korting %</label><input type="number" id="kc_pct" min="1" max="100" placeholder="10"></div>
+    <div><label>&nbsp;</label><button class="knop klein" id="kc_plus" style="width:100%">+ Toevoegen</button></div></div>
+    <div class="rij c2" style="margin-top:.4rem"><div><label>SumUp-link 1 kaart (optioneel)</label><input id="kc_l1" placeholder="https://pay.sumup.com/\u2026"></div>
+    <div><label>SumUp-link 2 kaarten (optioneel)</label><input id="kc_l2" placeholder="https://pay.sumup.com/\u2026"></div></div>
+  </div>
+  <div class="kaart" style="margin-bottom:1rem"><h3>💳 Digitale NFC-visitekaart maken</h3>
+    <p class="subtxt">Maak een persoonlijke kaartpagina voor een klant: invullen \u2192 downloaden \u2192 uploaden in de map <b>kaart/</b> van jullie GitHub \u2192 NFC-tag programmeren met de link (bv. trusttap.be/kaart/jan-bakker.html).</p>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem">
+    <button class="knop klein" id="nfcCodesKnop">+ Kaart voor klant (zelf instellen)</button>
+    <button class="knop klein lijnk" id="nfcKaartKnop">+ Vaste kaartpagina (zelf maken)</button></div>
+  </div>
+  <div class="kaart" style="margin-bottom:1rem"><h3>👥 Verkopers beheren</h3>
     <p class="subtxt">Beheerders: Giannis & Jano. Verkopers kunnen alleen hun eigen verkopen en bezoeken ingeven; ze zien geen stock, meldingen, webshop of andermans cijfers.</p>
     ${(DB.verkopers||[]).length?`<table style="margin:.5rem 0"><tr><th>Naam</th><th>E-mail (login)</th><th></th></tr>
       ${DB.verkopers.map(v=>`<tr><td><b>${esc(v.naam)}</b></td><td>${esc(v.email)}</td><td><button class="knop klein roodk" data-vkweg="${v.naam}">✕</button></td></tr>`).join("")}</table>`:'<div class="leeg">Nog geen extra verkopers.</div>'}
@@ -1699,6 +1825,70 @@ function renderInstellingen(){
     else alert("Meldingen geweigerd. Zet ze aan via de browserinstellingen van dit toestel.");
   });
   if(isB()){
+    nbLaden();
+    const cs=document.getElementById("camp_stuur");
+    if(cs)cs.addEventListener("click",async()=>{
+      const ond=document.getElementById("camp_ond").value.trim(), txt=document.getElementById("camp_txt").value.trim();
+      const st=document.getElementById("camp_status");
+      if(!ond||!txt){alert("Vul onderwerp en bericht in.");return}
+      const doel=document.getElementById("camp_doel").value;
+      const emailUit=t=>{const m=String(t||"").match(/[\w.+-]+@[\w-]+\.[\w.]+/);return m?m[0].toLowerCase():""};
+      let lijst=[];
+      if(doel==="alles"||doel==="abonnees"){
+        const {data}=await SB.from("nieuwsbrief").select("*").order("t",{ascending:false});
+        (data||[]).forEach(a=>lijst.push(String(a.email).toLowerCase()));
+      }
+      if(doel==="alles"||doel==="klanten")DB.klanten.forEach(kk=>{const e=emailUit(kk.email);if(e)lijst.push(e)});
+      if(doel==="alles"||doel==="leads")DB.leads.forEach(l=>{const e=emailUit(l.contact)||emailUit(l.notities);if(e)lijst.push(e)});
+      lijst=[...new Set(lijst)];
+      if(!lijst.length){st.textContent="Geen e-mailadressen gevonden voor deze doelgroep.";return}
+      if(!confirm("Versturen naar "+lijst.length+" adres(sen)?"))return;
+      cs.disabled=true; let ok=0,fout=0;
+      const html=huisstijlMail('<div style="white-space:pre-line">'+esc(txt)+'</div>','<br><br>Geen mails meer ontvangen? Antwoord met \u201cuitschrijven\u201d.');
+      for(const adres of lijst){
+        st.textContent="Versturen\u2026 "+(ok+fout+1)+"/"+lijst.length;
+        try{await mailVerstuur(adres,ond,txt,html);ok++;}catch(e){fout++;}
+      }
+      cs.disabled=false;
+      st.textContent="\u2713 Verstuurd: "+ok+(fout?" \u00b7 mislukt: "+fout:"");
+      logAct("mailing verstuurd \u2014 \u201c"+ond+"\u201d naar "+ok+" adressen ("+doel+")");bewaar();
+    });
+    kortingLaden();
+    const kp=document.getElementById("kc_plus");
+    if(kp)kp.addEventListener("click",async()=>{
+      const code=document.getElementById("kc_code").value.trim().toUpperCase();
+      const pct=Number(document.getElementById("kc_pct").value);
+      if(!code||!pct||pct<1||pct>100){alert("Vul een code en een percentage (1-100) in.");return}
+      const {error}=await SB.from("kortingscodes").insert({code,procent:pct,
+        sumup_k1:document.getElementById("kc_l1").value.trim(),sumup_k2:document.getElementById("kc_l2").value.trim()});
+      if(error){alert(error.code==="23505"?"Deze code bestaat al.":"Opslaan lukt niet \u2014 is het SQL-deel \u201cKortingscodes\u201d al gedraaid?");return}
+      logAct("kortingscode aangemaakt \u2014 "+code+" ("+pct+"%)");bewaar();
+      document.getElementById("kc_code").value="";document.getElementById("kc_pct").value="";
+      document.getElementById("kc_l1").value="";document.getElementById("kc_l2").value="";
+      kortingLaden();
+    });
+    const nk=document.getElementById("nfcKaartKnop");
+    if(nk)nk.addEventListener("click",nfcKaartFormulier);
+    const nc=document.getElementById("nfcCodesKnop");
+    if(nc)nc.addEventListener("click",async()=>{
+      const code=Math.random().toString(36).slice(2,10);
+      const bewerk=Math.random().toString(36).slice(2,12);
+      const {error}=await SB.from("nfc_kaarten").insert({code,bewerkcode:bewerk,gegevens:{}});
+      if(error){alert("Aanmaken lukt niet — is het SQL-deel \u201cNFC-visitekaarten\u201d al gedraaid?");return}
+      logAct("digitale kaart aangemaakt voor klant \u2014 code "+code); bewaar();
+      const kaartLink="https://trusttap.be/kaart.html?id="+code;
+      const instelLink="https://trusttap.be/kaart-instellen.html?code="+code+"&b="+bewerk;
+      openModal(`<h3>\ud83d\udcb3 Kaart aangemaakt</h3>
+        <p><b>1. NFC-tag programmeren met:</b></p><div class="li-item" style="word-break:break-all">${kaartLink}</div>
+        <p style="margin-top:.7rem"><b>2. Klant stelt zelf in via:</b></p><div class="li-item" style="word-break:break-all">${instelLink}</div>
+        <p class="subtxt" style="margin-top:.7rem">Stuur link 2 naar de klant (met de mail-knop hieronder staat alles al klaar). De klant kan zijn kaart altijd opnieuw aanpassen met dezelfde link.</p>
+        <button class="knop klein" id="nfcMail" style="margin-top:.6rem">\u2709\ufe0f Instructiemail naar klant</button>`);
+      document.getElementById("nfcMail").addEventListener("click",()=>{
+        mailFormulier({naar:"",naam:"",onderwerp:"Jouw digitale TrustTap-visitekaart \u2014 stel hem nu in"});
+        setTimeout(()=>{const t=document.getElementById("m_txt");
+          if(t)t.value="Dag,\n\nBedankt voor je bestelling! Je digitale visitekaart staat klaar.\n\nStel hem hier in (2 minuten):\n"+instelLink+"\n\nJe kaartlink (die op je NFC-kaart staat):\n"+kaartLink+"\n\nAanpassen kan altijd opnieuw via dezelfde instel-link \u2014 bewaar deze mail dus goed.\n\nVeel succes ermee!";},80);
+      });
+    });
     const tv=document.getElementById("vk_toevoegen");
     if(tv)tv.addEventListener("click",()=>{
       const naam=document.getElementById("vk_naam").value.trim(), email=document.getElementById("vk_email").value.trim().toLowerCase();
@@ -1746,19 +1936,59 @@ async function webshopImport(){
   try{if(typeof Notification!=="undefined"&&Notification&&Notification.permission==="granted")
     new Notification("Nieuwe webshopbestelling!",{body:"Wacht op SumUp-betaling \u2014 telt nog niet mee in de cijfers.",icon:"tt-icon.png"});}catch(e){}
 }
+function huisstijlMail(inhoudHtml,voetExtra){
+  return `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;border:1px solid #E9E0C9;border-radius:14px;overflow:hidden">
+    <div style="background:#141414;padding:18px 24px"><span style="color:#D8B266;font-weight:800;font-size:19px">\u25c6 Trust<span style="color:#ffffff">Tap</span></span>
+    <div style="color:#B08D4A;font-size:10px;letter-spacing:3px;margin-top:2px">SLIMME NFC-OPLOSSINGEN</div></div>
+    <div style="padding:24px;color:#222222;font-size:14px;line-height:1.7">${inhoudHtml}</div>
+    <div style="background:#FBF8F1;padding:14px 24px;font-size:11px;color:#8a8a8a;line-height:1.7">TrustTap \u00b7 Meirebeekstraat 10b, 9800 Deinze \u00b7 BTW BE 1041.196.713<br>info@trusttap.be \u00b7 +32 492 17 55 52 \u00b7 trusttap.be${voetExtra||""}</div></div>`;
+}
+async function mailVerstuur(naar,onderwerp,tekst,html){
+  const r=await fetch(SB_URL+"/functions/v1/mail",{method:"POST",
+    headers:{apikey:SB_KEY,Authorization:"Bearer "+SB_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({naar,onderwerp,tekst,html,vanNaam:"TrustTap",vanAdres:"info@trusttap.be",antwoordAan:"info@trusttap.be"})});
+  const g=await r.json().catch(()=>({}));
+  if(!r.ok||!g.ok)throw new Error(g.fout||r.status);
+}
+async function welkomstMailFysiek(k){
+  const kop="<h2 style=\"margin:0 0 10px;font-size:18px\">Welkom bij TrustTap, "+esc(k.naam)+"! \ud83c\udf89</h2>";
+  const uitleg="<p>Bedankt voor je vertrouwen \u2014 je bent nu offici\u00ebel TrustTap-klant!</p><p><b>Zo haal je alles uit je reviewkaart:</b><br>1. Leg de kaart zichtbaar aan de kassa of geef hem na de service<br>2. Klant tapt met de telefoon \u2014 jouw Google-reviewpagina opent meteen<br>3. Meer reviews = hoger in Google = meer klanten</p><p>Ook interessant: ontwerp je eigen <b>digitale visitekaart</b> in onze kaartstudio op <a href=\"https://trusttap.be/kaart-instellen.html\" style=\"color:#B08D4A;font-weight:700\">trusttap.be</a>.</p><p>Vragen? Antwoord gewoon op deze mail of app ons via WhatsApp.</p>";
+  mailVerstuur(k.email,"Welkom bij TrustTap \ud83c\udf89","Welkom bij TrustTap! Bedankt voor je vertrouwen. Vragen? Antwoord op deze mail.",huisstijlMail(kop+uitleg))
+    .then(()=>{DB.mails.push({id:nieuwId(),datum:vandaagStr(),door:"automatisch",naar:k.email,onderwerp:"Welkomstmail",klantId:k.id});
+      logAct("welkomstmail gestuurd \u2014 "+k.email);bewaar();})
+    .catch(e=>{logAct("\u26a0\ufe0f welkomstmail NIET gelukt ("+k.email+") \u2014 "+e.message);bewaar();});
+}
+async function welkomstMail(g,k){
+  if(!g.email)return;
+  const dig=g.product==="k3";
+  const kop="<h2 style=\"margin:0 0 10px;font-size:18px\">Welkom bij TrustTap, "+esc(g.naam||k.naam)+"! \ud83c\udf89</h2>";
+  const best="<p><b>Je bestelling:</b> "+esc(g.productnaam||"")+" \u2014 "+eur(Number(g.totaal)||0)+" (betaald \u2713)</p>";
+  const uitleg=dig
+    ?"<p>Je digitale visitekaart staat voor je klaar! Ontwerp hem zelf in onze kaartstudio \u2014 kies je stijl, vul je gegevens in en je kaart staat meteen live:</p><p><a href=\"https://trusttap.be/kaart-instellen.html\" style=\"display:inline-block;background:#D8B266;color:#141414;font-weight:800;padding:12px 22px;border-radius:10px;text-decoration:none\">\u2728 Open de kaartstudio</a></p><p style=\"font-size:12px;color:#666\">Bewaar na het aanmaken zeker je kaart- en bewerkcodes \u2014 daarmee pas je je kaart altijd gratis aan.</p>"
+    :"<p>Bedankt voor je vertrouwen \u2014 je bent nu offici\u00ebel TrustTap-klant! \ud83c\udf89</p><p><b>Wat gebeurt er nu?</b><br>1. Wij stellen je kaart(en) volledig in met jouw Google-reviewlink<br>2. Binnen enkele werkdagen vallen ze in je bus, klaar voor gebruik<br>3. Neerleggen aan de kassa, klant tapt \u2014 en de reviews stromen binnen</p><p>Vragen? Antwoord gewoon op deze mail of app ons via WhatsApp.</p>";
+  const tekst="Welkom bij TrustTap! Je bestelling: "+(g.productnaam||"")+" \u2014 betaald. "+(dig?"Ontwerp je kaart op trusttap.be/kaart-instellen.html":"Wij stellen je kaarten in en versturen ze snel.");
+  try{
+    await mailVerstuur(g.email,"Welkom bij TrustTap \u2014 je bestelling is bevestigd \u2713",tekst,huisstijlMail(kop+best+uitleg));
+    DB.mails.push({id:nieuwId(),datum:vandaagStr(),door:"automatisch",naar:g.email,onderwerp:"Welkomstmail",klantId:k.id});
+    logAct("welkomstmail automatisch gestuurd \u2014 "+g.email);bewaar();
+  }catch(e){logAct("\u26a0\ufe0f welkomstmail NIET gelukt ("+g.email+") \u2014 "+e.message);bewaar();}
+}
 function webshopBetaald(wid){
   const w=DB.webshopWacht.find(x=>x.id==wid); if(!w)return;
   const g=w.g;
   let k=DB.klanten.find(x=>g.email&&x.email&&x.email.toLowerCase()===String(g.email).toLowerCase());
   if(!k){k={id:nieuwId(),naam:g.zaak||g.naam||"Webshopklant",email:g.email||"",tel:g.tel||"",adres:g.adres||"",btw:g.btw||"",
     notities:"Via webshop. Contact: "+(g.naam||"")+(g.googlelink?" \u00b7 Google: "+g.googlelink:""),aangemaakt:vandaagStr()};DB.klanten.push(k);}
-  const aantal=Number(g.tags)||1, totaal=Number(g.totaal)||0;
-  DB.verkopen.push({id:nieuwId(),datum:vandaagStr(),klantId:k.id,aantal,prijs:+(totaal/aantal).toFixed(2),totaal,
-    betaalwijze:"kaart",factuur:false,verkoper:"Jano",bron:"magazijn",webshop:true,betaald:true,
+  const aantal=Number(g.tags)||0, totaal=Number(g.totaal)||0;
+  DB.verkopen.push({id:nieuwId(),datum:vandaagStr(),klantId:k.id,aantal:aantal||1,prijs:+(totaal/(aantal||1)).toFixed(2),totaal,
+    betaalwijze:"kaart",factuur:false,verkoper:"Jano",bron:aantal>0?"magazijn":"",webshop:true,betaald:true,
     notitie:"WEBSHOP (SumUp betaald) \u2014 "+(g.productnaam||"")+(g.opm?" \u00b7 "+g.opm:"")});
+  if(aantal>0){
   DB.stock.magazijn-=aantal;
   DB.stocklog.unshift({datum:vandaagStr(),wie:"Webshop",type:"verkoop",aantal,van:"magazijn",naar:"klant: "+k.naam,actie:"Webshopverkoop \u2212"+aantal+" (magazijn) \u2192 "+k.naam});
+  }
   DB.webshopWacht=DB.webshopWacht.filter(x=>x.id!=wid);
+  welkomstMail(g,k);
   logAct("webshopbestelling bevestigd als betaald \u2014 "+k.naam+" \u00b7 "+eur(totaal));
   bewaar();renderVerkopen();
 }

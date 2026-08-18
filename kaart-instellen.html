@@ -1,0 +1,212 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kaartstudio — ontwerp je digitale visitekaart | TrustTap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Montserrat','Segoe UI',system-ui,sans-serif;background:#FBF8F1;min-height:100svh;color:#141414;padding:26px 16px 60px;overflow-x:hidden}
+.wrap{max-width:1020px;margin:0 auto}
+header .merk{font-size:.72rem;letter-spacing:.28em;color:#B08D4A;font-weight:800}
+header .merk a{color:inherit;text-decoration:none}
+header h1{font-size:1.6rem;letter-spacing:-.01em;margin-top:.3rem}
+header p{color:#6B6552;font-size:.9rem;margin-top:.35rem}
+.grid{display:grid;grid-template-columns:1fr 440px;gap:2rem;margin-top:1.6rem;align-items:start}
+@media(max-width:920px){.grid{grid-template-columns:1fr;gap:1.4rem}.pvKant{order:-1;position:static}.pv{margin:0 auto}}
+.stap{background:#FFFFFF;border:1px solid #E9E0C9;border-radius:18px;padding:1.5rem;margin-bottom:1.1rem;box-shadow:0 20px 45px -38px rgba(20,20,20,.35)}
+.stap h2{font-size:.76rem;letter-spacing:.18em;color:#B08D4A;text-transform:uppercase;display:flex;align-items:center;gap:.55rem}
+.stap h2 span{display:inline-flex;width:23px;height:23px;border-radius:50%;background:linear-gradient(135deg,#EED9A9,#D8B266 55%,#B98A3C);color:#141414;align-items:center;justify-content:center;font-size:.72rem}
+label{display:block;font-size:.66rem;font-weight:700;letter-spacing:.08em;color:#6B6552;margin:.8rem 0 .25rem;text-transform:uppercase}
+label b{color:#B08D4A}
+input,textarea{width:100%;padding:.68rem .85rem;border-radius:10px;border:1px solid #E2D9C2;background:#FDFCF8;color:#141414;font:inherit;font-size:16px}
+input:focus,textarea:focus{outline:none;border-color:#D8B266;box-shadow:0 0 0 3px rgba(216,178,102,.18)}
+input.fout{border-color:#c0564f}
+.veldfout{color:#e08585;font-size:.74rem;margin-top:.25rem;display:none}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media(max-width:520px){.r2{grid-template-columns:1fr}}
+.knop{display:block;width:100%;margin-top:1rem;padding:.95rem;border:none;border-radius:12px;font-weight:800;font-size:1rem;cursor:pointer;background:linear-gradient(135deg,#EED9A9,#D8B266 55%,#B98A3C);color:#141414;font-family:inherit}
+.knop.lijn{background:none;border:1.5px solid #D8B266;color:#B08D4A}
+.knop[disabled]{opacity:.55;cursor:wait}
+.st{margin-top:.8rem;font-size:.88rem;min-height:1.3em}
+.st.ok{color:#7bc47f}.st.fout{color:#e08585}
+.codes{background:#FCF7EA;border:1px dashed #B08D4A;border-radius:12px;padding:1rem;margin-top:1rem;font-size:.82rem;word-break:break-all;display:none;line-height:1.8}
+.codes b{color:#B08D4A}
+.kop-kopieer{margin-left:.5rem;cursor:pointer;border:1px solid #D8B266;background:#fff;color:#B08D4A;border-radius:8px;font-size:.7rem;padding:.15rem .5rem;font-weight:700}
+.themas{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:.5rem}
+.thema{border:2px solid #E2D9C2;border-radius:12px;padding:.6rem .3rem;text-align:center;cursor:pointer;font-size:.72rem;font-weight:700;color:#6B6552;background:#fff}
+.thema .bol{width:28px;height:28px;border-radius:50%;margin:0 auto .35rem}
+.thema.actief{border-color:#D8B266;color:#141414;background:#FCF7EA}
+.pvKant{position:sticky;top:20px}
+.pvTitel{font-size:.7rem;letter-spacing:.24em;color:#6B6552;text-transform:uppercase;text-align:center;margin-bottom:.7rem}
+
+.pv{--bg1:#1c1c1c;--bg2:#101010;--pg:#0d0d0d;--rand:rgba(216,178,102,.5);--acc:#D8B266;--accG:linear-gradient(135deg,#EED9A9,#D8B266 55%,#B98A3C);--txt:#efece3;--sub:#9a958a;--kt:#151515;--vlak:rgba(255,255,255,.05)}
+.pv{width:min(420px,100%);background:linear-gradient(170deg,var(--bg1),var(--bg2));border:1px solid var(--rand);border-radius:26px;overflow:hidden;text-align:center;color:var(--txt);box-shadow:0 40px 80px -40px rgba(0,0,0,.65)}
+.pv .cover{height:92px;background:var(--accG)}
+.pv .inhoud{padding:0 1.7rem 2rem}
+.pv .a{width:104px;height:104px;border-radius:50%;margin:-52px auto 1rem;background:var(--accG);border:4px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:var(--kt);overflow:hidden}
+.pv .a img{width:100%;height:100%;object-fit:cover}
+.pv h1{font-size:1.5rem;letter-spacing:-.01em}
+.pv .f{color:var(--acc);font-size:.88rem;font-weight:700;margin:.3rem 0 .1rem}
+.pv .b{color:var(--sub);font-size:.85rem}
+.pv .bio{color:var(--sub);font-size:.86rem;line-height:1.6;margin:.8rem auto 0;max-width:32ch}
+.pv .uren{color:var(--acc);font-size:.8rem;font-weight:700;margin-top:.7rem}
+.pv .ks{margin-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.pv .ks .k:first-child{grid-column:1/-1}
+.pv .k{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.85rem .6rem;border:1px solid var(--rand);border-radius:13px;color:var(--txt);text-decoration:none;font-weight:700;font-size:.92rem;background:var(--vlak)}
+.pv .k:hover{background:var(--acc);color:var(--kt)}
+.pv .k.goud{background:var(--accG);color:var(--kt);border:none}
+.pv .rr{margin-top:1rem;display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap}
+.pv .r{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--rand);text-decoration:none;font-size:1.15rem;background:var(--vlak)}
+.pv .r:hover{background:var(--acc)}
+.pv .voet{margin-top:1.7rem;font-size:.64rem;color:var(--sub);letter-spacing:.1em}
+.pv .voet a{color:var(--acc);text-decoration:none;font-weight:800}
+</style></head><body><div class="wrap">
+<header><div class="merk">◆ <a href="https://trusttap.be">TRUSTTAP</a> · KAARTSTUDIO</div><h1>✨ Ontwerp je digitale visitekaart</h1><p>Ontwerp je digitale visitekaart — je ziet rechts meteen het resultaat. Alles is later aanpasbaar met je codes.</p></header>
+<div class="grid"><div>
+<div class="stap"><h2><span>1</span> Jouw kaart</h2>
+  <button class="knop lijn" id="i_nieuw" style="margin-top:.8rem">✨ Nieuwe kaart aanmaken</button>
+  <div class="codes" id="i_codes"></div>
+  <div class="r2"><div><label>Kaartcode</label><input id="i_code" autocomplete="off"></div>
+  <div><label>Bewerkcode</label><input id="i_bewerk" autocomplete="off"></div></div>
+</div>
+<div class="stap"><h2><span>2</span> Kies je stijl</h2>
+  <div class="themas" id="i_themas">
+    <div class="thema actief" data-t="goud"><div class="bol" style="background:linear-gradient(135deg,#EED9A9,#B98A3C)"></div>Goud</div>
+    <div class="thema" data-t="licht"><div class="bol" style="background:#FBF8F1;border:1px solid #999"></div>Licht</div>
+    <div class="thema" data-t="blauw"><div class="bol" style="background:linear-gradient(135deg,#C4DAFF,#4A7FD4)"></div>Blauw</div>
+    <div class="thema" data-t="smaragd"><div class="bol" style="background:linear-gradient(135deg,#B7F0D6,#2E9A6E)"></div>Groen</div>
+    <div class="thema" data-t="zwart"><div class="bol" style="background:linear-gradient(135deg,#FFFFFF,#9E9E9E);border:1px solid #999"></div>Zwart-wit</div>
+    <div class="thema" data-t="bordeaux"><div class="bol" style="background:linear-gradient(135deg,#F6C6D6,#B75F7F)"></div>Bordeaux</div>
+  </div>
+</div>
+<div class="stap"><h2><span>3</span> Jouw gegevens</h2>
+  <label>Naam <b>*</b></label><input id="i_naam" placeholder="Jan Bakker">
+  <div class="r2"><div><label>Functie</label><input id="i_functie" placeholder="Zaakvoerder"></div>
+  <div><label>Bedrijf</label><input id="i_bedrijf" placeholder="Bakkerij Jan"></div></div>
+  <label>Korte omschrijving (max. 160 tekens)</label><textarea id="i_bio" rows="2" maxlength="160" placeholder="Ambachtelijk brood sinds 1998 — elke dag vers."></textarea>
+  <div class="r2"><div><label>Telefoon</label><input id="i_tel" placeholder="+32 470 12 34 56"><div class="veldfout" id="f_tel">Gebruik alleen cijfers, spaties en een + (bv. +32 470 12 34 56).</div></div>
+  <div><label>E-mail</label><input id="i_email" placeholder="jan@bakkerij.be"><div class="veldfout" id="f_email">Dit lijkt geen geldig e-mailadres.</div></div></div>
+  <label>Adres</label><input id="i_adres" placeholder="Marktstraat 1, 9800 Deinze">
+  <label>Openingsuren (optioneel)</label><input id="i_uren" placeholder="Di–za 7u–18u · zo 7u–13u">
+  <label>Foto (link naar een afbeelding, optioneel)</label><input id="i_foto" placeholder="https://…/foto.jpg"><div class="veldfout" id="f_foto">Deze foto-link kan niet geladen worden — controleer de link.</div>
+</div>
+<div class="stap"><h2><span>4</span> Online kanalen</h2>
+  <div class="r2"><div><label>Website</label><input id="i_site" placeholder="bakkerijjan.be"></div>
+  <div><label>Instagram</label><input id="i_insta" placeholder="instagram.com/bakkerijjan"></div></div>
+  <div class="r2"><div><label>LinkedIn</label><input id="i_linkedin" placeholder="linkedin.com/in/janbakker"></div>
+  <div><label>Facebook</label><input id="i_facebook" placeholder="facebook.com/bakkerijjan"></div></div>
+  <label>TikTok</label><input id="i_tiktok" placeholder="tiktok.com/@bakkerijjan">
+</div>
+<div class="stap"><h2><span>5</span> Publiceren</h2>
+  <button class="knop" id="i_bewaar">Kaart opslaan &amp; publiceren</button>
+  <div class="st" id="i_status"></div>
+</div>
+</div>
+<div class="pvKant"><div class="pvTitel">Live voorbeeld</div><div class="pv" id="pv"></div></div>
+</div></div>
+<script>
+
+const THEMAS={
+ goud:{"--bg1":"#1c1c1c","--bg2":"#101010","--pg":"#0d0d0d","--rand":"rgba(216,178,102,.5)","--acc":"#D8B266","--accG":"linear-gradient(135deg,#EED9A9,#D8B266 55%,#B98A3C)","--txt":"#efece3","--sub":"#9a958a","--kt":"#151515","--vlak":"rgba(255,255,255,.05)"},
+ licht:{"--bg1":"#FFFFFF","--bg2":"#FBF8F1","--pg":"#ECE6D4","--rand":"#E0D3B2","--acc":"#A8853F","--accG":"linear-gradient(135deg,#E9CE93,#C9A45C 55%,#A8853F)","--txt":"#1d1c19","--sub":"#8a8371","--kt":"#151515","--vlak":"rgba(0,0,0,.045)"},
+ blauw:{"--bg1":"#14233B","--bg2":"#0B1526","--pg":"#081120","--rand":"rgba(127,178,255,.45)","--acc":"#8AB8FF","--accG":"linear-gradient(135deg,#C4DAFF,#8AB8FF 55%,#4A7FD4)","--txt":"#EAF1FB","--sub":"#8FA3BF","--kt":"#0B1526","--vlak":"rgba(255,255,255,.06)"},
+ smaragd:{"--bg1":"#123128","--bg2":"#0B2019","--pg":"#081812","--rand":"rgba(88,201,154,.45)","--acc":"#6BD5A8","--accG":"linear-gradient(135deg,#B7F0D6,#6BD5A8 55%,#2E9A6E)","--txt":"#EAF7F0","--sub":"#89AF9E","--kt":"#0B2019","--vlak":"rgba(255,255,255,.06)"},
+ zwart:{"--bg1":"#242424","--bg2":"#141414","--pg":"#0e0e0e","--rand":"#414141","--acc":"#EDEDED","--accG":"linear-gradient(135deg,#FFFFFF,#DCDCDC 55%,#9E9E9E)","--txt":"#F2F2F2","--sub":"#9a9a9a","--kt":"#111111","--vlak":"rgba(255,255,255,.06)"},
+ bordeaux:{"--bg1":"#3A1220","--bg2":"#250B14","--pg":"#1D0810","--rand":"rgba(233,150,177,.4)","--acc":"#E996B1","--accG":"linear-gradient(135deg,#F6C6D6,#E996B1 55%,#B75F7F)","--txt":"#FBEDF2","--sub":"#B78E9C","--kt":"#250B14","--vlak":"rgba(255,255,255,.06)"}};
+function themaZet(el,naam){const t=THEMAS[naam]||THEMAS.goud;for(const k in t)el.style.setProperty(k,t[k]);}
+function kaartEsc(x){return String(x||"").replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]))}
+function urlNorm(v){v=String(v||"").trim();if(!v)return"";if(!/^https?:\/\//i.test(v))v="https://"+v;return v}
+function telNorm(v){return String(v||"").replace(/[^0-9+]/g,"")}
+function waNr(v){return telNorm(v).replace(/^\+/,"").replace(/^0/,"32")}
+function vcardVan(g){
+  const tel=telNorm(g.tel);
+  return "BEGIN:VCARD\nVERSION:3.0\nFN:"+g.naam+(g.bedrijf?"\nORG:"+g.bedrijf:"")+(g.functie?"\nTITLE:"+g.functie:"")
+    +(tel?"\nTEL;TYPE=CELL:"+tel:"")+(g.email?"\nEMAIL:"+g.email:"")+(g.site?"\nURL:"+urlNorm(g.site):"")
+    +(g.adres?"\nADR;TYPE=WORK:;;"+g.adres:"")+(g.bio?"\nNOTE:"+g.bio:"")+"\nEND:VCARD";
+}
+function kaartHtml(g){
+  const e=kaartEsc, tel=telNorm(g.tel);
+  const ini=String(g.naam||"?").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
+  const groot=[];
+  groot.push("<a class='k goud' href='data:text/vcard;charset=utf-8,"+encodeURIComponent(vcardVan(g))+"' download='"+e(g.naam||"contact").replace(/\s+/g,"-").toLowerCase()+".vcf'><span>💾</span> Bewaar contact</a>");
+  if(tel)groot.push("<a class='k' href='tel:"+tel+"'><span>📞</span> Bellen</a>");
+  if(tel)groot.push("<a class='k' target='_blank' rel='noopener' href='https://wa.me/"+waNr(g.tel)+"'><span>💬</span> WhatsApp</a>");
+  if(g.email)groot.push("<a class='k' href='mailto:"+e(g.email)+"'><span>✉️</span> E-mail</a>");
+  const rond=[];
+  const R=(h,i,titel)=>rond.push("<a class='r' title='"+titel+"' target='_blank' rel='noopener' href='"+h+"'>"+i+"</a>");
+  if(g.site)R(urlNorm(g.site),"🌐","Website");
+  if(g.insta)R(urlNorm(g.insta),"📷","Instagram");
+  if(g.linkedin)R(urlNorm(g.linkedin),"💼","LinkedIn");
+  if(g.facebook)R(urlNorm(g.facebook),"👥","Facebook");
+  if(g.tiktok)R(urlNorm(g.tiktok),"🎵","TikTok");
+  if(g.adres)R("https://maps.google.com/?q="+encodeURIComponent(g.adres),"📍","Route");
+  return "<div class='cover'></div><div class='inhoud'>"
+    +"<div class='a'>"+(g.foto?"<img src='"+e(g.foto)+"' alt='' onerror=\"this.parentNode.textContent='"+ini+"'\">":ini)+"</div>"
+    +"<h1>"+e(g.naam||"Jouw naam")+"</h1>"
+    +(g.functie?"<div class='f'>"+e(g.functie)+"</div>":"")
+    +(g.bedrijf?"<div class='b'>"+e(g.bedrijf)+"</div>":"")
+    +(g.bio?"<p class='bio'>"+e(g.bio)+"</p>":"")
+    +(g.uren?"<div class='uren'>🕒 "+e(g.uren)+"</div>":"")
+    +"<div class='ks'>"+groot.join("")+"</div>"
+    +(rond.length?"<div class='rr'>"+rond.join("")+"</div>":"")
+    +"<div class='voet'>DIGITAAL VISITEKAARTJE DOOR <a href='https://trusttap.be' target='_blank' rel='noopener'>TRUSTTAP</a></div></div>";
+}
+
+const q=new URLSearchParams(location.search);
+const E=id=>document.getElementById(id);
+E("i_code").value=q.get("code")||localStorage.getItem("tt_kcode")||"";
+E("i_bewerk").value=q.get("b")||localStorage.getItem("tt_kbewerk")||"";
+let thema="goud";
+const V=id=>E(id).value.trim();
+function verzamel(){return {naam:V("i_naam"),functie:V("i_functie"),bedrijf:V("i_bedrijf"),bio:V("i_bio"),tel:V("i_tel"),email:V("i_email"),site:V("i_site"),insta:V("i_insta"),linkedin:V("i_linkedin"),facebook:V("i_facebook"),tiktok:V("i_tiktok"),adres:V("i_adres"),uren:V("i_uren"),foto:V("i_foto"),thema}}
+function preview(){const pv=E("pv");themaZet(pv,thema);pv.innerHTML=kaartHtml(verzamel())}
+document.querySelectorAll("input,textarea").forEach(el=>el.addEventListener("input",preview));
+E("i_themas").addEventListener("click",e=>{const t=e.target.closest(".thema");if(!t)return;
+  document.querySelectorAll(".thema").forEach(x=>x.classList.remove("actief"));t.classList.add("actief");thema=t.dataset.t;preview();});
+preview();
+function controleer(){
+  let ok=true;
+  const zet=(id,f,slecht)=>{E(id).classList.toggle("fout",slecht);E(f).style.display=slecht?"block":"none";if(slecht)ok=false};
+  zet("i_email","f_email", V("i_email")!==""&&!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(V("i_email")));
+  zet("i_tel","f_tel", V("i_tel")!==""&&!/^[+0-9][0-9 ]{7,}$/.test(V("i_tel")));
+  return ok;
+}
+E("i_foto").addEventListener("change",()=>{
+  const u=V("i_foto"); E("i_foto").classList.remove("fout"); E("f_foto").style.display="none";
+  if(!u)return; const im=new Image();
+  im.onerror=()=>{E("i_foto").classList.add("fout");E("f_foto").style.display="block"};
+  im.src=urlNorm(u);
+});
+E("i_nieuw").addEventListener("click",async()=>{
+  const st=E("i_status");st.className="st";st.textContent="Kaart aanmaken…";E("i_nieuw").disabled=true;
+  const maakCode=()=>Math.random().toString(36).slice(2,10);
+  let gelukt=false, code="", bewerk="";
+  for(let poging=0;poging<2&&!gelukt;poging++){
+    code=maakCode();bewerk=Math.random().toString(36).slice(2,12);
+    try{const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/nfc_kaarten",{method:"POST",headers:{apikey:"sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh",Authorization:"Bearer sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh","Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({code,bewerkcode:bewerk,gegevens:{}})});
+      gelukt=r.ok;}catch(e){}
+  }
+  E("i_nieuw").disabled=false;
+  if(!gelukt){st.textContent="Aanmaken lukt niet — controleer je internet en probeer opnieuw.";st.className="st fout";return}
+  E("i_code").value=code;E("i_bewerk").value=bewerk;
+  try{localStorage.setItem("tt_kcode",code);localStorage.setItem("tt_kbewerk",bewerk)}catch(e){}
+  const kl="https://trusttap.be/kaart.html?id="+code, il="https://trusttap.be/kaart-instellen.html?code="+code+"&b="+bewerk;
+  const cd=E("i_codes");cd.style.display="block";
+  cd.innerHTML="⚠️ <b>Bewaar deze twee links goed</b> (schermafbeelding!):<br>Kaartlink (voor op je NFC-kaart):<br><b id=\"lnk1\">"+kl+"</b><button class=\"kop-kopieer\" data-kop=\"lnk1\">kopieer</button><br>Instel-link (om later aan te passen):<br><b id=\"lnk2\">"+il+"</b><button class=\"kop-kopieer\" data-kop=\"lnk2\">kopieer</button>";
+  cd.querySelectorAll("[data-kop]").forEach(b=>b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(E(b.dataset.kop).textContent);b.textContent="✓"}catch(e){}}));
+  st.textContent="✓ Kaart aangemaakt — ontwerp hem nu en klik onderaan op publiceren.";st.className="st ok";
+});
+E("i_bewaar").addEventListener("click",async()=>{
+  const st=E("i_status");st.className="st";
+  if(!V("i_code")||!V("i_bewerk")){st.textContent="Maak eerst een kaart aan (stap 1) of vul je kaart- en bewerkcode in.";st.className="st fout";return}
+  if(!V("i_naam")){st.textContent="Vul je naam in (stap 3) — dat is het enige verplichte veld.";st.className="st fout";return}
+  if(!controleer()){st.textContent="Kijk de rood gemarkeerde velden even na.";st.className="st fout";return}
+  st.textContent="Publiceren…";E("i_bewaar").disabled=true;
+  const g=verzamel();["site","insta","linkedin","facebook","tiktok","foto"].forEach(k=>{if(g[k])g[k]=urlNorm(g[k])});
+  try{
+    const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/rpc/kaart_opslaan",{method:"POST",headers:{apikey:"sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh",Authorization:"Bearer sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh","Content-Type":"application/json"},body:JSON.stringify({p_code:V("i_code"),p_bewerk:V("i_bewerk"),p_gegevens:g})});
+    const ok=await r.json();
+    if(ok===true){try{localStorage.setItem("tt_kcode",V("i_code"));localStorage.setItem("tt_kbewerk",V("i_bewerk"))}catch(e){}
+      st.innerHTML="✓ Gepubliceerd! Bekijk je kaart: <a style=\"color:#D8B266\" href=\"kaart.html?id="+encodeURIComponent(V("i_code"))+"\">trusttap.be/kaart.html?id="+encodeURIComponent(V("i_code"))+"</a>";st.className="st ok";}
+    else{st.textContent="Kaartcode of bewerkcode klopt niet — kijk je bewaarde links na.";st.className="st fout";}
+  }catch(e){st.textContent="Publiceren lukt even niet — controleer je internet en probeer opnieuw.";st.className="st fout"}
+  E("i_bewaar").disabled=false;
+});
+</script></body></html>

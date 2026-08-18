@@ -1,0 +1,105 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Digitaal visitekaartje — TrustTap</title>
+<meta name="description" content="Digitaal visitekaartje — tap, bewaar het contact en verbind meteen. Door TrustTap.">
+<style>*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,Arial,sans-serif;background:var(--pg,#0d0d0d);min-height:100svh;display:flex;flex-direction:column;padding:22px 16px}
+.midden{margin:auto;width:100%;display:flex;flex-direction:column;align-items:center;gap:14px}
+@media(max-width:380px){.pv .ks{grid-template-columns:1fr}}
+
+.pv{--bg1:#1c1c1c;--bg2:#101010;--pg:#0d0d0d;--rand:rgba(216,178,102,.5);--acc:#D8B266;--accG:linear-gradient(135deg,#EED9A9,#D8B266 55%,#B98A3C);--txt:#efece3;--sub:#9a958a;--kt:#151515;--vlak:rgba(255,255,255,.05)}
+.pv{width:min(420px,100%);background:linear-gradient(170deg,var(--bg1),var(--bg2));border:1px solid var(--rand);border-radius:26px;overflow:hidden;text-align:center;color:var(--txt);box-shadow:0 40px 80px -40px rgba(0,0,0,.65)}
+.pv .cover{height:92px;background:var(--accG)}
+.pv .inhoud{padding:0 1.7rem 2rem}
+.pv .a{width:104px;height:104px;border-radius:50%;margin:-52px auto 1rem;background:var(--accG);border:4px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;color:var(--kt);overflow:hidden}
+.pv .a img{width:100%;height:100%;object-fit:cover}
+.pv h1{font-size:1.5rem;letter-spacing:-.01em}
+.pv .f{color:var(--acc);font-size:.88rem;font-weight:700;margin:.3rem 0 .1rem}
+.pv .b{color:var(--sub);font-size:.85rem}
+.pv .bio{color:var(--sub);font-size:.86rem;line-height:1.6;margin:.8rem auto 0;max-width:32ch}
+.pv .uren{color:var(--acc);font-size:.8rem;font-weight:700;margin-top:.7rem}
+.pv .ks{margin-top:1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.pv .ks .k:first-child{grid-column:1/-1}
+.pv .k{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.85rem .6rem;border:1px solid var(--rand);border-radius:13px;color:var(--txt);text-decoration:none;font-weight:700;font-size:.92rem;background:var(--vlak)}
+.pv .k:hover{background:var(--acc);color:var(--kt)}
+.pv .k.goud{background:var(--accG);color:var(--kt);border:none}
+.pv .rr{margin-top:1rem;display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap}
+.pv .r{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid var(--rand);text-decoration:none;font-size:1.15rem;background:var(--vlak)}
+.pv .r:hover{background:var(--acc)}
+.pv .voet{margin-top:1.7rem;font-size:.64rem;color:var(--sub);letter-spacing:.1em}
+.pv .voet a{color:var(--acc);text-decoration:none;font-weight:800}
+.deel{border:none;background:none;color:#8a8578;font:inherit;font-size:.8rem;cursor:pointer;text-decoration:underline}
+.skelet{color:#9a958a;text-align:center;padding:3rem 1rem}
+</style></head><body>
+<div class="midden"><div class="pv" id="kaart"><div class="skelet">Kaart laden…</div></div>
+<button class="deel" id="deelKnop" hidden>↪︎ Deel deze kaart</button></div>
+<script>
+
+const THEMAS={
+ goud:{"--bg1":"#1c1c1c","--bg2":"#101010","--pg":"#0d0d0d","--rand":"rgba(216,178,102,.5)","--acc":"#D8B266","--accG":"linear-gradient(135deg,#EED9A9,#D8B266 55%,#B98A3C)","--txt":"#efece3","--sub":"#9a958a","--kt":"#151515","--vlak":"rgba(255,255,255,.05)"},
+ licht:{"--bg1":"#FFFFFF","--bg2":"#FBF8F1","--pg":"#ECE6D4","--rand":"#E0D3B2","--acc":"#A8853F","--accG":"linear-gradient(135deg,#E9CE93,#C9A45C 55%,#A8853F)","--txt":"#1d1c19","--sub":"#8a8371","--kt":"#151515","--vlak":"rgba(0,0,0,.045)"},
+ blauw:{"--bg1":"#14233B","--bg2":"#0B1526","--pg":"#081120","--rand":"rgba(127,178,255,.45)","--acc":"#8AB8FF","--accG":"linear-gradient(135deg,#C4DAFF,#8AB8FF 55%,#4A7FD4)","--txt":"#EAF1FB","--sub":"#8FA3BF","--kt":"#0B1526","--vlak":"rgba(255,255,255,.06)"},
+ smaragd:{"--bg1":"#123128","--bg2":"#0B2019","--pg":"#081812","--rand":"rgba(88,201,154,.45)","--acc":"#6BD5A8","--accG":"linear-gradient(135deg,#B7F0D6,#6BD5A8 55%,#2E9A6E)","--txt":"#EAF7F0","--sub":"#89AF9E","--kt":"#0B2019","--vlak":"rgba(255,255,255,.06)"},
+ zwart:{"--bg1":"#242424","--bg2":"#141414","--pg":"#0e0e0e","--rand":"#414141","--acc":"#EDEDED","--accG":"linear-gradient(135deg,#FFFFFF,#DCDCDC 55%,#9E9E9E)","--txt":"#F2F2F2","--sub":"#9a9a9a","--kt":"#111111","--vlak":"rgba(255,255,255,.06)"},
+ bordeaux:{"--bg1":"#3A1220","--bg2":"#250B14","--pg":"#1D0810","--rand":"rgba(233,150,177,.4)","--acc":"#E996B1","--accG":"linear-gradient(135deg,#F6C6D6,#E996B1 55%,#B75F7F)","--txt":"#FBEDF2","--sub":"#B78E9C","--kt":"#250B14","--vlak":"rgba(255,255,255,.06)"}};
+function themaZet(el,naam){const t=THEMAS[naam]||THEMAS.goud;for(const k in t)el.style.setProperty(k,t[k]);}
+function kaartEsc(x){return String(x||"").replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]))}
+function urlNorm(v){v=String(v||"").trim();if(!v)return"";if(!/^https?:\/\//i.test(v))v="https://"+v;return v}
+function telNorm(v){return String(v||"").replace(/[^0-9+]/g,"")}
+function waNr(v){return telNorm(v).replace(/^\+/,"").replace(/^0/,"32")}
+function vcardVan(g){
+  const tel=telNorm(g.tel);
+  return "BEGIN:VCARD\nVERSION:3.0\nFN:"+g.naam+(g.bedrijf?"\nORG:"+g.bedrijf:"")+(g.functie?"\nTITLE:"+g.functie:"")
+    +(tel?"\nTEL;TYPE=CELL:"+tel:"")+(g.email?"\nEMAIL:"+g.email:"")+(g.site?"\nURL:"+urlNorm(g.site):"")
+    +(g.adres?"\nADR;TYPE=WORK:;;"+g.adres:"")+(g.bio?"\nNOTE:"+g.bio:"")+"\nEND:VCARD";
+}
+function kaartHtml(g){
+  const e=kaartEsc, tel=telNorm(g.tel);
+  const ini=String(g.naam||"?").split(/\s+/).map(x=>x[0]).join("").slice(0,2).toUpperCase();
+  const groot=[];
+  groot.push("<a class='k goud' href='data:text/vcard;charset=utf-8,"+encodeURIComponent(vcardVan(g))+"' download='"+e(g.naam||"contact").replace(/\s+/g,"-").toLowerCase()+".vcf'><span>💾</span> Bewaar contact</a>");
+  if(tel)groot.push("<a class='k' href='tel:"+tel+"'><span>📞</span> Bellen</a>");
+  if(tel)groot.push("<a class='k' target='_blank' rel='noopener' href='https://wa.me/"+waNr(g.tel)+"'><span>💬</span> WhatsApp</a>");
+  if(g.email)groot.push("<a class='k' href='mailto:"+e(g.email)+"'><span>✉️</span> E-mail</a>");
+  const rond=[];
+  const R=(h,i,titel)=>rond.push("<a class='r' title='"+titel+"' target='_blank' rel='noopener' href='"+h+"'>"+i+"</a>");
+  if(g.site)R(urlNorm(g.site),"🌐","Website");
+  if(g.insta)R(urlNorm(g.insta),"📷","Instagram");
+  if(g.linkedin)R(urlNorm(g.linkedin),"💼","LinkedIn");
+  if(g.facebook)R(urlNorm(g.facebook),"👥","Facebook");
+  if(g.tiktok)R(urlNorm(g.tiktok),"🎵","TikTok");
+  if(g.adres)R("https://maps.google.com/?q="+encodeURIComponent(g.adres),"📍","Route");
+  return "<div class='cover'></div><div class='inhoud'>"
+    +"<div class='a'>"+(g.foto?"<img src='"+e(g.foto)+"' alt='' onerror=\"this.parentNode.textContent='"+ini+"'\">":ini)+"</div>"
+    +"<h1>"+e(g.naam||"Jouw naam")+"</h1>"
+    +(g.functie?"<div class='f'>"+e(g.functie)+"</div>":"")
+    +(g.bedrijf?"<div class='b'>"+e(g.bedrijf)+"</div>":"")
+    +(g.bio?"<p class='bio'>"+e(g.bio)+"</p>":"")
+    +(g.uren?"<div class='uren'>🕒 "+e(g.uren)+"</div>":"")
+    +"<div class='ks'>"+groot.join("")+"</div>"
+    +(rond.length?"<div class='rr'>"+rond.join("")+"</div>":"")
+    +"<div class='voet'>DIGITAAL VISITEKAARTJE DOOR <a href='https://trusttap.be' target='_blank' rel='noopener'>TRUSTTAP</a></div></div>";
+}
+
+const code=new URLSearchParams(location.search).get("id")||"";
+const kEl=document.getElementById("kaart");
+async function laad(){
+  if(!code){kEl.innerHTML="<div class='skelet'>Geen kaartcode in de link gevonden.<br>Controleer de link of neem contact op via <a style='color:#D8B266' href='https://trusttap.be'>trusttap.be</a>.</div>";return}
+  try{
+    const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/kaart_publiek?code=eq."+encodeURIComponent(code)+"&select=gegevens",{headers:{apikey:"sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh",Authorization:"Bearer sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh"}});
+    if(!r.ok)throw 0;
+    const d=await r.json(); const g=d&&d[0]&&d[0].gegevens;
+    if(!d||!d.length){kEl.innerHTML="<div class='skelet'>Deze kaart bestaat niet (meer).</div>";return}
+    if(!g||!g.naam){kEl.innerHTML="<div class='skelet'>Deze kaart is nog niet ingesteld.<br><br><a style='color:#D8B266;font-weight:700' href='kaart-instellen.html?code="+encodeURIComponent(code)+"'>⚙️ Kaart nu instellen</a></div>";return}
+    themaZet(kEl,g.thema); document.body.style.background=getComputedStyle(kEl).getPropertyValue("--pg");
+    document.title=(g.naam||"Digitaal visitekaartje")+" — "+(g.bedrijf||"TrustTap");
+    kEl.innerHTML=kaartHtml(g);
+    const dk=document.getElementById("deelKnop"); dk.hidden=false;
+    dk.addEventListener("click",async()=>{
+      const u=location.href;
+      if(navigator.share){try{await navigator.share({title:g.naam,url:u})}catch(e){}}
+      else{try{await navigator.clipboard.writeText(u);dk.textContent="✓ Link gekopieerd"}catch(e){}}
+    });
+  }catch(e){kEl.innerHTML="<div class='skelet'>Laden lukt even niet — controleer je internet en probeer opnieuw.</div>"}
+}
+laad();
+</script></body></html>

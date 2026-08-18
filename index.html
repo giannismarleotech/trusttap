@@ -481,6 +481,14 @@ footer{border-top:2px solid var(--goud)}
       <a href="#bestellen" data-p="k2" class="btn btn-goud" data-i18n="p_btn"></a>
     </div>
     </div>
+    <div class="prod reveal" style="text-align:center;max-width:420px;margin:1.4rem auto 0">
+      <div style="font-size:3.2rem;margin:.6rem 0 .4rem">💳</div>
+      <h3 data-i18n="pk3_t"></h3><p class="sub" data-i18n="pk3_s"></p>
+      <div class="prijs"><span class="nu">&euro; 5,00</span><span class="per" data-i18n="prijs_per"></span></div>
+      <ul style="text-align:left"><li data-i18n="d_f1"></li><li data-i18n="d_f2"></li><li data-i18n="d_f3"></li><li data-i18n="d_f4"></li></ul>
+      <a href="#bestellen" data-p="k3" class="btn btn-goud" data-i18n="p_btn"></a>
+      <a href="kaart-instellen.html" style="display:block;margin-top:.7rem;font-size:.85rem;font-weight:700;color:var(--goud-d,#B08D4A)" data-i18n="d_link"></a>
+    </div>
   <div class="bulk reveal" id="offerte">
     <div><h3 data-i18n="bulk_t"></h3><p data-i18n="bulk_p"></p></div>
     <a class="btn btn-zwart" href="mailto:info@trusttap.be?subject=Offerte%20aanvraag%20TrustTap" data-i18n="bulk_btn"></a>
@@ -495,7 +503,7 @@ footer{border-top:2px solid var(--goud)}
   <form id="bestelForm" class="bestel-grid" onsubmit="return false">
     <div class="veld">
       <label data-i18n="v_product"></label>
-      <select name="product"><option value="k1">1 TrustTap Kaart &mdash; &euro; 30,00</option><option value="k2">2 TrustTap Kaarten &mdash; &euro; 50,00</option></select>
+      <select name="product"><option value="k1">1 TrustTap Kaart &mdash; &euro; 30,00</option><option value="k2">2 TrustTap Kaarten &mdash; &euro; 50,00</option><option value="k3">Digitale visitekaart (zonder fysieke kaart) &mdash; &euro; 5,00</option></select>
       
       <label data-i18n="v_naam"></label><input name="naam" autocomplete="name">
       <label data-i18n="v_zaak"></label><input name="zaak" autocomplete="organization">
@@ -512,9 +520,14 @@ footer{border-top:2px solid var(--goud)}
         <tr><td data-i18n="sam_prod"></td><td id="samProd"></td></tr>
         
         <tr><td data-i18n="sam_lever"></td><td data-i18n="sam_gratis"></td></tr>
-        <tr><td data-i18n="sam_kosten"></td><td id="samKost">&euro; 0,75</td></tr>
+        <tr id="kortRij" style="display:none;color:#2E7D32;font-weight:700"><td data-i18n="kort_rij"></td><td id="kortBedrag"></td></tr>
         <tr><td data-i18n="sam_tot"></td><td id="samTot"></td></tr>
       </table>
+      <div style="display:flex;gap:.5rem;margin:.9rem 0 .15rem">
+        <input id="kortIn" placeholder="Kortingscode / Code promo" style="flex:1;border:1px solid #E2D9C2;border-radius:10px;padding:.55rem .8rem;font:inherit;font-size:16px">
+        <button class="btn btn-lijn" type="button" id="kortKnop" data-i18n="kort_knop"></button>
+      </div>
+      <div class="subtxt" id="kortStatus" style="margin:0 0 .6rem"></div>
       <p style="font-size:.8rem;margin:.8rem 0 1.2rem" data-i18n="sam_note"></p>
       <p style="font-size:.82rem;margin:0 0 .8rem" data-i18n-html="best_bulk"></p>
       <button class="btn btn-goud" id="verstuurSumup" style="width:100%" data-i18n="best_knop2"></button>
@@ -644,6 +657,15 @@ footer{border-top:2px solid var(--goud)}
       <a href="mailto:info@trusttap.be">info@trusttap.be</a>
       <a href="tel:+32492175552">+32 492 17 55 52</a>
       <a href="#" class="aanvraag-open" style="color:var(--goud);font-weight:700" data-i18n="foot_aanvraag"></a>
+      <a href="kaart-instellen.html" data-i18n="foot_studio"></a>
+      <div style="margin-top:1rem">
+        <div style="font-weight:800;font-size:.85rem;margin-bottom:.4rem" data-i18n="nb_t"></div>
+        <div style="display:flex;gap:.4rem;max-width:320px">
+          <input id="nbMail" type="email" placeholder="jouw@email.be" style="flex:1;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:10px;padding:.55rem .8rem;font:inherit;font-size:16px">
+          <button class="btn btn-goud" type="button" id="nbKnop" style="padding:.55rem 1rem" data-i18n="nb_knop"></button>
+        </div>
+        <div class="subtxt" id="nbStatus" style="margin-top:.35rem"></div>
+      </div>
       <a href="https://wa.me/32492175552" target="_blank" rel="noopener">WhatsApp</a>
       <a href="https://instagram.com/trusttap.be" target="_blank" rel="noopener">Instagram — @trusttap.be</a>
       <a href="#voorwaarden" data-i18n="foot_s4"></a>
@@ -671,7 +693,7 @@ nl:{
  breed_eyebrow:"Meer dan reviews",breed_h2:"TrustTap is een NFC-huis, geen éénproductswinkel",
  breed_p:"Alles wat met een tap slimmer kan, bouwen wij. Vandaag helpen we ondernemers aan meer Google reviews. Binnenkort lanceren we nieuwe NFC-producten — tot en met volledig custom oplossingen op maat.",
  b1_t:"Nu verkrijgbaar",b1_p:"TrustTap Review Kaart — verzamel Google reviews met één tap.",
- b2_t:"Binnenkort",b2_p:"Nieuwe NFC-producten zijn in de maak. Hou onze kanalen in de gaten voor de lancering.", av_t:"Offerte / contact aanvragen", av_p:"Laat uw gegevens achter \u2014 wij nemen binnen 1 werkdag contact op.", av_naam:"Uw naam", av_zaak:"Zaak / bedrijf", av_tel:"Telefoon", av_ber:"Uw vraag (aantal kaarten, wensen\u2026)", av_knop:"Aanvraag versturen", av_ok:"Bedankt! Uw aanvraag is goed ontvangen \u2014 wij nemen snel contact op.", av_fout:"Vul minstens uw naam of zaak \u00e9n een geldig e-mailadres in.", av_fout2:"Versturen lukte niet \u2014 probeer het zo opnieuw of bel ons.", vid_eyebrow:"BEKIJK HET ZELF", vid_t:"TrustTap in 30 seconden", vid_p:"Van tap tot review \u2014 zo simpel werkt het.",
+ b2_t:"Binnenkort",b2_p:"Nieuwe NFC-producten zijn in de maak. Hou onze kanalen in de gaten voor de lancering.", av_t:"Offerte / contact aanvragen", av_p:"Laat uw gegevens achter \u2014 wij nemen binnen 1 werkdag contact op.", av_naam:"Uw naam", av_zaak:"Zaak / bedrijf", av_tel:"Telefoon", av_ber:"Uw vraag (aantal kaarten, wensen\u2026)", av_knop:"Aanvraag versturen", av_ok:"Bedankt! Uw aanvraag is goed ontvangen \u2014 wij nemen snel contact op.", kort_knop:"Toepassen", kort_rij:"Korting", kort_ok:"\u2713 Code toegepast: {p}% korting", kort_fout:"Deze code is niet (meer) geldig.", kort_geenlink:"Uw bestelling is geregistreerd m\u00e9t korting! Wij sturen u meteen een betaalverzoek voor het verlaagde bedrag.", pk3_t:"Digitale visitekaart", pk3_s:"Jouw persoonlijke kaartpagina \u2014 zonder fysieke kaart. Deel hem via link of QR.", d_f1:"Zelf ontwerpen in de kaartstudio (4 stijlen)", d_f2:"Bewaar contact-knop, WhatsApp, socials & route", d_f3:"Altijd zelf aanpasbaar \u2014 zonder abonnement", d_f4:"Direct klaar na betaling", dig_ok:"Bedankt! Na de betaling ontwerp je je kaart meteen zelf op trusttap.be/kaart-instellen.html \u2014 bewaar die link goed.", d_link:"\u2728 Proberen? Open de kaartstudio \u2192", foot_studio:"\u2728 Kaartstudio", nb_t:"\ud83d\udce9 Blijf op de hoogte", nb_knop:"Inschrijven", nb_ok:"\u2713 Ingeschreven \u2014 tot in je mailbox!", nb_fout:"Vul een geldig e-mailadres in.", av_fout:"Vul minstens uw naam of zaak \u00e9n een geldig e-mailadres in.", av_fout2:"Versturen lukte niet \u2014 probeer het zo opnieuw of bel ons.", vid_eyebrow:"BEKIJK HET ZELF", vid_t:"TrustTap in 30 seconden", vid_p:"Van tap tot review \u2014 zo simpel werkt het.",
  b3_t:"Custom op aanvraag",b3_p:"Een eigen NFC-idee? Wij ontwerpen en bouwen het op maat van uw zaak.",
  hoe_eyebrow:"Zo werkt het",hoe_h2:"Van tap tot review in 10 seconden",
  s1_t:"Klant tapt",s1_p:"Uw klant houdt zijn smartphone even tegen de kaart. Werkt op alle moderne telefoons — geen app nodig.",
@@ -747,7 +769,7 @@ en:{
  best_st1:"1 · Choose product",best_st2:"2 · Your details",best_st3:"3 \u00b7 Pay securely",
  v_product:"Product",v_aantal:"Number of packs",v_naam:"Name *",v_zaak:"Business name",v_email:"E-mail *",v_tel:"Phone *",v_adres:"Delivery address",v_btw:"VAT number (for invoice)",v_gr:"Google review link or your business name on Google",v_opm:"Remarks",
  sam_t:"Summary", best_knop2:"Order and pay", sam_kosten:"Online payment fee",sam_prod:"Product",sam_aantal:"Quantity",sam_lever:"Shipping",sam_gratis:"Free",sam_tot:"Total",
- sam_note:"After payment we contact you within 1 business day to personalise your card (your Google link). Note: once configured, the order is non-refundable (see terms).", best_bulk:"More than 2 cards or a custom design? <a href=\"#\" class=\"aanvraag-open\"><b>Request your quote here</b></a> \u2014 we\u2019ll get back to you quickly.",
+ sam_note:"After payment we contact you within 1 business day to personalise your card (your Google link). Note: once configured, the order is non-refundable (see terms).", best_bulk:"More than 2 cards or a custom design? <a href=\"#\" class=\"aanvraag-open\"><b>Request your quote here</b></a> \u2014 we\u2019ll get back to you quickly.", kort_knop:"Apply", kort_rij:"Discount", kort_ok:"\u2713 Code applied: {p}% off", kort_fout:"This code is not (or no longer) valid.", kort_geenlink:"Your order is registered with the discount! We\u2019ll send you a payment request for the reduced amount right away.", pk3_t:"Digital business card", pk3_s:"Your personal card page \u2014 without a physical card. Share it via link or QR.", d_f1:"Design it yourself in the card studio (4 styles)", d_f2:"Save-contact button, WhatsApp, socials & route", d_f3:"Always editable \u2014 no subscription", d_f4:"Ready right after payment", dig_ok:"Thank you! After payment, design your card right away at trusttap.be/kaart-instellen.html \u2014 save that link.", d_link:"\u2728 Try it \u2014 open the card studio \u2192", foot_studio:"\u2728 Card studio", nb_t:"\ud83d\udce9 Stay in the loop", nb_knop:"Subscribe", nb_ok:"\u2713 Subscribed \u2014 see you in your inbox!", nb_fout:"Please enter a valid e-mail address.",
  best_knop:"Send order by e-mail",best_wa:"Or order via WhatsApp",
  best_fout:"Please fill in at least name, e-mail and phone.",
  hp_eyebrow:"In practice",hp_h2:"How TrustTap pays for itself",hp_p:"Scroll through the story of one customer, one tap and one review — and what it does for your business.",
@@ -798,7 +820,7 @@ fr:{
  best_st1:"1 · Choisir le produit",best_st2:"2 · Vos coordonnées",best_st3:"3 \u00b7 Payez en toute s\u00e9curit\u00e9",
  v_product:"Produit",v_aantal:"Nombre de packs",v_naam:"Nom *",v_zaak:"Nom du commerce",v_email:"E-mail *",v_tel:"Téléphone *",v_adres:"Adresse de livraison",v_btw:"Numéro de TVA (facture)",v_gr:"Lien d'avis Google ou nom de votre commerce sur Google",v_opm:"Remarques",
  sam_t:"Résumé", best_knop2:"Commander et payer", sam_kosten:"Frais de paiement en ligne",sam_prod:"Produit",sam_aantal:"Quantité",sam_lever:"Livraison",sam_gratis:"Gratuite",sam_tot:"Total",
- sam_note:"Apr\u00e8s le paiement, nous vous contactons sous 1 jour ouvrable pour la personnalisation. Attention : une fois configur\u00e9e, la commande n\u2019est pas remboursable (voir conditions).", best_bulk:"Plus de 2 cartes ou un design personnalis\u00e9 ? <a href=\"#\" class=\"aanvraag-open\"><b>Demandez votre devis ici</b></a> \u2014 nous vous recontactons rapidement.",
+ sam_note:"Apr\u00e8s le paiement, nous vous contactons sous 1 jour ouvrable pour la personnalisation. Attention : une fois configur\u00e9e, la commande n\u2019est pas remboursable (voir conditions).", best_bulk:"Plus de 2 cartes ou un design personnalis\u00e9 ? <a href=\"#\" class=\"aanvraag-open\"><b>Demandez votre devis ici</b></a> \u2014 nous vous recontactons rapidement.", kort_knop:"Appliquer", kort_rij:"R\u00e9duction", kort_ok:"\u2713 Code appliqu\u00e9 : \u2212{p} %", kort_fout:"Ce code n\u2019est pas (ou plus) valable.", kort_geenlink:"Votre commande est enregistr\u00e9e avec la r\u00e9duction ! Nous vous envoyons imm\u00e9diatement une demande de paiement du montant r\u00e9duit.", pk3_t:"Carte de visite digitale", pk3_s:"Votre page de carte personnelle \u2014 sans carte physique. Partagez-la via lien ou QR.", d_f1:"Cr\u00e9ez-la vous-m\u00eame dans le studio (4 styles)", d_f2:"Bouton enregistrer le contact, WhatsApp, r\u00e9seaux & itin\u00e9raire", d_f3:"Toujours modifiable \u2014 sans abonnement", d_f4:"Pr\u00eate juste apr\u00e8s le paiement", dig_ok:"Merci ! Apr\u00e8s le paiement, cr\u00e9ez votre carte tout de suite sur trusttap.be/kaart-instellen.html \u2014 gardez bien ce lien.", d_link:"\u2728 Essayez le studio de cartes \u2192", foot_studio:"\u2728 Studio de cartes", nb_t:"\ud83d\udce9 Restez inform\u00e9", nb_knop:"S\u2019abonner", nb_ok:"\u2713 Inscrit \u2014 \u00e0 bient\u00f4t dans votre bo\u00eete !", nb_fout:"Indiquez un e-mail valide.",
  best_knop:"Envoyer la commande par e-mail",best_wa:"Ou commander via WhatsApp",
  best_fout:"Veuillez remplir au moins le nom, l'e-mail et le téléphone.",
  hp_eyebrow:"En pratique",hp_h2:"Comment TrustTap se rentabilise",hp_p:"Faites défiler l'histoire d'un client, d'un tap et d'un avis — et ce que cela apporte à votre commerce.",
@@ -847,23 +869,43 @@ document.addEventListener("DOMContentLoaded",()=>{
   vertaal();
 });
 /* ---------------- bestelpagina ---------------- */
-const PRODUCTEN={k1:{naam:"1 TrustTap Kaart",prijs:30.00,tags:1,sumup:"https://pay.sumup.com/b2c/QTQ9RTLZ"},k2:{naam:"2 TrustTap Kaarten",prijs:50.00,tags:2,sumup:"https://pay.sumup.com/b2c/QTEARYAM"}};
-const BETAALKOST=0.75;
+const PRODUCTEN={k1:{naam:"1 TrustTap Kaart",prijs:30.00,tags:1,sumup:"https://pay.sumup.com/b2c/QQVCQT33"},k3:{naam:"Digitale visitekaart",prijs:5.00,tags:0,sumup:"https://pay.sumup.com/b2c/QP8FIVQO"},k2:{naam:"2 TrustTap Kaarten",prijs:50.00,tags:2,sumup:"https://pay.sumup.com/b2c/Q5N3Q8AW"}};
+const BETAALKOST=0;
 function eurF(n){return "€ "+n.toFixed(2).replace(".",",")}
 function veld(f,n){return f.querySelector('[name="'+n+'"]')}
+let KORT=null;
+function kortBedragVan(p){return KORT?+(p.prijs*KORT.procent/100).toFixed(2):0}
 function bestelUpdate(){
   const f=document.getElementById("bestelForm"); if(!f)return;
   const p=PRODUCTEN[veld(f,"product").value]||PRODUCTEN.k1;
-  const n=1;
   document.getElementById("samProd").textContent=p.naam;
-  
-  document.getElementById("samTot").textContent=eurF(p.prijs*n+BETAALKOST);
+  const kb=kortBedragVan(p);
+  const rij=document.getElementById("kortRij");
+  if(rij){rij.style.display=KORT?"table-row":"none";
+    if(KORT)document.getElementById("kortBedrag").textContent="\u2212 "+eurF(kb)+" ("+KORT.procent+"%)";}
+  document.getElementById("samTot").textContent=eurF(p.prijs-kb+BETAALKOST);
 }
 function bestelInit(){
   const f=document.getElementById("bestelForm");
 
   f.addEventListener("input",bestelUpdate);
   bestelUpdate();
+  document.getElementById("kortKnop").addEventListener("click",async()=>{
+    const D=T[taal]||T.nl, st=document.getElementById("kortStatus");
+    const code=document.getElementById("kortIn").value.trim();
+    if(!code){KORT=null;st.textContent="";bestelUpdate();return}
+    st.textContent="\u2026";
+    try{
+      const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/rpc/korting_check",{method:"POST",
+        headers:{apikey:STAT_KEY,Authorization:"Bearer "+STAT_KEY,"Content-Type":"application/json"},
+        body:JSON.stringify({p_code:code})});
+      const k=await r.json();
+      if(k&&k.procent){KORT={code:code.toUpperCase(),procent:k.procent,l1:k.sumup_k1||"",l2:k.sumup_k2||""};
+        st.textContent=D.kort_ok.replace("{p}",k.procent);st.style.color="#2E7D32";}
+      else{KORT=null;st.textContent=D.kort_fout;st.style.color="#B3261E";}
+    }catch(e){KORT=null;st.textContent=D.kort_fout;st.style.color="#B3261E";}
+    bestelUpdate();
+  });
   document.getElementById("verstuurSumup").addEventListener("click",async e=>{
     e.preventDefault();
     const D=T[taal]||T.nl, v=n=>veld(f,n).value;
@@ -873,12 +915,19 @@ function bestelInit(){
     try{
       const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/webshop_orders",{method:"POST",
         headers:{apikey:"sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh",Authorization:"Bearer sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh","Content-Type":"application/json",Prefer:"return=minimal"},
-        body:JSON.stringify({gegevens:{product:v("product"),productnaam:p.naam,totaal:+(p.prijs+BETAALKOST).toFixed(2),tags:p.tags,
+        body:JSON.stringify({gegevens:{product:v("product"),productnaam:p.naam,totaal:+(p.prijs-kortBedragVan(p)+BETAALKOST).toFixed(2),tags:p.tags,
+          korting:KORT?{code:KORT.code,procent:KORT.procent}:null,
           naam:v("naam"),zaak:v("zaak"),email:v("email"),tel:v("tel"),adres:v("adres"),btw:v("btw"),
           googlelink:v("googlelink"),opm:v("opm")}})});
       if(!r.ok)throw new Error("status "+r.status);
       stat("afrekenen",v("product"));
-      location.href=p.sumup;
+      if(v("product")==="k3")alert(D.dig_ok);
+      if(KORT){
+        const eigenLink=v("product")==="k2"?KORT.l2:KORT.l1;
+        if(eigenLink){location.href=eigenLink;}
+        else{alert(D.kort_geenlink);knop.disabled=false;vertaal();}
+      }else if(p.sumup.indexOf("http")===0){location.href=p.sumup;}
+      else{knop.disabled=false;vertaal();}
     }catch(err){
       knop.disabled=false;vertaal();
       alert("De bestelling kon niet worden doorgestuurd. Probeer opnieuw of bestel via WhatsApp.");
@@ -895,6 +944,21 @@ function stat(type,info){
     headers:{apikey:STAT_KEY,Authorization:"Bearer "+STAT_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},
     body:JSON.stringify({sessie:statSessie(),type,info:String(info||"").slice(0,120)})}).catch(function(){});}catch(e){}
 }
+document.addEventListener("click",async e=>{
+  if(e.target&&e.target.id==="nbKnop"){
+    const D=T[taal]||T.nl, st=document.getElementById("nbStatus"), em=document.getElementById("nbMail").value.trim();
+    if(!em.includes("@")){st.textContent=D.nb_fout;return}
+    st.textContent="\u2026";
+    try{
+      const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/nieuwsbrief",{method:"POST",
+        headers:{apikey:STAT_KEY,Authorization:"Bearer "+STAT_KEY,"Content-Type":"application/json",Prefer:"return=minimal"},
+        body:JSON.stringify({email:em.toLowerCase(),taal:taal})});
+      if(r.ok||r.status===409){st.textContent=D.nb_ok;document.getElementById("nbMail").value="";}
+      else{st.textContent=D.nb_fout;}
+    }catch(x){st.textContent=D.nb_fout}
+    return;
+  }
+});
 document.addEventListener("click",e=>{
   const a=e.target.closest(".aanvraag-open");
   if(a){e.preventDefault();stat("aanvraag_open","");
