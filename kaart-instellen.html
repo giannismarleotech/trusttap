@@ -58,10 +58,13 @@ input.fout{border-color:#c0564f}
 .pv .voet{margin-top:1.7rem;font-size:.64rem;color:var(--sub);letter-spacing:.1em}
 .pv .voet a{color:var(--acc);text-decoration:none;font-weight:800}
 </style></head><body><div class="wrap">
-<header><div class="merk">◆ <a href="https://trusttap.be">TRUSTTAP</a> · KAARTSTUDIO</div><h1>✨ Ontwerp je digitale visitekaart</h1><p>Ontwerp je digitale visitekaart — je ziet rechts meteen het resultaat. Alles is later aanpasbaar met je codes.</p></header>
+<header><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem"><div class="merk">◆ <a href="https://trusttap.be">TRUSTTAP</a> · KAARTSTUDIO</div>
+<a href="https://trusttap.be" style="font-size:.8rem;font-weight:800;color:#B08D4A;text-decoration:none;border:1.5px solid #D8B266;border-radius:10px;padding:.4rem .8rem">← Terug naar trusttap.be</a></div><h1>✨ Ontwerp je digitale visitekaart</h1><p>Ontwerp je digitale visitekaart — je ziet rechts meteen het resultaat. Alles is later aanpasbaar met je codes.</p></header>
 <div class="grid"><div>
 <div class="stap"><h2><span>1</span> Jouw kaart</h2>
-  <button class="knop lijn" id="i_nieuw" style="margin-top:.8rem">✨ Nieuwe kaart aanmaken</button>
+  <p style="background:#FCF7EA;border:1px dashed #B08D4A;border-radius:12px;padding:.9rem;font-size:.85rem;line-height:1.7;margin-top:.8rem">
+  🛒 Je <b>kaartcode</b> en <b>bewerkcode</b> ontving je bij je bestelling (op het bevestigingsscherm en in je bevestigingsmail) — ze staan hieronder al ingevuld als je via je persoonlijke link kwam.<br>
+  Nog geen digitale visitekaart? <a href="https://trusttap.be/#producten" style="color:#B08D4A;font-weight:800">Bestel er één op trusttap.be →</a></p>
   <div class="codes" id="i_codes"></div>
   <div class="r2"><div><label>Kaartcode</label><input id="i_code" autocomplete="off"></div>
   <div><label>Bewerkcode</label><input id="i_bewerk" autocomplete="off"></div></div>
@@ -173,25 +176,6 @@ E("i_foto").addEventListener("change",()=>{
   if(!u)return; const im=new Image();
   im.onerror=()=>{E("i_foto").classList.add("fout");E("f_foto").style.display="block"};
   im.src=urlNorm(u);
-});
-E("i_nieuw").addEventListener("click",async()=>{
-  const st=E("i_status");st.className="st";st.textContent="Kaart aanmaken…";E("i_nieuw").disabled=true;
-  const maakCode=()=>Math.random().toString(36).slice(2,10);
-  let gelukt=false, code="", bewerk="";
-  for(let poging=0;poging<2&&!gelukt;poging++){
-    code=maakCode();bewerk=Math.random().toString(36).slice(2,12);
-    try{const r=await fetch("https://abpnpymfjnzxsscdfvop.supabase.co/rest/v1/nfc_kaarten",{method:"POST",headers:{apikey:"sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh",Authorization:"Bearer sb_publishable_A-3kLw6GD6i2NwPg4035vQ_6krCRHIh","Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({code,bewerkcode:bewerk,gegevens:{}})});
-      gelukt=r.ok;}catch(e){}
-  }
-  E("i_nieuw").disabled=false;
-  if(!gelukt){st.textContent="Aanmaken lukt niet — controleer je internet en probeer opnieuw.";st.className="st fout";return}
-  E("i_code").value=code;E("i_bewerk").value=bewerk;
-  try{localStorage.setItem("tt_kcode",code);localStorage.setItem("tt_kbewerk",bewerk)}catch(e){}
-  const kl="https://trusttap.be/kaart.html?id="+code, il="https://trusttap.be/kaart-instellen.html?code="+code+"&b="+bewerk;
-  const cd=E("i_codes");cd.style.display="block";
-  cd.innerHTML="⚠️ <b>Bewaar deze twee links goed</b> (schermafbeelding!):<br>Kaartlink (voor op je NFC-kaart):<br><b id=\"lnk1\">"+kl+"</b><button class=\"kop-kopieer\" data-kop=\"lnk1\">kopieer</button><br>Instel-link (om later aan te passen):<br><b id=\"lnk2\">"+il+"</b><button class=\"kop-kopieer\" data-kop=\"lnk2\">kopieer</button>";
-  cd.querySelectorAll("[data-kop]").forEach(b=>b.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(E(b.dataset.kop).textContent);b.textContent="✓"}catch(e){}}));
-  st.textContent="✓ Kaart aangemaakt — ontwerp hem nu en klik onderaan op publiceren.";st.className="st ok";
 });
 E("i_bewaar").addEventListener("click",async()=>{
   const st=E("i_status");st.className="st";
