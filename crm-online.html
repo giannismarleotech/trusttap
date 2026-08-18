@@ -287,7 +287,7 @@ function isB(){return ROL==="beheerder"}
 
 /* ---------- opslag ---------- */
 const SLEUTEL = "trusttap_crm_v1";
-function leegeData(){return {klanten:[],verkopen:[],leads:[],bezoeken:[],dagstatus:[],tickets:[],taken:[],webshopWacht:[],verkopers:[],mails:[],logboek:[],stock:{magazijn:0,Giannis:0,Jano:0},stocklog:[],teller:1}}
+function leegeData(){return {klanten:[],verkopen:[],leads:[],bezoeken:[],dagstatus:[],tickets:[],taken:[],webshopWacht:[],verkopers:[],mails:[],logboek:[],offertes:[],stock:{magazijn:0,Giannis:0,Jano:0},stocklog:[],teller:1}}
 
 /* ---------- startgegevens (verkopen & leads Giannis, 13-15/08/2026) ---------- */
 function seedData(){
@@ -403,7 +403,15 @@ async function start(){
     await webStatsLaden();
     {const a=document.querySelector("#hoofdnav a.actief");
      if(a&&a.dataset.view==="dashboard")renderDashboard();}
-    SB.channel("crm4").on("postgres_changes",{event:"INSERT",schema:"public",table:"site_events"},()=>{
+    SB.channel("crm4").on("postgres_changes",{event:"INSERT",schema:"public",table:"site_events"},p=>{
+      const e=p.new||{};
+      if(webMeldAan()){
+        if(e.type==="weergave"&&e.sessie&&!gezSessies.has(e.sessie)){gezSessies.add(e.sessie);webMelding("\ud83d\udc40 Nieuwe bezoeker op trusttap.be","Bekijkt: "+(e.info||"home"));}
+        else if(e.type==="winkelwagen")webMelding("\ud83d\uded2 Bezoeker koos een product!",(e.info==="k2"?"Duo-verpakking (\u20ac 50)":"1 kaart (\u20ac 30)"));
+        else if(e.type==="afrekenen")webMelding("\ud83d\udcb3 Bezoeker gaat afrekenen!",(e.info==="k2"?"Duo-verpakking \u2014 \u20ac 50,75":"1 kaart \u2014 \u20ac 30,75"));
+        else if(e.type==="aanvraag_open")webMelding("\u270d\ufe0f Bezoeker opent het contactformulier","Mogelijk komt er zo een aanvraag binnen\u2026");
+        if(e.sessie)gezSessies.add(e.sessie);
+      }
       webStatsLaden().then(()=>{const a=document.querySelector("#hoofdnav a.actief");
         if(a&&a.dataset.view==="dashboard"&&(!modalOverlay||modalOverlay.hidden))renderDashboard();});
     }).subscribe();
@@ -561,6 +569,7 @@ async function webStatsLaden(){
     webStats={laden:false,weergaven:data.filter(e=>e.type==="weergave").length,bezoekers:uniek.size,
       winkelwagen:data.filter(e=>e.type==="winkelwagen").length,afrekenen:data.filter(e=>e.type==="afrekenen").length,
       live:new Set(data.filter(e=>new Date(e.t).getTime()>vijf).map(e=>e.sessie)).size};
+    data.forEach(e=>{if(e.sessie)gezSessies.add(e.sessie)});
   }catch(e){webStats={fout:true}}
 }
 function webStatsKaart(){
@@ -833,6 +842,72 @@ function mailFormulier(v){
     }catch(e){st.textContent="Versturen mislukt (netwerk). Gebruik desnoods \u2018Openen in Mail-app\u2019."}
   });
 }
+function offerteFormulier(k){
+  const morgen30=new Date(Date.now()+30*864e5).toISOString().slice(0,10);
+  openModal(`
+    <h3>📄 Offerte voor ${esc(k.naam)}</h3>
+    <p class="subtxt">Vul prijzen <b>exclusief btw</b> in — de offerte toont excl., btw 21% en incl.</p>
+    ${[1,2,3].map(i=>`<div class="rij c3" style="margin-top:.3rem">
+      <div style="grid-column:span 1"><label>Omschrijving ${i}</label><input id="of_o${i}" value="${i===1?"TrustTap NFC-reviewkaart — volledig ingesteld":""}"></div>
+      <div><label>Aantal</label><input type="number" id="of_a${i}" min="0" value="${i===1?1:0}"></div>
+      <div><label>Prijs/stuk (excl.)</label><input type="number" step="0.01" id="of_p${i}" value="${i===1?30:0}"></div></div>`).join("")}
+    <div class="rij c2" style="margin-top:.5rem"><div><label>Geldig tot</label><input type="date" id="of_geldig" value="${morgen30}"></div>
+    <div><label>Opmerking (optioneel)</label><input id="of_opm" placeholder="bv. levering binnen 5 werkdagen"></div></div>
+    <button class="knop" id="of_maak" style="margin-top:.9rem">Offerte openen (afdrukken / bewaar als PDF)</button>
+    <p class="subtxt" style="margin-top:.6rem">💡 De officiële <b>factuur</b> maak je na akkoord in Dexxter (verplichte Peppol-verzending voor B2B sinds 2026).</p>`);
+  document.getElementById("of_maak").addEventListener("click",()=>{
+    const regels=[1,2,3].map(i=>({o:document.getElementById("of_o"+i).value.trim(),
+      a:Number(document.getElementById("of_a"+i).value)||0,
+      p:Number(document.getElementById("of_p"+i).value)||0})).filter(r=>r.o&&r.a>0);
+    if(!regels.length){alert("Vul minstens één regel in.");return}
+    const excl=regels.reduce((s,r)=>s+r.a*r.p,0), btw=excl*0.21, incl=excl+btw;
+    const jaar=new Date().getFullYear();
+    const nr="OF-"+jaar+"-"+String((DB.offertes||[]).filter(o=>String(o.nr).includes(jaar)).length+1).padStart(3,"0");
+    DB.offertes.push({id:nieuwId(),nr,klantId:k.id,datum:vandaagStr(),totaalExcl:excl,door:ingelogd});
+    logAct("offerte gemaakt — "+nr+" · "+k.naam+" · "+eur(incl)+" incl.");
+    bewaar();
+    const geldig=document.getElementById("of_geldig").value, opm=document.getElementById("of_opm").value.trim();
+    const won=window.open("","_blank");
+    won.document.write(`<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>${nr} — TrustTap</title><style>
+      body{font-family:Arial,Helvetica,sans-serif;color:#141414;margin:0;padding:48px;font-size:14px}
+      .kop{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #D8B266;padding-bottom:18px}
+      .merk{font-size:26px;font-weight:800;letter-spacing:.02em}
+      .merk span{color:#B08D4A}
+      .tag{font-size:10px;letter-spacing:.25em;color:#B08D4A;font-weight:700}
+      h1{font-size:20px;margin:26px 0 4px}
+      table{width:100%;border-collapse:collapse;margin-top:18px}
+      th{text-align:left;font-size:11px;letter-spacing:.12em;color:#8a8a8a;border-bottom:2px solid #141414;padding:6px 8px}
+      td{padding:9px 8px;border-bottom:1px solid #E9E0C9}
+      .r{text-align:right}
+      .tot td{border:none;padding:5px 8px}
+      .tot .eind{font-size:17px;font-weight:800;border-top:2px solid #141414}
+      .voet{margin-top:40px;padding-top:14px;border-top:1px solid #E9E0C9;font-size:11px;color:#8a8a8a;line-height:1.7}
+      .blok{margin-top:22px;display:flex;gap:60px}
+      .blok b{display:block;font-size:10px;letter-spacing:.2em;color:#B08D4A;margin-bottom:5px}
+    </style></head><body>
+      <div class="kop"><div><div class="merk">◆ Trust<span>Tap</span></div><div class="tag">SLIMME NFC-OPLOSSINGEN</div></div>
+      <div style="text-align:right;font-size:12px;line-height:1.7">TrustTap · Meirebeekstraat 10b, 9800 Deinze<br>BTW BE 1041.196.713<br>info@trusttap.be · +32 492 17 55 52 · trusttap.be</div></div>
+      <h1>Offerte ${nr}</h1>
+      <div style="font-size:12px;color:#666">Datum: ${nlDatum(vandaagStr())} &nbsp;·&nbsp; Geldig tot: ${nlDatum(geldig)} &nbsp;·&nbsp; Opgemaakt door: ${esc(ingelogd)}</div>
+      <div class="blok"><div><b>OFFERTE VOOR</b>${esc(k.naam)}${k.contact?"<br>"+esc(k.contact):""}${k.adres?"<br>"+esc(k.adres).replace(/\n/g,"<br>"):""}${k.btw?"<br>"+esc(k.btw):""}</div></div>
+      <table><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Prijs/stuk</th><th class="r">Totaal (excl.)</th></tr>
+      ${regels.map(r=>`<tr><td>${esc(r.o)}</td><td class="r">${r.a}</td><td class="r">${eur(r.p)}</td><td class="r">${eur(r.a*r.p)}</td></tr>`).join("")}
+      </table>
+      <table style="width:290px;margin-left:auto" class="tot">
+        <tr><td>Subtotaal (excl. btw)</td><td class="r">${eur(excl)}</td></tr>
+        <tr><td>Btw 21%</td><td class="r">${eur(btw)}</td></tr>
+        <tr class="eind"><td class="eind">Totaal (incl. btw)</td><td class="r eind">${eur(incl)}</td></tr>
+      </table>
+      ${opm?`<p style="margin-top:22px"><b>Opmerking:</b> ${esc(opm)}</p>`:""}
+      <div class="voet">Eenmalige aankoop — geen abonnement. Levering volledig ingesteld met uw Google-reviewlink.<br>
+      Deze offerte is vrijblijvend en geldig tot bovenstaande datum. Na akkoord ontvangt u de factuur (via Peppol).<br>
+      TrustTap · Tap. Review. Grow.</div>
+      <script>window.print()</${"script"}>
+    </body></html>`);
+    won.document.close();
+    sluitModal();
+  });
+}
 function klantDetail(id){
   const k=DB.klanten.find(x=>x.id==id); if(!k)return;
   const kopen=DB.verkopen.filter(v=>v.klantId==id).sort((a,b)=>b.datum.localeCompare(a.datum));
@@ -849,9 +924,12 @@ function klantDetail(id){
     <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap">
       <button class="knop klein" id="d_verkoop">+ Verkoop registreren</button>
       ${k.email?`<button class="knop klein lijnk" id="d_mail">✉️ E-mail sturen</button>`:""}
+      ${isB()?`<button class="knop klein lijnk" id="d_offerte">📄 Offerte maken</button>`:""}
       <button class="knop klein lijnk" id="d_ticket">+ Ticket</button>
       <button class="knop klein lijnk" id="d_bewerk">Gegevens bewerken</button>
       <button class="knop klein roodk" id="d_weg">Verwijderen</button></div>`);
+  const doff=document.getElementById("d_offerte");
+  if(doff)doff.addEventListener("click",()=>offerteFormulier(k));
   const dm=document.getElementById("d_mail");
   if(dm)dm.addEventListener("click",()=>mailFormulier({naar:k.email,naam:k.naam,klantId:k.id}));
   document.getElementById("d_bewerk").addEventListener("click",()=>klantFormulier(k));
@@ -1489,6 +1567,9 @@ function renderBezoekRegister(){
 }
 
 let aanvrOpen=0;
+const gezSessies=new Set();
+function webMeldAan(){try{return localStorage.getItem("tt_webmeld")!=="0"}catch(e){return true}}
+function webMelding(t,b){try{if(typeof Notification!=="undefined"&&Notification&&Notification.permission==="granted")new Notification(t,{body:b||"",icon:"tt-icon.png"});}catch(e){}}
 async function aanvrTeller(){
   try{const {count}=await SB.from("site_aanvragen").select("id",{count:"exact",head:true}).eq("verwerkt",false);
     aanvrOpen=count||0;ticketBadgeUpdate();}catch(e){}
@@ -1575,6 +1656,10 @@ function renderInstellingen(){
       <button class="knop klein lijnk" id="meldKnop">🔔 Meldingen op dit toestel aanzetten</button>
       <button class="knop klein lijnk" id="meldTest">📳 Stuur test-melding</button>
     </div>
+    ${isB()?`<label style="display:flex;align-items:center;gap:.5rem;margin-top:.9rem;cursor:pointer">
+      <input type="checkbox" id="webMeldSchakel" style="width:auto" ${webMeldAan()?"checked":""}>
+      <span>\ud83c\udf10 Live meldingen van de website (nieuwe bezoekers, gekozen producten, afrekenen, contactformulier)</span></label>
+    <p class="subtxt" style="margin:.3rem 0 0">Per toestel in te stellen. Meldingen komen binnen zolang het CRM openstaat.</p>`:""}
   </div>
   ${isB()?`<div class="rij c2">
     <div class="kaart"><h3>Back-up</h3>
@@ -1596,6 +1681,8 @@ function renderInstellingen(){
       <div style="margin-top:1rem;display:flex;gap:.6rem;flex-wrap:wrap"><button class="knop klein lijnk" id="herSeed">Startgegevens (13\u201315/08) herladen</button><button class="knop klein roodk" id="wisAlles">Alles wissen</button></div>
     </div>
   </div>`:""}`;
+  const ws=document.getElementById("webMeldSchakel");
+  if(ws)ws.addEventListener("change",()=>{try{localStorage.setItem("tt_webmeld",ws.checked?"1":"0")}catch(e){}});
   const mt=document.getElementById("meldTest");
   if(mt)mt.addEventListener("click",()=>{
     if(typeof Notification==="undefined"||!Notification){alert("Dit toestel/browser ondersteunt geen meldingen.");return}
